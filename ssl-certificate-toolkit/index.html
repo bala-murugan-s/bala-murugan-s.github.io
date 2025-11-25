@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSL/TLS Certificate Toolkit | Balamurugan S</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            font-family: 'Courier New', monospace;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .tab-active {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="app"></div>
+
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        function App() {
+            const [activeTab, setActiveTab] = useState('csr-generator');
+
+            // CSR Generator Component
+            const CSRGenerator = () => {
+                const [formData, setFormData] = useState({
+                    commonName: '',
+                    organization: '',
+                    organizationalUnit: '',
+                    locality: '',
+                    state: '',
+                    country: '',
+                    email: '',
+                    keySize: '2048',
+                    san: ''
+                });
+                const [output, setOutput] = useState('');
+
+                const handleChange = (e) => {
+                    setFormData({ ...formData, [e.target.name]: e.target.value });
+                };
+
+                const generateCSR = () => {
+                    const { commonName, organization, organizationalUnit, locality, state, country, email, keySize, san } = formData;
+
+                    if (!commonName) {
+                        alert('Common Name (CN) is required');
+                        return;
+                    }
+
+                    const subjectParts = [
+                        `CN=${commonName}`,
+                        organization && `O=${organization}`,
+                        organizationalUnit && `OU=${organizationalUnit}`,
+                        locality && `L=${locality}`,
+                        state && `ST=${state}`,
+                        country && `C=${country}`,
+                        email && `emailAddress=${email}`
+                    ].filter(Boolean).join(', ');
+
+                    const sanConfig = san ? `\nsubjectAltName = DNS:${san.split(',').map(s => s.trim()).join(', DNS:')}` : '';
+
+                    const commands = `# Step 1: Generate Private Key (${keySize}-bit RSA)
+openssl genrsa -out private.key ${keySize}
+
+# Step 2: Generate CSR (Certificate Signing Request)
+openssl req -new -key private.key -out certificate.csr -subj "/${subjectParts.replace(/, /g, '/')}"${sanConfig ? '\n\n# Step 3: Create OpenSSL Config for SAN (Subject Alternative Names)\ncat > san.cnf <<EOF\n[req]\ndistinguished_name = req_distinguished_name\nreq_extensions = v3_req\n\n[req_distinguished_name]\n\n[v3_req]' + sanConfig + '\nEOF\n\n# Generate CSR with SAN\nopenssl req -new -key private.key -out certificate.csr -config san.cnf -subj "/' + subjectParts.replace(/, /g, '/') + '"' : ''}
+
+# Verify CSR
+openssl req -text -noout -verify -in certificate.csr
+
+# Display CSR content
+cat certificate.csr`;
+
+                    setOutput(commands);
+                };
+
+                return (
+                    <div className="space-y-6">
+                        <div className="bg-white rounded-lg shadow-lg p-6">
+                            <h3 className="text-2xl font-bold mb-4 text-blue-600">CSR & Private Key Generator</h3>
+                            <p className="text-gray-600 mb-6">Generate Certificate Signing Request (CSR) and Private Key for SSL/TLS certificates</p>
+
+                            <div className="grid md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-semibold mb-2">Common Name (CN) *</label>
+                                    <input
+                                        type="text"
+                                        name="commonName"
+                                        value={formData.commonName}
+                                        onChange={handleChange}
+                                        placeholder="example.com or *.example.com"
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">Domain name or wildcard (e.g., *.example.com)</p>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-semibold mb-2">Organization (O)</label>
+                                    <input
+                                        type="text"
+                                        name="organization"
+                                        value={formData.organization}
+                                        onChange={handleChange}
+                                        placeholder="Your Company Inc"
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-semibold mb-2">Organizational Unit (OU)</label>
+                                    <input
+                                        type="text"
+                                        name="organizationalUnit"
+                                        value={formData.organizationalUnit}
+                                        onChange={handleChange}
+                                        placeholder="IT Department"
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-semibold mb-2">Locality (L)</label>
+                                    <input
+                                        type="text"
+                                        name="locality"
+                                        value={formData.locality}
+                                        onChange={handleChange}
+                                        placeholder="San Francisco"
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-semibold mb-2">State/Province (ST)</label>
+                                    <input
+                                        type="text"
+                                        name="state"
+                                        value={formData.state}
+                                        onChange={handleChange}
+                                        placeholder="California"
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-semibold mb-2">Country (C)</label>
+                                    <input
+                                        type="text"
+                                        name="country"
+                                        value={formData.country}
+                                        onChange={handleChange}
+                                        placeholder="US"
+                                        maxLength="2"
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">2-letter country code</p>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-semibold mb-2">Email Address</label>
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        placeholder="admin@example.com"
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-semibold mb-2">Key Size</label>
+                                    <select
+                                        name="keySize"
+                                        value={formData.keySize}
+                                        onChange={handleChange}
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                    >
+                                        <option value="2048">2048 bits (Standard)</option>
+                                        <option value="3072">3072 bits (Enhanced)</option>
+                                        <option value="4096">4096 bits (Maximum)</option>
+                                    </select>
+                                </div>
+
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-semibold mb-2">Subject Alternative Names (SAN)</label>
+                                    <input
+                                        type="text"
+                                        name="san"
+                                        value={formData.san}
+                                        onChange={handleChange}
+                                        placeholder="www.example.com, mail.example.com, api.example.com"
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">Comma-separated additional domain names</p>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={generateCSR}
+                                className="mt-6 w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+                            >
+                                Generate CSR Commands
+                            </button>
+                        </div>
+
+                        {output && (
+                            <div className="bg-white rounded-lg shadow-lg p-6">
+                                <h4 className="text-xl font-bold mb-4">OpenSSL Commands</h4>
+                                <pre className="code-block">{output}</pre>
+                                <button
+                                    onClick={() => navigator.clipboard.writeText(output)}
+                                    className="mt-4 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition"
+                                >
+                                    📋 Copy Commands
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                );
+            };
+
+            // Self-Signed Certificate Generator
+            const SelfSignedGenerator = () => {
+                const [config, setConfig] = useState({
+                    commonName: '',
+                    days: '365',
+                    keySize: '2048'
+                });
+                const [output, setOutput] = useState('');
+
+                const generateSelfSigned = () => {
+                    if (!config.commonName) {
+                        alert('Common Name is required');
+                        return;
+                    }
+
+                    const commands = `# Generate Self-Signed Certificate (Valid for ${config.days} days)
+
+# Method 1: Generate key and certificate in one command
+openssl req -x509 -newkey rsa:${config.keySize} -keyout selfsigned.key -out selfsigned.crt -days ${config.days} -nodes -subj "/CN=${config.commonName}"
+
+# Method 2: Using existing private key
+# Step 1: Generate private key (if not exists)
+openssl genrsa -out selfsigned.key ${config.keySize}
+
+# Step 2: Generate self-signed certificate
+openssl req -x509 -key selfsigned.key -out selfsigned.crt -days ${config.days} -subj "/CN=${config.commonName}"
+
+# Verify the certificate
+openssl x509 -in selfsigned.crt -text -noout
+
+# Check certificate dates
+openssl x509 -in selfsigned.crt -noout -dates
+
+# View certificate in readable format
+openssl x509 -in selfsigned.crt -text -noout | grep -A 2 "Subject:"`;
+
+                    setOutput(commands);
+                };
+
+                return (
+                    <div className="space-y-6">
+                        <div className="bg-white rounded-lg shadow-lg p-6">
+                            <h3 className="text-2xl font-bold mb-4 text-green-600">Self-Signed Certificate Generator</h3>
+                            <p className="text-gray-600 mb-6">Create self-signed SSL certificates for testing and development</p>
+
+                            <div className="grid md:grid-cols-3 gap-4">
+                                <div>
+                                    <label className="block text-sm font-semibold mb-2">Common Name (CN) *</label>
+                                    <input
+                                        type="text"
+                                        value={config.commonName}
+                                        onChange={(e) => setConfig({...config, commonName: e.target.value})}
+                                        placeholder="localhost or example.com"
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-semibold mb-2">Validity (Days)</label>
+                                    <input
+                                        type="number"
+                                        value={config.days}
+                                        onChange={(e) => setConfig({...config, days: e.target.value})}
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-semibold mb-2">Key Size</label>
+                                    <select
+                                        value={config.keySize}
+                                        onChange={(e) => setConfig({...config, keySize: e.target.value})}
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none"
+                                    >
+                                        <option value="2048">2048 bits</option>
+                                        <option value="4096">4096 bits</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <button
+                                onClick={generateSelfSigned}
+                                className="mt-6 w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition"
+                            >
+                                Generate Self-Signed Certificate
+                            </button>
+                        </div>
+
+                        {output && (
+                            <div className="bg-white rounded-lg shadow-lg p-6">
+                                <h4 className="text-xl font-bold mb-4">OpenSSL Commands</h4>
+                                <pre className="code-block">{output}</pre>
+                                <button
+                                    onClick={() => navigator.clipboard.writeText(output)}
+                                    className="mt-4 bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition"
+                                >
+                                    📋 Copy Commands
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                );
+            };
+
+            // Certificate Converter
+            const CertificateConverter = () => {
+                const conversions = [
+                    {
+                        title: 'PEM to DER',
+                        description: 'Convert PEM format to DER (binary) format',
+                        commands: `# Certificate: PEM to DER
+openssl x509 -in certificate.pem -outform DER -out certificate.der
+
+# Private Key: PEM to DER
+openssl rsa -in private.key -outform DER -out private.der`
+                    },
+                    {
+                        title: 'DER to PEM',
+                        description: 'Convert DER format to PEM (text) format',
+                        commands: `# Certificate: DER to PEM
+openssl x509 -in certificate.der -inform DER -out certificate.pem
+
+# Private Key: DER to PEM
+openssl rsa -in private.der -inform DER -out private.pem`
+                    },
+                    {
+                        title: 'PEM to PFX/P12',
+                        description: 'Create PKCS#12 bundle from PEM files',
+                        commands: `# Create PFX bundle (includes certificate + private key + chain)
+openssl pkcs12 -export -out certificate.pfx -inkey private.key -in certificate.crt -certfile ca-bundle.crt
+
+# Without chain certificate
+openssl pkcs12 -export -out certificate.pfx -inkey private.key -in certificate.crt
+
+# With friendly name
+openssl pkcs12 -export -out certificate.pfx -inkey private.key -in certificate.crt -name "My Certificate"`
+                    },
+                    {
+                        title: 'PFX/P12 to PEM',
+                        description: 'Extract certificates and keys from PKCS#12 bundle',
+                        commands: `# Extract everything to PEM
+openssl pkcs12 -in certificate.pfx -out certificate.pem -nodes
+
+# Extract only certificate
+openssl pkcs12 -in certificate.pfx -clcerts -nokeys -out certificate.crt
+
+# Extract only private key
+openssl pkcs12 -in certificate.pfx -nocerts -nodes -out private.key
+
+# Extract CA certificates (chain)
+openssl pkcs12 -in certificate.pfx -cacerts -nokeys -out ca-bundle.crt
+
+# With password encryption for private key
+openssl pkcs12 -in certificate.pfx -nocerts -out private.key`
+                    },
+                    {
+                        title: 'P7B to PEM',
+                        description: 'Convert PKCS#7 format to PEM',
+                        commands: `# Convert P7B to PEM (certificate bundle)
+openssl pkcs7 -print_certs -in certificate.p7b -out certificate.pem
+
+# Convert P7B to CRT
+openssl pkcs7 -print_certs -in certificate.p7b -out certificate.crt`
+                    },
+                    {
+                        title: 'PEM to P7B',
+                        description: 'Convert PEM to PKCS#7 format',
+                        commands: `# Create P7B bundle
+openssl crl2pkcs7 -nocrl -certfile certificate.crt -certfile ca-bundle.crt -out certificate.p7b`
+                    }
+                ];
+
+                return (
+                    <div className="space-y-6">
+                        <div className="bg-white rounded-lg shadow-lg p-6">
+                            <h3 className="text-2xl font-bold mb-4 text-purple-600">Certificate Format Converter</h3>
+                            <p className="text-gray-600 mb-6">Convert between different SSL certificate formats</p>
+                        </div>
+
+                        {conversions.map((conv, idx) => (
+                            <div key={idx} className="bg-white rounded-lg shadow-lg p-6">
+                                <h4 className="text-xl font-bold mb-2 text-blue-600">{conv.title}</h4>
+                                <p className="text-gray-600 mb-4">{conv.description}</p>
+                                <pre className="code-block">{conv.commands}</pre>
+                                <button
+                                    onClick={() => navigator.clipboard.writeText(conv.commands)}
+                                    className="mt-4 bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700 transition"
+                                >
+                                    📋 Copy Commands
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                );
+            };
+
+            // Certificate Verification
+            const CertificateVerification = () => {
+                const verificationCommands = [
+                    {
+                        title: 'Verify Certificate Details',
+                        commands: `# View certificate content
+openssl x509 -in certificate.crt -text -noout
+
+# Check certificate dates (issued, expiry)
+openssl x509 -in certificate.crt -noout -dates
+
+# Check certificate subject and issuer
+openssl x509 -in certificate.crt -noout -subject -issuer
+
+# Check certificate fingerprint (SHA256)
+openssl x509 -in certificate.crt -noout -fingerprint -sha256
+
+# Check certificate serial number
+openssl x509 -in certificate.crt -noout -serial`
+                    },
+                    {
+                        title: 'Verify Certificate and Key Match',
+                        commands: `# Get certificate modulus
+openssl x509 -noout -modulus -in certificate.crt | openssl md5
+
+# Get private key modulus
+openssl rsa -noout -modulus -in private.key | openssl md5
+
+# If both MD5 hashes match, the certificate and key are paired correctly
+
+# Alternative: Compare directly
+diff <(openssl x509 -noout -modulus -in certificate.crt) <(openssl rsa -noout -modulus -in private.key)`
+                    },
+                    {
+                        title: 'Verify CSR',
+                        commands: `# View CSR content
+openssl req -text -noout -verify -in certificate.csr
+
+# Check CSR signature
+openssl req -in certificate.csr -noout -verify
+
+# Get CSR subject
+openssl req -in certificate.csr -noout -subject
+
+# Check CSR modulus (compare with key)
+openssl req -noout -modulus -in certificate.csr | openssl md5`
+                    },
+                    {
+                        title: 'Verify Certificate Chain',
+                        commands: `# Verify certificate against CA bundle
+openssl verify -CAfile ca-bundle.crt certificate.crt
+
+# Verify with intermediate certificates
+openssl verify -CAfile root-ca.crt -untrusted intermediate-ca.crt certificate.crt
+
+# Check certificate chain order
+openssl crl2pkcs7 -nocrl -certfile certificate-bundle.crt | openssl pkcs7 -print_certs -noout`
+                    },
+                    {
+                        title: 'Test SSL/TLS Connection',
+                        commands: `# Test HTTPS connection
+openssl s_client -connect example.com:443 -servername example.com
+
+# Show certificate chain
+openssl s_client -connect example.com:443 -showcerts
+
+# Test specific TLS version
+openssl s_client -connect example.com:443 -tls1_2
+
+# Check certificate expiry for remote server
+echo | openssl s_client -connect example.com:443 -servername example.com 2>/dev/null | openssl x509 -noout -dates
+
+# Test with specific cipher
+openssl s_client -connect example.com:443 -cipher 'ECDHE-RSA-AES256-GCM-SHA384'`
+                    },
+                    {
+                        title: 'Verify Certificate Revocation',
+                        commands: `# Check OCSP status
+openssl ocsp -issuer ca.crt -cert certificate.crt -url http://ocsp.example.com -CAfile ca-bundle.crt
+
+# Download and check CRL
+curl -o crl.pem http://crl.example.com/crl.pem
+openssl crl -in crl.pem -noout -text`
+                    }
+                ];
+
+                return (
+                    <div className="space-y-6">
+                        <div className="bg-white rounded-lg shadow-lg p-6">
+                            <h3 className="text-2xl font-bold mb-4 text-red-600">Certificate Verification & Testing</h3>
+                            <p className="text-gray-600 mb-6">Verify certificates, keys, and test SSL/TLS connections</p>
+                        </div>
+
+                        {verificationCommands.map((cmd, idx) => (
+                            <div key={idx} className="bg-white rounded-lg shadow-lg p-6">
+                                <h4 className="text-xl font-bold mb-4 text-blue-600">{cmd.title}</h4>
+                                <pre className="code-block">{cmd.commands}</pre>
+                                <button
+                                    onClick={() => navigator.clipboard.writeText(cmd.commands)}
+                                    className="mt-4 bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition"
+                                >
+                                    📋 Copy Commands
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                );
+            };
+
+            // Quick Reference
+            const QuickReference = () => {
+                const references = [
+                    {
+                        category: 'Common File Extensions',
+                        items: [
+                            { ext: '.crt, .cer', desc: 'Certificate file (PEM or DER format)' },
+                            { ext: '.key', desc: 'Private key file' },
+                            { ext: '.csr', desc: 'Certificate Signing Request' },
+                            { ext: '.pem', desc: 'Privacy Enhanced Mail (Base64 encoded)' },
+                            { ext: '.der', desc: 'Distinguished Encoding Rules (Binary format)' },
+                            { ext: '.pfx, .p12', desc: 'PKCS#12 bundle (certificate + private key)' },
+                            { ext: '.p7b, .p7c', desc: 'PKCS#7 certificate bundle' },
+                            { ext: '.jks', desc: 'Java KeyStore' }
+                        ]
+                    },
+                    {
+                        category: 'Key Sizes & Security',
+                        items: [
+                            { ext: '1024-bit', desc: 'Deprecated - Not secure' },
+                            { ext: '2048-bit', desc: 'Standard - Minimum recommended' },
+                            { ext: '3072-bit', desc: 'Enhanced security' },
+                            { ext: '4096-bit', desc: 'Maximum security (slower performance)' }
+                        ]
+                    },
+                    {
+                        category: 'Certificate Types',
+                        items: [
+                            { ext: 'DV', desc: 'Domain Validated - Basic, automated validation' },
+                            { ext: 'OV', desc: 'Organization Validated - Manual business verification' },
+                            { ext: 'EV', desc: 'Extended Validation - Highest validation, green bar' },
+                            { ext: 'Wildcard', desc: 'Covers *.domain.com subdomains' },
+                            { ext: 'SAN/UCC', desc: 'Multiple domains in one certificate' }
+                        ]
+                    },
+                    {
+                        category: 'Common OpenSSL Commands',
+                        items: [
+                            { ext: 'genrsa', desc: 'Generate RSA private key' },
+                            { ext: 'req', desc: 'Create CSR or self-signed certificate' },
+                            { ext: 'x509', desc: 'Display and manipulate X.509 certificates' },
+                            { ext: 'pkcs12', desc: 'Work with PKCS#12 bundles' },
+                            { ext: 'rsa', desc: 'Manage RSA keys' },
+                            { ext: 's_client', desc: 'SSL/TLS client for testing connections' },
+                            { ext: 'verify', desc: 'Verify certificate chains' }
+                        ]
+                    }
+                ];
+
+                return (
+                    <div className="space-y-6">
+                        <div className="bg-white rounded-lg shadow-lg p-6">
+                            <h3 className="text-2xl font-bold mb-4 text-indigo-600">SSL/TLS Quick Reference</h3>
+                            <p className="text-gray-600 mb-6">Essential information about SSL certificates and formats</p>
+                        </div>
+
+                        {references.map((ref, idx) => (
+                            <div key={idx} className="bg-white rounded-lg shadow-lg p-6">
+                                <h4 className="text-xl font-bold mb-4 text-blue-600">{ref.category}</h4>
+                                <div className="space-y-3">
+                                    {ref.items.map((item, i) => (
+                                        <div key={i} className="flex items-start gap-4 p-3 bg-gray-50 rounded-lg">
+                                            <span className="font-mono font-bold text-indigo-600 min-w-[120px]">{item.ext}</span>
+                                            <span className="text-gray-700">{item.desc}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+
+                        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg p-8">
+                            <h4 className="text-2xl font-bold mb-4">💡 Pro Tips</h4>
+                            <ul className="space-y-3">
+                                <li className="flex items-start gap-3">
+                                    <span className="text-2xl">🔐</span>
+                                    <span>Always keep private keys secure and never share them publicly</span>
+                                </li>
+                                <li className="flex items-start gap-3">
+                                    <span className="text-2xl">⏰</span>
+                                    <span>Monitor certificate expiration dates - set reminders 30 days before expiry</span>
+                                </li>
+                                <li className="flex items-start gap-3">
+                                    <span className="text-2xl">🔄</span>
+                                    <span>Use 2048-bit minimum key size for production certificates</span>
+                                </li>
+                                <li className="flex items-start gap-3">
+                                    <span className="text-2xl">🌐</span>
+                                    <span>Include all necessary intermediate certificates in the chain</span>
+                                </li>
+                                <li className="flex items-start gap-3">
+                                    <span className="text-2xl">✅</span>
+                                    <span>Always verify certificate-key pair matching before deployment</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                );
+            };
