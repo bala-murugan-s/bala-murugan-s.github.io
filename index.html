@@ -3,257 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Balamurugan S - Cloud & Network Security Specialist</title>
-    <meta name="description" content="Cloud & Network Security Consultant with 14+ years experience in SASE, SD-WAN, DevSecOps">
+    <title>Security Tools - Balamurugan S</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
-        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        .gradient-bg-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-        .gradient-bg-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-        .card-hover { 
+        .tool-card {
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .card-hover:hover { 
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.2);
-        }
-        .animate-float {
-            animation: float 6s ease-in-out infinite;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-        .tech-badge {
-            transition: all 0.3s ease;
-        }
-        .tech-badge:hover {
-            transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        .tool-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
         }
     </style>
 </head>
 <body class="bg-gray-50">
-    <!-- Navigation -->
-    <nav class="bg-white shadow-lg sticky top-0 z-50">
-        <div class="container mx-auto px-4">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center gap-3">
-                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-red-600 to-pink-600 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-8">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h1 class="text-4xl font-bold mb-2">Security Tools</h1>
+                    <p class="text-lg opacity-90">Essential cybersecurity utilities and references</p>
+                </div>
+                <a href="/" class="bg-white text-red-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+                    ← Back to Home
+                </a>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div class="bg-white/10 backdrop-blur rounded-lg p-4">
+                    <p class="text-2xl font-bold">10+</p>
+                    <p class="text-sm opacity-90">Security Tools</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur rounded-lg p-4">
+                    <p class="text-2xl font-bold">OWASP</p>
+                    <p class="text-sm opacity-90">Compliant</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur rounded-lg p-4">
+                    <p class="text-2xl font-bold">Real-time</p>
+                    <p class="text-sm opacity-90">Analysis</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur rounded-lg p-4">
+                    <p class="text-2xl font-bold">Free</p>
+                    <p class="text-sm opacity-90">Open Source</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Tools Grid -->
+    <main class="container mx-auto px-4 py-12">
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            <!-- Password Analyzer -->
+            <a href="password-analyzer/" class="tool-card block bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-br from-purple-500 to-purple-600 p-6 text-white">
+                    <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    </svg>
+                    <h3 class="text-2xl font-bold mb-2">Password Analyzer</h3>
+                    <p class="text-purple-100">Real-time password strength analysis</p>
+                </div>
+                <div class="p-6">
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">Strength Meter</span>
+                        <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">Best Practices</span>
+                        <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">Real-time</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Analyze password strength with real-time feedback on complexity, length, and security.</p>
+                </div>
+                <div class="px-6 pb-6">
+                    <span class="inline-flex items-center text-purple-600 font-semibold">
+                        Launch Tool
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- Hash Generator -->
+            <a href="hash-generator/" class="tool-card block bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-6 text-white">
+                    <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                    </svg>
+                    <h3 class="text-2xl font-bold mb-2">Hash Generator</h3>
+                    <p class="text-blue-100">Generate cryptographic hashes</p>
+                </div>
+                <div class="p-6">
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">SHA-256</span>
+                        <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">SHA-1</span>
+                        <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">MD5</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Generate SHA-256, SHA-1, and other cryptographic hashes for text and files.</p>
+                </div>
+                <div class="px-6 pb-6">
+                    <span class="inline-flex items-center text-blue-600 font-semibold">
+                        Launch Tool
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                    </span>
+                </div>
+            </a>
+
+            <!-- OWASP Top 10 -->
+            <a href="owasp-reference/" class="tool-card block bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-br from-red-500 to-red-600 p-6 text-white">
+                    <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                     </svg>
-                    <div>
-                        <h1 class="text-xl font-bold text-gray-800">Balamurugan S</h1>
-                        <p class="text-xs text-gray-500">Security Architect</p>
+                    <h3 class="text-2xl font-bold mb-2">OWASP Top 10</h3>
+                    <p class="text-red-100">Web application security risks</p>
+                </div>
+                <div class="p-6">
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold">OWASP 2021</span>
+                        <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold">Vulnerabilities</span>
+                        <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold">Reference</span>
                     </div>
+                    <p class="text-gray-600 text-sm">Comprehensive guide to OWASP Top 10 security risks with explanations and mitigations.</p>
                 </div>
-                <div class="hidden md:flex gap-6">
-                    <a href="#about" class="text-gray-600 hover:text-blue-600 font-medium transition">About</a>
-                    <a href="#tools" class="text-gray-600 hover:text-blue-600 font-medium transition">Tools</a>
-                    <a href="#projects" class="text-gray-600 hover:text-blue-600 font-medium transition">Projects</a>
-                    <a href="#contact" class="text-gray-600 hover:text-blue-600 font-medium transition">Contact</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section class="gradient-bg text-white py-20">
-        <div class="container mx-auto px-4">
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div class="animate-float">
-                    <h1 class="text-5xl md:text-6xl font-bold mb-4">Cloud & Network Security Specialist</h1>
-                    <p class="text-xl md:text-2xl mb-6 opacity-90">Architecting secure, scalable infrastructures with 14+ years of global experience</p>
-                    <div class="flex flex-wrap gap-4">
-                        <a href="#tools" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition shadow-lg">
-                            Explore Tools
-                        </a>
-                        <a href="https://github.com/bala-murugan-s" target="_blank" class="bg-blue-800 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-900 transition">
-                            View GitHub
-                        </a>
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-white/10 backdrop-blur rounded-xl p-6 text-center">
-                        <p class="text-4xl font-bold mb-2">14+</p>
-                        <p class="opacity-90">Years Experience</p>
-                    </div>
-                    <div class="bg-white/10 backdrop-blur rounded-xl p-6 text-center">
-                        <p class="text-4xl font-bold mb-2">70+</p>
-                        <p class="opacity-90">Sites Deployed</p>
-                    </div>
-                    <div class="bg-white/10 backdrop-blur rounded-xl p-6 text-center">
-                        <p class="text-4xl font-bold mb-2">60%</p>
-                        <p class="opacity-90">Cost Reduction</p>
-                    </div>
-                    <div class="bg-white/10 backdrop-blur rounded-xl p-6 text-center">
-                        <p class="text-4xl font-bold mb-2">6+</p>
-                        <p class="opacity-90">Certifications</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- About Section -->
-    <section id="about" class="py-20 bg-white">
-        <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-12">Expertise Overview</h2>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="text-center p-8 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 card-hover">
-                    <svg class="w-16 h-16 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
-                    </svg>
-                    <h3 class="text-2xl font-bold mb-3">SASE & Zero Trust</h3>
-                    <p class="text-gray-700">Architected enterprise SASE solutions with Prisma Access & Zscaler, reducing gateway reliance by 60%</p>
-                </div>
-                <div class="text-center p-8 rounded-xl bg-gradient-to-br from-green-50 to-green-100 card-hover">
-                    <svg class="w-16 h-16 text-green-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
-                    </svg>
-                    <h3 class="text-2xl font-bold mb-3">SD-WAN Excellence</h3>
-                    <p class="text-gray-700">Deployed Cisco Viptela & Meraki SD-WAN across 70+ sites, cutting MPLS costs by 50%</p>
-                </div>
-                <div class="text-center p-8 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 card-hover">
-                    <svg class="w-16 h-16 text-purple-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-                    </svg>
-                    <h3 class="text-2xl font-bold mb-3">DevSecOps & IaC</h3>
-                    <p class="text-gray-700">Automated security provisioning with Terraform, Ansible & Python, reducing manual effort by 40%</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Tools Section -->
-    <section id="tools" class="py-20 bg-gray-50">
-        <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-4">Interactive Tools & Resources</h2>
-            <p class="text-center text-gray-600 mb-12 text-lg">Practical tools built for security and network professionals</p>
-            
-            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                <!-- Security Tools -->
-                <a href="/security-tools/" class="block">
-                    <div class="bg-gradient-to-br from-red-500 to-pink-600 text-white rounded-2xl p-8 card-hover shadow-xl">
-                        <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                <div class="px-6 pb-6">
+                    <span class="inline-flex items-center text-red-600 font-semibold">
+                        Launch Tool
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                         </svg>
-                        <h3 class="text-3xl font-bold mb-3">Security Tools</h3>
-                        <p class="text-lg mb-4 opacity-90">Password analyzer, hash generator, OWASP Top 10 reference, and security best practices</p>
-                        <div class="flex items-center gap-2 text-lg font-semibold">
-                            <span>Explore Security Tools</span>
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                            </svg>
-                        </div>
-                    </div>
-                </a>
+                    </span>
+                </div>
+            </a>
 
-                <!-- Network Tools -->
-                <a href="/network-tools/" class="block">
-                    <div class="bg-gradient-to-br from-blue-500 to-cyan-600 text-white rounded-2xl p-8 card-hover shadow-xl">
-                        <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+            <!-- Security Best Practices -->
+            <a href="security-practices/" class="tool-card block bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-br from-green-500 to-green-600 p-6 text-white">
+                    <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3 class="text-2xl font-bold mb-2">Best Practices</h3>
+                    <p class="text-green-100">Security implementation guidelines</p>
+                </div>
+                <div class="p-6">
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">Guidelines</span>
+                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">Frameworks</span>
+                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">Standards</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Industry-standard security best practices for authentication, encryption, and access control.</p>
+                </div>
+                <div class="px-6 pb-6">
+                    <span class="inline-flex items-center text-green-600 font-semibold">
+                        Launch Tool
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                         </svg>
-                        <h3 class="text-3xl font-bold mb-3">Network Tools</h3>
-                        <p class="text-lg mb-4 opacity-90">Subnet calculator, CIDR calculator, port reference, and network planning utilities</p>
-                        <div class="flex items-center gap-2 text-lg font-semibold">
-                            <span>Explore Network Tools</span>
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                            </svg>
-                        </div>
+                    </span>
+                </div>
+            </a>
+
+            <!-- Base64 Encoder/Decoder -->
+            <a href="base64-tool/" class="tool-card block bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 p-6 text-white">
+                    <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    </svg>
+                    <h3 class="text-2xl font-bold mb-2">Base64 Tool</h3>
+                    <p class="text-indigo-100">Encode and decode Base64</p>
+                </div>
+                <div class="p-6">
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold">Encoder</span>
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold">Decoder</span>
                     </div>
-                </a>
-            </div>
-        </div>
-    </section>
+                    <p class="text-gray-600 text-sm">Encode and decode text using Base64 encoding.</p>
+                </div>
+                <div class="px-6 pb-6">
+                    <span class="inline-flex items-center text-indigo-600 font-semibold">
+                        Coming Soon
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </span>
+                </div>
+            </a>
 
-    <!-- Projects Section -->
-    <section id="projects" class="py-20 bg-white">
-        <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-12">Key Projects & Achievements</h2>
-            <div class="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-                <div class="border-l-4 border-blue-600 bg-blue-50 p-6 rounded-r-xl">
-                    <h3 class="text-xl font-bold mb-2">Zero Trust & SASE Automation</h3>
-                    <p class="text-gray-700 mb-3">Migrated enterprise to Prisma Access using Terraform + Ansible automation</p>
-                    <p class="text-blue-600 font-bold">Result: 60% reduction in gateway reliance</p>
+            <!-- JWT Decoder -->
+            <a href="jwt-decoder/" class="tool-card block bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 p-6 text-white">
+                    <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    </svg>
+                    <h3 class="text-2xl font-bold mb-2">JWT Decoder</h3>
+                    <p class="text-yellow-100">Decode JSON Web Tokens</p>
                 </div>
-                <div class="border-l-4 border-green-600 bg-green-50 p-6 rounded-r-xl">
-                    <h3 class="text-xl font-bold mb-2">Enterprise SD-WAN Deployment</h3>
-                    <p class="text-gray-700 mb-3">Global Cisco Viptela & Meraki SD-WAN rollout across 70+ sites</p>
-                    <p class="text-green-600 font-bold">Result: 50% MPLS cost savings</p>
+                <div class="p-6">
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-semibold">JWT</span>
+                        <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-semibold">Decoder</span>
+                        <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-semibold">Validator</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Decode and validate JSON Web Tokens with header and payload inspection.</p>
                 </div>
-                <div class="border-l-4 border-purple-600 bg-purple-50 p-6 rounded-r-xl">
-                    <h3 class="text-xl font-bold mb-2">Multi-Cloud Security Architecture</h3>
-                    <p class="text-gray-700 mb-3">Built secure AWS/Azure landing zones with Aviatrix & Prisma Cloud</p>
-                    <p class="text-purple-600 font-bold">Result: 70% faster provisioning time</p>
+                <div class="px-6 pb-6">
+                    <span class="inline-flex items-center text-yellow-600 font-semibold">
+                        Coming Soon
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </span>
                 </div>
-                <div class="border-l-4 border-orange-600 bg-orange-50 p-6 rounded-r-xl">
-                    <h3 class="text-xl font-bold mb-2">SOC Automation & Response</h3>
-                    <p class="text-gray-700 mb-3">Automated incident response with Splunk ES & Cortex XSOAR</p>
-                    <p class="text-orange-600 font-bold">Result: 40% reduction in manual triage</p>
-                </div>
-            </div>
-        </div>
-    </section>
+            </a>
 
-    <!-- Skills Section -->
-    <section class="py-20 bg-gray-50">
-        <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-12">Technical Competencies</h2>
-            <div class="max-w-5xl mx-auto">
-                <div class="flex flex-wrap justify-center gap-3">
-                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Palo Alto Networks</span>
-                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Zscaler ZIA/ZPA</span>
-                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Cisco Viptela</span>
-                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Aviatrix</span>
-                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Prisma Cloud</span>
-                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">AWS Security</span>
-                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Azure Security</span>
-                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Terraform</span>
-                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Ansible</span>
-                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Python</span>
-                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">SD-WAN</span>
-                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Zero Trust</span>
-                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">SASE</span>
-                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Kubernetes</span>
-                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">F5 WAF</span>
-                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Splunk ES</span>
-                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Microsoft Sentinel</span>
-                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Cortex XSOAR</span>
+            <!-- SSL Certificate Checker -->
+            <a href="ssl-checker/" class="tool-card block bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-br from-teal-500 to-teal-600 p-6 text-white">
+                    <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    <h3 class="text-2xl font-bold mb-2">SSL Checker</h3>
+                    <p class="text-teal-100">Verify SSL/TLS certificates</p>
                 </div>
-            </div>
-        </div>
-    </section>
+                <div class="p-6">
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-xs font-semibold">SSL/TLS</span>
+                        <span class="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-xs font-semibold">Certificate</span>
+                        <span class="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-xs font-semibold">Validator</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Check SSL/TLS certificate validity, expiration, and security configuration.</p>
+                </div>
+                <div class="px-6 pb-6">
+                    <span class="inline-flex items-center text-teal-600 font-semibold">
+                        Coming Soon
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </span>
+                </div>
+            </a>
 
-    <!-- Contact Section -->
-    <section id="contact" class="py-20 gradient-bg text-white">
-        <div class="container mx-auto px-4 text-center">
-            <h2 class="text-4xl font-bold mb-6">Let's Connect</h2>
-            <p class="text-xl mb-8 opacity-90">Interested in collaborating or learning more about my work?</p>
-            <div class="flex flex-wrap justify-center gap-4">
-                <a href="https://www.linkedin.com/in/bala-murugan-s" target="_blank" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition shadow-lg">
-                    LinkedIn Profile
+            <!-- MITRE ATT&CK -->
+            <a href="mitre-attack/" class="tool-card block bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-br from-gray-700 to-gray-800 p-6 text-white">
+                    <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <h3 class="text-2xl font-bold mb-2">MITRE ATT&CK</h3>
+                    <p class="text-gray-300">Adversary tactics reference</p>
+                </div>
+                <div class="p-6">
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">Tactics</span>
+                        <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">Techniques</span>
+                        <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">Reference</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Quick reference guide for MITRE ATT&CK framework tactics and techniques.</p>
+                </div>
+                <div class="px-6 pb-6">
+                    <span class="inline-flex items-center text-gray-600 font-semibold">
+                        Coming Soon
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </span>
+                </div>
+            </a>
+
+        </div>
+
+        <!-- Add New Tool Info -->
+        <div class="mt-16 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl p-8 text-center">
+            <h2 class="text-2xl font-bold mb-4">More Security Tools Coming Soon!</h2>
+            <p class="text-lg mb-6">I'm constantly adding new security tools and utilities. Check back regularly for updates.</p>
+            <div class="flex justify-center gap-4">
+                <a href="https://github.com/bala-murugan-s" target="_blank" class="bg-white text-red-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+                    View on GitHub
                 </a>
-                <a href="https://github.com/bala-murugan-s" target="_blank" class="bg-gray-800 text-white px-8 py-3 rounded-lg font-bold hover:bg-gray-900 transition">
-                    GitHub Repositories
-                </a>
-                <a href="mailto:s-balamurugan@zohomail.in" class="bg-blue-800 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-900 transition">
-                    Email Me
+                <a href="mailto:s-balamurugan@zohomail.in" class="bg-red-800 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-900 transition">
+                    Suggest a Tool
                 </a>
             </div>
         </div>
-    </section>
+    </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-8">
+    <footer class="bg-gray-800 text-white py-8 mt-16">
         <div class="container mx-auto px-4 text-center">
-            <p class="mb-2">© 2025 Balamurugan Sivaraman</p>
-            <p class="text-gray-400 text-sm">Cloud & Network Security Specialist | 14+ Years Global Experience</p>
-            <p class="text-gray-500 text-xs mt-4">SASE | SD-WAN | DevSecOps | Zero Trust Architecture</p>
+            <p class="mb-2">© 2025 Balamurugan Sivaraman - Security Tools</p>
+            <p class="text-gray-400 text-sm">Cloud & Network Security Specialist | 14+ Years Experience</p>
         </div>
     </footer>
 </body>
