@@ -3,468 +3,294 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SSL Certificate Toolkit Test</title>
+    <title>Security Tools - Balamurugan S</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .tool-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        body {
-            font-family: Arial, sans-serif;
-            background: #f5f5f5;
-            padding: 20px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-        }
-        h1 {
-            font-size: 2em;
-            margin-bottom: 10px;
-        }
-        .back-btn {
-            display: inline-block;
-            background: white;
-            color: #667eea;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        .back-btn:hover {
-            background: #f0f0f0;
-        }
-        .tabs {
-            display: flex;
-            gap: 10px;
-            background: white;
-            padding: 10px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        .tab {
-            padding: 10px 20px;
-            background: #e0e0e0;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .tab.active {
-            background: #667eea;
-            color: white;
-        }
-        .tab:hover {
-            background: #d0d0d0;
-        }
-        .tab.active:hover {
-            background: #5568d3;
-        }
-        .content {
-            display: none;
-        }
-        .content.active {
-            display: block;
-        }
-        .card {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        input, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        .btn {
-            background: #667eea;
-            color: white;
-            padding: 12px 30px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-        }
-        .btn:hover {
-            background: #5568d3;
-        }
-        .btn-copy {
-            background: #22c55e;
-            margin-top: 15px;
-            width: auto;
-        }
-        .btn-copy:hover {
-            background: #16a34a;
-        }
-        .code-block {
-            background: #1e293b;
-            color: #e2e8f0;
-            padding: 20px;
-            border-radius: 5px;
-            overflow-x: auto;
-            font-family: 'Courier New', monospace;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-        }
-        .hidden {
-            display: none;
-        }
-        footer {
-            background: #333;
-            color: white;
-            text-align: center;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 40px;
-        }
-        footer a {
-            color: #667eea;
-            text-decoration: none;
-        }
-        footer a:hover {
-            text-decoration: underline;
+        .tool-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>🔐 SSL/TLS Certificate Toolkit</h1>
-            <p>Complete SSL certificate management and operations</p>
-            <a href="../" class="back-btn">← Back to Security Tools</a>
-        </header>
-
-        <div class="tabs">
-            <button class="tab active" onclick="showTab('csr')">🔑 CSR Generator</button>
-            <button class="tab" onclick="showTab('selfsigned')">📝 Self-Signed</button>
-            <button class="tab" onclick="showTab('converter')">🔄 Converter</button>
-            <button class="tab" onclick="showTab('verify')">✅ Verification</button>
-            <button class="tab" onclick="showTab('reference')">📚 Reference</button>
-        </div>
-
-        <!-- CSR Generator -->
-        <div id="csr" class="content active">
-            <div class="card">
-                <h2>CSR & Private Key Generator</h2>
-                <p style="color: #666; margin-bottom: 20px;">Generate Certificate Signing Request (CSR) and Private Key</p>
-                
-                <div class="grid">
-                    <div class="form-group">
-                        <label>Common Name (CN) *</label>
-                        <input type="text" id="cn" placeholder="example.com">
-                    </div>
-                    <div class="form-group">
-                        <label>Organization</label>
-                        <input type="text" id="org" placeholder="Your Company">
-                    </div>
-                    <div class="form-group">
-                        <label>Key Size</label>
-                        <select id="keysize">
-                            <option value="2048">2048 bits</option>
-                            <option value="4096">4096 bits</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Country Code</label>
-                        <input type="text" id="country" placeholder="US" maxlength="2">
-                    </div>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-red-600 to-pink-600 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-8">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h1 class="text-4xl font-bold mb-2">Security Tools</h1>
+                    <p class="text-lg opacity-90">Essential cybersecurity utilities and references</p>
                 </div>
-
-                <button class="btn" onclick="generateCSR()">Generate Commands</button>
+                <a href="/" class="bg-white text-red-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+                    ← Back to Home
+                </a>
             </div>
-
-            <div id="csr-output" class="card hidden">
-                <h3>OpenSSL Commands</h3>
-                <pre id="csr-code" class="code-block"></pre>
-                <button class="btn btn-copy" onclick="copyCode('csr-code')">📋 Copy Commands</button>
-            </div>
-        </div>
-
-        <!-- Self-Signed -->
-        <div id="selfsigned" class="content">
-            <div class="card">
-                <h2>Self-Signed Certificate Generator</h2>
-                <p style="color: #666; margin-bottom: 20px;">Create self-signed SSL certificates for testing</p>
-                
-                <div class="grid">
-                    <div class="form-group">
-                        <label>Common Name (CN) *</label>
-                        <input type="text" id="ss-cn" placeholder="localhost">
-                    </div>
-                    <div class="form-group">
-                        <label>Days Valid</label>
-                        <input type="number" id="ss-days" value="365">
-                    </div>
-                    <div class="form-group">
-                        <label>Key Size</label>
-                        <select id="ss-keysize">
-                            <option value="2048">2048 bits</option>
-                            <option value="4096">4096 bits</option>
-                        </select>
-                    </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div class="bg-white/10 backdrop-blur rounded-lg p-4">
+                    <p class="text-2xl font-bold">10+</p>
+                    <p class="text-sm opacity-90">Security Tools</p>
                 </div>
-
-                <button class="btn" onclick="generateSelfSigned()">Generate Commands</button>
-            </div>
-
-            <div id="ss-output" class="card hidden">
-                <h3>OpenSSL Commands</h3>
-                <pre id="ss-code" class="code-block"></pre>
-                <button class="btn btn-copy" onclick="copyCode('ss-code')">📋 Copy Commands</button>
-            </div>
-        </div>
-
-        <!-- Converter -->
-        <div id="converter" class="content">
-            <div class="card">
-                <h2>Certificate Format Converter</h2>
-                <p style="color: #666; margin-bottom: 20px;">Convert between different SSL certificate formats</p>
-            </div>
-
-            <div class="card">
-                <h3>PEM to DER</h3>
-                <pre class="code-block">openssl x509 -in cert.pem -outform DER -out cert.der
-openssl rsa -in key.pem -outform DER -out key.der</pre>
-                <button class="btn btn-copy" onclick="copyPrevCode(this)">📋 Copy</button>
-            </div>
-
-            <div class="card">
-                <h3>PEM to PFX/P12</h3>
-                <pre class="code-block">openssl pkcs12 -export -out cert.pfx -inkey private.key -in cert.crt -certfile ca-bundle.crt</pre>
-                <button class="btn btn-copy" onclick="copyPrevCode(this)">📋 Copy</button>
-            </div>
-
-            <div class="card">
-                <h3>PFX/P12 to PEM</h3>
-                <pre class="code-block">openssl pkcs12 -in cert.pfx -out cert.pem -nodes
-openssl pkcs12 -in cert.pfx -clcerts -nokeys -out cert.crt
-openssl pkcs12 -in cert.pfx -nocerts -nodes -out private.key</pre>
-                <button class="btn btn-copy" onclick="copyPrevCode(this)">📋 Copy</button>
+                <div class="bg-white/10 backdrop-blur rounded-lg p-4">
+                    <p class="text-2xl font-bold">OWASP</p>
+                    <p class="text-sm opacity-90">Compliant</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur rounded-lg p-4">
+                    <p class="text-2xl font-bold">Real-time</p>
+                    <p class="text-sm opacity-90">Analysis</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur rounded-lg p-4">
+                    <p class="text-2xl font-bold">Free</p>
+                    <p class="text-sm opacity-90">Open Source</p>
+                </div>
             </div>
         </div>
+    </header>
 
-        <!-- Verification -->
-        <div id="verify" class="content">
-            <div class="card">
-                <h2>Certificate Verification & Testing</h2>
-                <p style="color: #666; margin-bottom: 20px;">Verify certificates, keys, and test SSL/TLS connections</p>
-            </div>
-
-            <div class="card">
-                <h3>View Certificate Details</h3>
-                <pre class="code-block">openssl x509 -in cert.crt -text -noout
-openssl x509 -in cert.crt -noout -dates
-openssl x509 -in cert.crt -noout -subject -issuer</pre>
-                <button class="btn btn-copy" onclick="copyPrevCode(this)">📋 Copy</button>
-            </div>
-
-            <div class="card">
-                <h3>Match Certificate & Key</h3>
-                <pre class="code-block">openssl x509 -noout -modulus -in cert.crt | openssl md5
-openssl rsa -noout -modulus -in private.key | openssl md5</pre>
-                <button class="btn btn-copy" onclick="copyPrevCode(this)">📋 Copy</button>
-            </div>
-
-            <div class="card">
-                <h3>Test SSL Connection</h3>
-                <pre class="code-block">openssl s_client -connect example.com:443 -servername example.com
-echo | openssl s_client -connect example.com:443 2>/dev/null | openssl x509 -noout -dates</pre>
-                <button class="btn btn-copy" onclick="copyPrevCode(this)">📋 Copy</button>
-            </div>
-        </div>
-
-        <!-- Reference -->
-        <div id="reference" class="content">
-            <div class="card">
-                <h2>Quick Reference Guide</h2>
-                <p style="color: #666; margin-bottom: 20px;">Essential SSL/TLS certificate information</p>
-            </div>
-
-            <div class="card">
-                <h3>File Extensions</h3>
-                <table style="width: 100%; border-collapse: collapse;">
-                    <tr style="background: #f5f5f5;">
-                        <th style="padding: 10px; text-align: left;">Extension</th>
-                        <th style="padding: 10px; text-align: left;">Description</th>
-                    </tr>
-                    <tr><td style="padding: 10px; font-family: monospace; font-weight: bold;">.crt, .cer</td><td style="padding: 10px;">Certificate file</td></tr>
-                    <tr style="background: #f5f5f5;"><td style="padding: 10px; font-family: monospace; font-weight: bold;">.key</td><td style="padding: 10px;">Private key</td></tr>
-                    <tr><td style="padding: 10px; font-family: monospace; font-weight: bold;">.csr</td><td style="padding: 10px;">Certificate Signing Request</td></tr>
-                    <tr style="background: #f5f5f5;"><td style="padding: 10px; font-family: monospace; font-weight: bold;">.pem</td><td style="padding: 10px;">Base64 encoded format</td></tr>
-                    <tr><td style="padding: 10px; font-family: monospace; font-weight: bold;">.pfx, .p12</td><td style="padding: 10px;">PKCS#12 bundle</td></tr>
-                </table>
-            </div>
-
-            <div class="card">
-                <h3>💡 Pro Tips</h3>
-                <ul style="line-height: 2;">
-                    <li>🔐 Always keep private keys secure and never share them</li>
-                    <li>⏰ Monitor certificate expiration dates (30 days before)</li>
-                    <li>✅ Verify cert-key pair matching before deployment</li>
-                    <li>🔄 Use 2048-bit minimum for production certificates</li>
-                    <li>🌐 Include all intermediate certificates in the chain</li>
-                </ul>
-            </div>
-        </div>
-
-        <footer>
-            <p>© 2024 Balamurugan Sivaraman - SSL/TLS Certificate Toolkit</p>
-            <p style="margin-top: 10px; font-size: 0.9em; color: #aaa;">Cloud & Network Security Specialist | 14+ Years Experience</p>
-            <p style="margin-top: 15px;">
-                <a href="https://github.com/bala-murugan-s" target="_blank">GitHub</a> | 
-                <a href="mailto:s-balamurugan@zohomail.in">Email</a> | 
-                <a href="https://www.linkedin.com/in/balamurugan-sivaraman" target="_blank">LinkedIn</a>
-            </p>
-        </footer>
-    </div>
-
-    <script>
-        function showTab(tabName) {
-            // Hide all content
-            document.querySelectorAll('.content').forEach(el => {
-                el.classList.remove('active');
-            });
+    <!-- Tools Grid -->
+    <main class="container mx-auto px-4 py-12">
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             
-            // Remove active from all tabs
-            document.querySelectorAll('.tab').forEach(el => {
-                el.classList.remove('active');
-            });
-            
-            // Show selected content
-            document.getElementById(tabName).classList.add('active');
-            
-            // Activate clicked tab
-            event.target.classList.add('active');
-        }
+            <!-- Password Analyzer -->
+            <a href="password-analyzer/" class="tool-card block bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-br from-purple-500 to-purple-600 p-6 text-white">
+                    <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    </svg>
+                    <h3 class="text-2xl font-bold mb-2">Password Analyzer</h3>
+                    <p class="text-purple-100">Real-time password strength analysis</p>
+                </div>
+                <div class="p-6">
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">Strength Meter</span>
+                        <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">Best Practices</span>
+                        <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">Real-time</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Analyze password strength with real-time feedback on complexity, length, and security.</p>
+                </div>
+                <div class="px-6 pb-6">
+                    <span class="inline-flex items-center text-purple-600 font-semibold">
+                        Launch Tool
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                    </span>
+                </div>
+            </a>
 
-        function generateCSR() {
-            const cn = document.getElementById('cn').value.trim();
-            const org = document.getElementById('org').value.trim();
-            const keysize = document.getElementById('keysize').value;
-            const country = document.getElementById('country').value.trim();
+            <!-- Hash Generator -->
+            <a href="hash-generator/" class="tool-card block bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-6 text-white">
+                    <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
+                    </svg>
+                    <h3 class="text-2xl font-bold mb-2">Hash Generator</h3>
+                    <p class="text-blue-100">Generate cryptographic hashes</p>
+                </div>
+                <div class="p-6">
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">SHA-256</span>
+                        <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">SHA-1</span>
+                        <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">MD5</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Generate SHA-256, SHA-1, and other cryptographic hashes for text and files.</p>
+                </div>
+                <div class="px-6 pb-6">
+                    <span class="inline-flex items-center text-blue-600 font-semibold">
+                        Launch Tool
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                    </span>
+                </div>
+            </a>
 
-            if (!cn) {
-                alert('Common Name is required!');
-                return;
-            }
+            <!-- OWASP Top 10 -->
+            <a href="owasp-reference/" class="tool-card block bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-br from-red-500 to-red-600 p-6 text-white">
+                    <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    <h3 class="text-2xl font-bold mb-2">OWASP Top 10</h3>
+                    <p class="text-red-100">Web application security risks</p>
+                </div>
+                <div class="p-6">
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold">OWASP 2021</span>
+                        <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold">Vulnerabilities</span>
+                        <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold">Reference</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Comprehensive guide to OWASP Top 10 security risks with explanations and mitigations.</p>
+                </div>
+                <div class="px-6 pb-6">
+                    <span class="inline-flex items-center text-red-600 font-semibold">
+                        Launch Tool
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                    </span>
+                </div>
+            </a>
 
-            let subject = '/CN=' + cn;
-            if (org) subject += '/O=' + org;
-            if (country) subject += '/C=' + country;
+            <!-- Security Best Practices -->
+            <a href="security-practices/" class="tool-card block bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-br from-green-500 to-green-600 p-6 text-white">
+                    <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <h3 class="text-2xl font-bold mb-2">Best Practices</h3>
+                    <p class="text-green-100">Security implementation guidelines</p>
+                </div>
+                <div class="p-6">
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">Guidelines</span>
+                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">Frameworks</span>
+                        <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">Standards</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Industry-standard security best practices for authentication, encryption, and access control.</p>
+                </div>
+                <div class="px-6 pb-6">
+                    <span class="inline-flex items-center text-green-600 font-semibold">
+                        Launch Tool
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                        </svg>
+                    </span>
+                </div>
+            </a>
 
-            const commands = `# Generate Private Key (${keysize}-bit RSA)
-openssl genrsa -out private.key ${keysize}
+            <!-- Base64 Encoder/Decoder -->
+            <a href="base64-tool/" class="tool-card block bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 p-6 text-white">
+                    <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                    </svg>
+                    <h3 class="text-2xl font-bold mb-2">Base64 Tool</h3>
+                    <p class="text-indigo-100">Encode and decode Base64</p>
+                </div>
+                <div class="p-6">
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold">Encoder</span>
+                        <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold">Decoder</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Encode and decode text using Base64 encoding.</p>
+                </div>
+                <div class="px-6 pb-6">
+                    <span class="inline-flex items-center text-indigo-600 font-semibold">
+                        Coming Soon
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </span>
+                </div>
+            </a>
 
-# Generate CSR
-openssl req -new -key private.key -out certificate.csr -subj "${subject}"
+            <!-- JWT Decoder -->
+            <a href="jwt-decoder/" class="tool-card block bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 p-6 text-white">
+                    <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    </svg>
+                    <h3 class="text-2xl font-bold mb-2">JWT Decoder</h3>
+                    <p class="text-yellow-100">Decode JSON Web Tokens</p>
+                </div>
+                <div class="p-6">
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-semibold">JWT</span>
+                        <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-semibold">Decoder</span>
+                        <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-semibold">Validator</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Decode and validate JSON Web Tokens with header and payload inspection.</p>
+                </div>
+                <div class="px-6 pb-6">
+                    <span class="inline-flex items-center text-yellow-600 font-semibold">
+                        Coming Soon
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </span>
+                </div>
+            </a>
 
-# Verify CSR
-openssl req -text -noout -verify -in certificate.csr
+            <!-- SSL Certificate Checker -->
+            <a href="ssl-certificate-toolkit/" class="tool-card block bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-br from-teal-500 to-teal-600 p-6 text-white">
+                    <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    <h3 class="text-2xl font-bold mb-2">SSL Checker</h3>
+                    <p class="text-teal-100">Verify SSL/TLS certificates</p>
+                </div>
+                <div class="p-6">
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-xs font-semibold">SSL/TLS</span>
+                        <span class="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-xs font-semibold">Certificate</span>
+                        <span class="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-xs font-semibold">Validator</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Check SSL/TLS certificate validity, expiration, and security configuration.</p>
+                </div>
+                <div class="px-6 pb-6">
+                    <span class="inline-flex items-center text-teal-600 font-semibold">
+                        Explore Tool
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </span>
+                </div>
+            </a>
 
-# View CSR content
-cat certificate.csr`;
+            <!-- MITRE ATT&CK -->
+            <a href="mitre-attack/" class="tool-card block bg-white rounded-xl shadow-lg overflow-hidden">
+                <div class="bg-gradient-to-br from-gray-700 to-gray-800 p-6 text-white">
+                    <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <h3 class="text-2xl font-bold mb-2">MITRE ATT&CK</h3>
+                    <p class="text-gray-300">Adversary tactics reference</p>
+                </div>
+                <div class="p-6">
+                    <div class="flex flex-wrap gap-2 mb-4">
+                        <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">Tactics</span>
+                        <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">Techniques</span>
+                        <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">Reference</span>
+                    </div>
+                    <p class="text-gray-600 text-sm">Quick reference guide for MITRE ATT&CK framework tactics and techniques.</p>
+                </div>
+                <div class="px-6 pb-6">
+                    <span class="inline-flex items-center text-gray-600 font-semibold">
+                        Coming Soon
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </span>
+                </div>
+            </a>
 
-            document.getElementById('csr-code').textContent = commands;
-            document.getElementById('csr-output').classList.remove('hidden');
-            document.getElementById('csr-output').scrollIntoView({ behavior: 'smooth' });
-        }
+        </div>
 
-        function generateSelfSigned() {
-            const cn = document.getElementById('ss-cn').value.trim();
-            const days = document.getElementById('ss-days').value;
-            const keysize = document.getElementById('ss-keysize').value;
+        <!-- Add New Tool Info -->
+        <div class="mt-16 bg-gradient-to-r from-red-600 to-pink-600 text-white rounded-xl p-8 text-center">
+            <h2 class="text-2xl font-bold mb-4">More Security Tools Coming Soon!</h2>
+            <p class="text-lg mb-6">I'm constantly adding new security tools and utilities. Check back regularly for updates.</p>
+            <div class="flex justify-center gap-4">
+                <a href="https://github.com/bala-murugan-s" target="_blank" class="bg-white text-red-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+                    View on GitHub
+                </a>
+                <a href="mailto:s-balamurugan@zohomail.in" class="bg-red-800 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-900 transition">
+                    Suggest a Tool
+                </a>
+            </div>
+        </div>
+    </main>
 
-            if (!cn) {
-                alert('Common Name is required!');
-                return;
-            }
-
-            const commands = `# Generate Self-Signed Certificate (Valid for ${days} days)
-openssl req -x509 -newkey rsa:${keysize} -keyout selfsigned.key -out selfsigned.crt -days ${days} -nodes -subj "/CN=${cn}"
-
-# Verify Certificate
-openssl x509 -in selfsigned.crt -text -noout
-
-# Check Certificate Dates
-openssl x509 -in selfsigned.crt -noout -dates`;
-
-            document.getElementById('ss-code').textContent = commands;
-            document.getElementById('ss-output').classList.remove('hidden');
-            document.getElementById('ss-output').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function copyCode(elementId) {
-            const text = document.getElementById(elementId).textContent;
-            navigator.clipboard.writeText(text).then(function() {
-                const btn = event.target;
-                const originalText = btn.textContent;
-                btn.textContent = '✅ Copied!';
-                btn.style.background = '#16a34a';
-                setTimeout(function() {
-                    btn.textContent = originalText;
-                    btn.style.background = '';
-                }, 2000);
-            }).catch(function(err) {
-                alert('Failed to copy: ' + err);
-            });
-        }
-
-        function copyPrevCode(button) {
-            const codeBlock = button.previousElementSibling;
-            const text = codeBlock.textContent;
-            navigator.clipboard.writeText(text).then(function() {
-                const originalText = button.textContent;
-                button.textContent = '✅ Copied!';
-                button.style.background = '#16a34a';
-                setTimeout(function() {
-                    button.textContent = originalText;
-                    button.style.background = '';
-                }, 2000);
-            }).catch(function(err) {
-                alert('Failed to copy: ' + err);
-            });
-        }
-
-        // Initialize on page load
-        console.log('SSL Certificate Toolkit loaded successfully!');
-    </script>
-	    <!-- Footer -->
+    <!-- Footer -->
     <footer class="bg-gray-800 text-white py-8 mt-16">
         <div class="container mx-auto px-4 text-center">
-            <p class="mb-2">© 2025 Balamurugan Sivaraman - Network Tools</p>
+            <p class="mb-2">© 2025 Balamurugan Sivaraman - Security Tools</p>
             <p class="text-gray-400 text-sm">Cloud & Network Security Specialist | 14+ Years Experience</p>
         </div>
     </footer>
