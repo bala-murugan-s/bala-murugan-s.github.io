@@ -681,7 +681,7 @@ db-server 192.168.1.20"></textarea>
                         </tr>
                         <tr>
                             <td><strong>Period (.)</strong></td>
-                            <td class="not-supported">❌ Not Allowed</td>
+                            <td class="supported">✅ Allowed</td>
                             <td class="not-supported">❌ Not Allowed</td>
                             <td class="supported">✅ Allowed</td>
                             <td class="supported">✅ Allowed</td>
@@ -798,10 +798,10 @@ db-server 192.168.1.20"></textarea>
             switch(vendor) {
                 case 'paloalto':
                     // Only alphanumeric, hyphen, underscore, and spaces (with quotes)
-                    const paloPattern = /^[a-zA-Z0-9\-_ ]+$/;
+                    const paloPattern = /^[a-zA-Z0-9\.\-_ ]+$/;
                     if (!paloPattern.test(name)) {
                         results.valid = false;
-                        results.messages.push('Palo Alto: Only letters, numbers, hyphen (-), underscore (_), and spaces allowed');
+                        results.messages.push('Palo Alto: Only letters, numbers, period(.), hyphen (-), underscore (_), and spaces allowed');
                     }
                     if (hasSpace) {
                         results.messages.push('Palo Alto: Spaces detected - will wrap in quotes');
@@ -814,7 +814,7 @@ db-server 192.168.1.20"></textarea>
                         results.valid = false;
                         results.messages.push('Fortinet: Spaces NOT allowed (causes operational issues)');
                     }
-                    // No special chars except hyphen and underscore
+                    // No special chars except period, hyphen and underscore
                     const fortiPattern = /^[a-zA-Z0-9\-_]+$/;
                     if (!fortiPattern.test(name)) {
                         results.valid = false;
