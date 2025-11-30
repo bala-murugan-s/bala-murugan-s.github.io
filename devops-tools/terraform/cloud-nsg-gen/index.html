@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terraform Security Group/NSG Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-hcl.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0f172a;
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            border-right: 1px solid #334155;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 4px 0 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid #334155;
+        }
+
+        .sidebar-header h1 {
+            font-size: 1.5em;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .sidebar-header p {
+            color: #94a3b8;
+            font-size: 0.9em;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        /* Cloud Provider Selector */
+        .provider-selector {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .provider-btn {
+            padding: 12px;
+            background: #1e293b;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 0.85em;
+            text-align: center;
+        }
+
+        .provider-btn:hover {
+            border-color: #3b82f6;
+            background: #1e40af;
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .provider-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            border-color: #3b82f6;
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #0f172a;
+        }
+
+        .toolbar {
+            background: #1e293b;
+            border-bottom: 1px solid #334155;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toolbar-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .toolbar-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: #334155;
+            color: #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #475569;
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        /* Rules Canvas */
+        .rules-canvas {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+        }
+
+        .rules-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .rule-card {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 2px solid #334155;
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rule-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #3b82f6 0%, #8b5cf6 100%);
+        }
+
+        .rule-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .rule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .rule-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .badge-ingress {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+        }
+
+        .badge-egress {
+            background: rgba(139, 92, 246, 0.2);
+            color: #a78bfa;
+        }
+
+        .rule-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            border-radius: 6px;
+            background: #334155;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1em;
+        }
+
+        .icon-btn:hover {
+            background: #475569;
+            color: #e2e8f0;
+            transform: scale(1.1);
+        }
+
+        .rule-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .rule-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .rule-field label {
+            font-size: 0.85em;
+            color: #94a3b8;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .rule-field input,
+        .rule-field select {
+            padding: 10px 12px;
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 0.95em;
+            transition: all 0.3s;
+        }
+
+        .rule-field input:focus,
+        .rule-field select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .rule-field input::placeholder {
+            color: #475569;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #64748b;
+            text-align: center;
+            padding: 40px;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5em;
+            margin-bottom: 8px;
+            color: #94a3b8;
+        }
+
+        .empty-state p {
+            margin-bottom: 24px;
+            max-width: 400px;
+        }
+
+        /* Code Preview Drawer */
+        .code-drawer {
+            position: fixed;
+            bottom: 0;
+            left: 320px;
+            right: 0;
+            height: 0;
+            background: #000;
+            border-top: 1px solid #334155;
+            transition: height 0.3s;
+            overflow: hidden;
+            z-index: 100;
+        }
+
+        .code-drawer.open {
+            height: 50vh;
+        }
+
+        .code-drawer-header {
+            background: #0a0a0a;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #334155;
+        }
+
+        .code-drawer-content {
+            height: calc(100% - 50px);
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .code-tabs {
+            display: flex;
+            gap: 8px;
+        }
+
+        .code-tab {
+            padding: 8px 16px;
+            background: transparent;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .code-tab:hover {
+            color: #94a3b8;
+            background: #1e293b;
+        }
+
+        .code-tab.active {
+            background: #1e293b;
+            color: #3b82f6;
+        }
+
+        pre {
+            margin: 0 !important;
+            border-radius: 8px !important;
+            font-size: 0.9em !important;
+        }
+
+        /* Form Section */
+        .form-section {
+            margin-bottom: 20px;
+        }
+
+        .form-section-title {
+            font-size: 0.9em;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9em;
+            color: #94a3b8;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 0.95em;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .quick-action-btn {
+            padding: 16px;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border: 2px solid #334155;
+            border-radius: 12px;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .quick-action-btn:hover {
+            border-color: #3b82f6;
+            background: linear-gradient(135deg, #1e40af 0%, #6d28d9 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .quick-action-icon {
+            font-size: 1.5em;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            background: #1e293b;
+            padding: 16px 24px;
+            border-bottom: 1px solid #334155;
+            display: flex;
+            gap: 32px;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+        }
+
+        .stat-content span {
+            display: block;
+            font-size: 0.85em;
+            color: #64748b;
+        }
+
+        .stat-content strong {
+            display: block;
+            font-size: 1.3em;
+            color: #e2e8f0;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .rule-card {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 280px;
+            }
+            
+            .code-drawer {
+                left: 280px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 50vh;
+            }
+            
+            .code-drawer {
+                left: 0;
+            }
+            
+            .stats-bar {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>🛡️ Security Rules</h1>
+                <p>Visual firewall rule builder</p>
+            </div>
+
+            <div class="sidebar-content">
+                <!-- Provider Selection -->
+                <div class="form-section">
+                    <div class="form-section-title">Cloud Provider</div>
+                    <div class="provider-selector">
+                        <button class="provider-btn active" data-provider="aws">AWS SG</button>
+                        <button class="provider-btn" data-provider="azure">Azure NSG</button>
+                        <button class="provider-btn" data-provider="gcp">GCP FW</button>
+                    </div>
+                </div>
+
+                <!-- Basic Info -->
+                <div class="form-section">
+                    <div class="form-section-title">Basic Information</div>
+                    <div class="form-group">
+                        <label>Group Name</label>
+                        <input type="text" id="sg-name" value="web-sg" placeholder="e.g., web-sg">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <input type="text" id="sg-description" value="Security group for web servers" placeholder="Security group description">
+                    </div>
+                    <div class="form-group" id="vpc-field">
+                        <label>VPC ID</label>
+                        <input type="text" id="vpc-id" value="vpc-12345678" placeholder="vpc-xxxxxxxxx">
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="form-section">
+                    <div class="form-section-title">Quick Templates</div>
+                    <div class="quick-actions">
+                        <button class="quick-action-btn" onclick="addCommonRule('http')">
+                            <span class="quick-action-icon">🌐</span>
+                            HTTP/HTTPS
+                        </button>
+                        <button class="quick-action-btn" onclick="addCommonRule('ssh')">
+                            <span class="quick-action-icon">🔑</span>
+                            SSH
+                        </button>
+                        <button class="quick-action-btn" onclick="addCommonRule('database')">
+                            <span class="quick-action-icon">🗄️</span>
+                            Database
+                        </button>
+                        <button class="quick-action-btn" onclick="addCommonRule('custom')">
+                            <span class="quick-action-icon">➕</span>
+                            Custom Rule
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Bulk Import -->
+                <div class="form-section">
+                    <div class="form-section-title">Bulk Import</div>
+                    <button class="btn btn-secondary" style="width: 100%;" onclick="openBulkImport()">
+                        📄 Import CSV Rules
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="toolbar-title" id="provider-title">AWS Security Group Rules</div>
+                <div class="toolbar-actions">
+                    <button class="btn btn-success" onclick="toggleCodeDrawer()">
+                        💻 View Code
+                    </button>
+                    <button class="btn btn-primary" onclick="exportTerraform()">
+                        📥 Export Terraform
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat">
+                    <div class="stat-icon">📊</div>
+                    <div class="stat-content">
+                        <span>Total Rules</span>
+                        <strong id="total-rules">0</strong>
+                    </div>
+                </div>
+                <div class="stat">
+                    <div class="stat-icon">⬇️</div>
+                    <div class="stat-content">
+                        <span>Ingress</span>
+                        <strong id="ingress-count">0</strong>
+                    </div>
+                </div>
+                <div class="stat">
+                    <div class="stat-icon">⬆️</div>
+                    <div class="stat-content">
+                        <span>Egress</span>
+                        <strong id="egress-count">0</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Rules Canvas -->
+            <div class="rules-canvas">
+                <div class="rules-grid" id="rules-container">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🛡️</div>
+                        <h3>No Rules Yet</h3>
+                        <p>Start by adding a quick template or create a custom rule from the sidebar</p>
+                        <button class="btn btn-primary" onclick="addCommonRule('custom')">
+                            ➕ Add Your First Rule
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Code Preview Drawer -->
+        <div class="code-drawer" id="code-drawer">
+            <div class="code-drawer-header">
+                <div class="code-tabs">
+                    <button class="code-tab active" data-file="main">main.tf</button>
+                    <button class="code-tab" data-file="variables">variables.tf</button>
+                    <button class="code-tab" data-file="outputs">outputs.tf</button>
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn btn-secondary" onclick="copyCode()">📋 Copy</button>
+                    <button class="btn btn-secondary" onclick="toggleCodeDrawer()">✕ Close</button>
+                </div>
+            </div>
+            <div class="code-drawer-content">
+                <pre><code id="code-output" class="language-hcl"># Generated Terraform code will appear here</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentProvider = 'aws';
+        let currentFile = 'main';
+        let rules = [];
+        let ruleIdCounter = 1;
+        let generatedCode = { main: '', variables: '', outputs: '' };
+
+        const commonPorts = {
+            http: { protocol: 'tcp', port: '80', description: 'HTTP' },
+            https: { protocol: 'tcp', port: '443', description: 'HTTPS' },
+            ssh: { protocol: 'tcp', port: '22', description: 'SSH' },
+            rdp: { protocol: 'tcp', port: '3389', description: 'RDP' },
+            mysql: { protocol: 'tcp', port: '3306', description: 'MySQL' },
+            postgresql: { protocol: 'tcp', port: '5432', description: 'PostgreSQL' },
+            mongodb: { protocol: 'tcp', port: '27017', description: 'MongoDB' },
+        };
+
+        // Provider switching
+        document.querySelectorAll('.provider-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.provider-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentProvider = this.dataset.provider;
+                updateProviderUI();
+            });
+        });
+
+        // Code tab switching
+        document.querySelectorAll('.code-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                currentFile = this.dataset.file;
+                updateCodeDisplay();
+            });
+        });
+
+        function updateProviderUI() {
+            const titles = {
+                aws: 'AWS Security Group Rules',
+                azure: 'Azure Network Security Group Rules',
+                gcp: 'GCP Firewall Rules'
+            };
+            document.getElementById('provider-title').textContent = titles[currentProvider];
+            
+            // Show/hide VPC field for GCP
+            const vpcField = document.getElementById('vpc-field');
+            if (currentProvider === 'gcp') {
+                vpcField.querySelector('label').textContent = 'Network Name';
+                document.getElementById('vpc-id').placeholder = 'default';
+            } else if (currentProvider === 'azure') {
+                vpcField.querySelector('label').textContent = 'Resource Group';
+                document.getElementById('vpc-id').placeholder = 'my-resource-group';
+            } else {
+                vpcField.querySelector('label').textContent = 'VPC ID';
+                document.getElementById('vpc-id').placeholder = 'vpc-xxxxxxxxx';
+            }
+            
+            renderRules();
+        }
+
+        function addCommonRule(type) {
+            const rule = {
+                id: ruleIdCounter++,
+                type: 'ingress',
+                protocol: 'tcp',
+                port: '',
+                source: '0.0.0.0/0',
+                description: ''
+            };
+
+            if (type === 'http') {
+                rule.port = '80';
+                rule.description = 'Allow HTTP';
+            } else if (type === 'ssh') {
+                rule.port = '22';
+                rule.description = 'Allow SSH';
+                rule.source = '10.0.0.0/8';
+            } else if (type === 'database') {
+                rule.port = '3306';
+                rule.description = 'Allow MySQL';
+                rule.source = '10.0.0.0/16';
+            } else {
+                rule.description = 'Custom rule';
+            }
+
+            rules.push(rule);
+            renderRules();
+        }
+
+        function duplicateRule(id) {
+            const original = rules.find(r => r.id === id);
+            if (original) {
+                const duplicate = { ...original, id: ruleIdCounter++ };
+                rules.push(duplicate);
+                renderRules();
+            }
+        }
+
+        function deleteRule(id) {
+            rules = rules.filter(r => r.id !== id);
+            renderRules();
+        }
+
+        function updateRule(id, field, value) {
+            const rule = rules.find(r => r.id === id);
+            if (rule) {
+                rule[field] = value;
+                updateStats();
+            }
+        }
+
+        function renderRules() {
+            const container = document.getElementById('rules-container');
+            
+            if (rules.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🛡️</div>
+                        <h3>No Rules Yet</h3>
+                        <p>Start by adding a quick template or create a custom rule from the sidebar</p>
+                        <button class="btn btn-primary" onclick="addCommonRule('custom')">
+                            ➕ Add Your First Rule
+                        </button>
+                    </div>
+                `;
+                updateStats();
+                return;
+            }
+
+            container.innerHTML = rules.map(rule => `
+                <div class="rule-card">
+                    <div class="rule-header">
+                        <span class="rule-type-badge badge-${rule.type}">
+                            ${rule.type === 'ingress' ? '⬇️' : '⬆️'} ${rule.type.toUpperCase()}
+                        </span>
+                        <div class="rule-actions">
+                            <button class="icon-btn" onclick="duplicateRule(${rule.id})" title="Duplicate">📋</button>
+                            <button class="icon-btn" onclick="deleteRule(${rule.id})" title="Delete">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="rule-content">
+                        <div class="rule-field">
+                            <label>Direction</label>
+                            <select onchange="updateRule(${rule.id}, 'type', this.value)" value="${rule.type}">
+                                <option value="ingress" ${rule.type === 'ingress' ? 'selected' : ''}>Ingress</option>
+                                <option value="egress" ${rule.type === 'egress' ? 'selected' : ''}>Egress</option>
+                            </select>
+                        </div>
+                        <div class="rule-field">
+                            <label>Protocol</label>
+                            <select onchange="updateRule(${rule.id}, 'protocol', this.value)" value="${rule.protocol}">
+                                <option value="tcp" ${rule.protocol === 'tcp' ? 'selected' : ''}>TCP</option>
+                                <option value="udp" ${rule.protocol === 'udp' ? 'selected' : ''}>UDP</option>
+                                <option value="icmp" ${rule.protocol === 'icmp' ? 'selected' : ''}>ICMP</option>
+                                <option value="all" ${rule.protocol === 'all' ? 'selected' : ''}>All</option>
+                            </select>
+                        </div>
+                        <div class="rule-field">
+                            <label>Port Range</label>
+                            <input type="text" value="${rule.port}" placeholder="80 or 80-443" 
+                                   onchange="updateRule(${rule.id}, 'port', this.value)">
+                        </div>
+                        <div class="rule-field">
+                            <label>${rule.type === 'ingress' ? 'Source' : 'Destination'}</label>
+                            <input type="text" value="${rule.source}" placeholder="0.0.0.0/0" 
+                                   onchange="updateRule(${rule.id}, 'source', this.value)">
+                        </div>
+                        <div class="rule-field" style="grid-column: 1 / -1;">
+                            <label>Description</label>
+                            <input type="text" value="${rule.description}" placeholder="Rule description" 
+                                   onchange="updateRule(${rule.id}, 'description', this.value)">
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            updateStats();
+        }
+
+        function updateStats() {
+            const total = rules.length;
+            const ingress = rules.filter(r => r.type === 'ingress').length;
+            const egress = rules.filter(r => r.type === 'egress').length;
+            
+            document.getElementById('total-rules').textContent = total;
+            document.getElementById('ingress-count').textContent = ingress;
+            document.getElementById('egress-count').textContent = egress;
+        }
+
+        function generateTerraform() {
+            const sgName = document.getElementById('sg-name').value;
+            const sgDescription = document.getElementById('sg-description').value;
+            const vpcId = document.getElementById('vpc-id').value;
+
+            if (currentProvider === 'aws') {
+                generateAWSTerraform(sgName, sgDescription, vpcId);
+            } else if (currentProvider === 'azure') {
+                generateAzureTerraform(sgName, sgDescription, vpcId);
+            } else if (currentProvider === 'gcp') {
+                generateGCPTerraform(sgName, sgDescription, vpcId);
+            }
+        }
+
+        function generateAWSTerraform(sgName, sgDescription, vpcId) {
+            const ingressRules = rules.filter(r => r.type === 'ingress');
+            const egressRules = rules.filter(r => r.type === 'egress');
+
+            generatedCode.main = `# AWS Security Group Configuration
+# Generated by DevOps Tools
+
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = var.aws_region
+}
+
+# Security Group
+resource "aws_security_group" "main" {
+  name        = var.security_group_name
+  description = var.security_group_description
+  vpc_id      = var.vpc_id
+
+  tags = {
+    Name        = var.security_group_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
+
+${ingressRules.map((rule, idx) => {
+    const portRange = rule.port.includes('-') ? rule.port.split('-') : [rule.port, rule.port];
+    return `
+# Ingress Rule ${idx + 1}: ${rule.description}
+resource "aws_security_group_rule" "ingress_${idx + 1}" {
+  type              = "ingress"
+  security_group_id = aws_security_group.main.id
+  protocol          = "${rule.protocol}"
+  from_port         = ${rule.protocol === 'all' || rule.protocol === 'icmp' ? '-1' : portRange[0]}
+  to_port           = ${rule.protocol === 'all' || rule.protocol === 'icmp' ? '-1' : portRange[1] || portRange[0]}
+  cidr_blocks       = ["${rule.source}"]
+  description       = "${rule.description}"
+}`;
+}).join('\n')}
+
+${egressRules.length > 0 ? egressRules.map((rule, idx) => {
+    const portRange = rule.port.includes('-') ? rule.port.split('-') : [rule.port, rule.port];
+    return `
+# Egress Rule ${idx + 1}: ${rule.description}
+resource "aws_security_group_rule" "egress_${idx + 1}" {
+  type              = "egress"
+  security_group_id = aws_security_group.main.id
+  protocol          = "${rule.protocol}"
+  from_port         = ${rule.protocol === 'all' || rule.protocol === 'icmp' ? '-1' : portRange[0]}
+  to_port           = ${rule.protocol === 'all' || rule.protocol === 'icmp' ? '-1' : portRange[1] || portRange[0]}
+  cidr_blocks       = ["${rule.source}"]
+  description       = "${rule.description}"
+}`;
+}).join('\n') : `
+# Default Egress Rule - Allow all outbound
+resource "aws_security_group_rule" "egress_all" {
+  type              = "egress"
+  security_group_id = aws_security_group.main.id
+  protocol          = "-1"
+  from_port         = -1
+  to_port           = -1
+  cidr_blocks       = ["0.0.0.0/0"]
+  description       = "Allow all outbound traffic"
+}`}`;
+
+            generatedCode.variables = `# Variables for AWS Security Group
+
+variable "aws_region" {
+  description = "AWS region"
+  type        = string
+  default     = "us-east-1"
+}
+
+variable "security_group_name" {
+  description = "Name of the security group"
+  type        = string
+  default     = "${sgName}"
+}
+
+variable "security_group_description" {
+  description = "Description of the security group"
+  type        = string
+  default     = "${sgDescription}"
+}
+
+variable "vpc_id" {
+  description = "VPC ID where the security group will be created"
+  type        = string
+  default     = "${vpcId}"
+}
+
+variable "environment" {
+  description = "Environment name"
+  type        = string
+  default     = "production"
+}`;
+
+            generatedCode.outputs = `# Outputs for AWS Security Group
+
+output "security_group_id" {
+  description = "ID of the security group"
+  value       = aws_security_group.main.id
+}
+
+output "security_group_name" {
+  description = "Name of the security group"
+  value       = aws_security_group.main.name
+}
+
+output "security_group_arn" {
+  description = "ARN of the security group"
+  value       = aws_security_group.main.arn
+}
+
+output "vpc_id" {
+  description = "VPC ID of the security group"
+  value       = aws_security_group.main.vpc_id
+}`;
+        }
+
+        function generateAzureTerraform(sgName, sgDescription, rgName) {
+            generatedCode.main = `# Azure Network Security Group Configuration
+# Generated by DevOps Tools
+
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.0"
+    }
+  }
+}
+
+provider "azurerm" {
+  features {}
+}
+
+# Data source for resource group
+data "azurerm_resource_group" "main" {
+  name = var.resource_group_name
+}
+
+# Network Security Group
+resource "azurerm_network_security_group" "main" {
+  name                = var.nsg_name
+  location            = data.azurerm_resource_group.main.location
+  resource_group_name = data.azurerm_resource_group.main.name
+
+${rules.map((rule, idx) => {
+    const priority = 100 + (idx * 10);
+    const portRange = rule.port || '*';
+    return `
+  security_rule {
+    name                       = "${rule.description || `rule-${idx + 1}`}"
+    priority                   = ${priority}
+    direction                  = "${rule.type === 'ingress' ? 'Inbound' : 'Outbound'}"
+    access                     = "Allow"
+    protocol                   = "${rule.protocol === 'all' ? '*' : rule.protocol.toUpperCase()}"
+    source_port_range          = "*"
+    destination_port_range     = "${portRange}"
+    source_address_prefix      = "${rule.source}"
+    destination_address_prefix = "*"
+  }`;
+}).join('\n')}
+
+  tags = {
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}`;
+
+            generatedCode.variables = `# Variables for Azure NSG
+
+variable "resource_group_name" {
+  description = "Name of the resource group"
+  type        = string
+  default     = "${rgName}"
+}
+
+variable "nsg_name" {
+  description = "Name of the network security group"
+  type        = string
+  default     = "${sgName}"
+}
+
+variable "environment" {
+  description = "Environment name"
+  type        = string
+  default     = "production"
+}`;
+
+            generatedCode.outputs = `# Outputs for Azure NSG
+
+output "nsg_id" {
+  description = "ID of the network security group"
+  value       = azurerm_network_security_group.main.id
+}
+
+output "nsg_name" {
+  description = "Name of the network security group"
+  value       = azurerm_network_security_group.main.name
+}
+
+output "resource_group_name" {
+  description = "Resource group name"
+  value       = data.azurerm_resource_group.main.name
+}`;
+        }
+
+        function generateGCPTerraform(sgName, sgDescription, network) {
+            const ingressRules = rules.filter(r => r.type === 'ingress');
+            const egressRules = rules.filter(r => r.type === 'egress');
+
+            generatedCode.main = `# GCP Firewall Rules Configuration
+# Generated by DevOps Tools
+
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "google" {
+  project = var.project_id
+  region  = var.region
+}
+
+${ingressRules.map((rule, idx) => {
+    const ports = rule.port ? [rule.port] : [];
+    return `
+# Ingress Rule: ${rule.description}
+resource "google_compute_firewall" "ingress_${idx + 1}" {
+  name    = "\${var.firewall_name_prefix}-ingress-${idx + 1}"
+  network = var.network_name
+
+  allow {
+    protocol = "${rule.protocol}"
+${ports.length > 0 ? `    ports    = ["${rule.port}"]` : ''}
+  }
+
+  source_ranges = ["${rule.source}"]
+  direction     = "INGRESS"
+
+  description = "${rule.description}"
+}`;
+}).join('\n')}
+
+${egressRules.map((rule, idx) => {
+    const ports = rule.port ? [rule.port] : [];
+    return `
+# Egress Rule: ${rule.description}
+resource "google_compute_firewall" "egress_${idx + 1}" {
+  name    = "\${var.firewall_name_prefix}-egress-${idx + 1}"
+  network = var.network_name
+
+  allow {
+    protocol = "${rule.protocol}"
+${ports.length > 0 ? `    ports    = ["${rule.port}"]` : ''}
+  }
+
+  destination_ranges = ["${rule.source}"]
+  direction          = "EGRESS"
+
+  description = "${rule.description}"
+}`;
+}).join('\n')}`;
+
+            generatedCode.variables = `# Variables for GCP Firewall Rules
+
+variable "project_id" {
+  description = "GCP Project ID"
+  type        = string
+  default     = "my-project-id"
+}
+
+variable "region" {
+  description = "GCP region"
+  type        = string
+  default     = "us-central1"
+}
+
+variable "network_name" {
+  description = "Name of the VPC network"
+  type        = string
+  default     = "${network}"
+}
+
+variable "firewall_name_prefix" {
+  description = "Prefix for firewall rule names"
+  type        = string
+  default     = "${sgName}"
+}`;
+
+            generatedCode.outputs = `# Outputs for GCP Firewall Rules
+
+${ingressRules.map((rule, idx) => `
+output "ingress_rule_${idx + 1}_id" {
+  description = "ID of ingress rule ${idx + 1}"
+  value       = google_compute_firewall.ingress_${idx + 1}.id
+}`).join('\n')}
+
+${egressRules.map((rule, idx) => `
+output "egress_rule_${idx + 1}_id" {
+  description = "ID of egress rule ${idx + 1}"
+  value       = google_compute_firewall.egress_${idx + 1}.id
+}`).join('\n')}`;
+        }
+
+        function toggleCodeDrawer() {
+            const drawer = document.getElementById('code-drawer');
+            drawer.classList.toggle('open');
+            
+            if (drawer.classList.contains('open')) {
+                generateTerraform();
+                updateCodeDisplay();
+            }
+        }
+
+        function updateCodeDisplay() {
+            const codeOutput = document.getElementById('code-output');
+            codeOutput.textContent = generatedCode[currentFile] || '# No code generated yet';
+            Prism.highlightElement(codeOutput);
+        }
+
+        function copyCode() {
+            const code = generatedCode[currentFile];
+            navigator.clipboard.writeText(code).then(() => {
+                alert('Code copied to clipboard!');
+            });
+        }
+
+        function exportTerraform() {
+            generateTerraform();
+            
+            const files = {
+                'main.tf': generatedCode.main,
+                'variables.tf': generatedCode.variables,
+                'outputs.tf': generatedCode.outputs
+            };
+
+            // Create a simple download for each file
+            Object.entries(files).forEach(([filename, content]) => {
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+        }
+
+        function openBulkImport() {
+            const csv = prompt('Paste CSV data (format: type,protocol,port,source,description):\n\nExample:\ningress,tcp,80,0.0.0.0/0,Allow HTTP\ningress,tcp,443,0.0.0.0/0,Allow HTTPS');
+            
+            if (csv) {
+                const lines = csv.trim().split('\n');
+                lines.forEach(line => {
+                    const [type, protocol, port, source, description] = line.split(',');
+                    if (type && protocol) {
+                        rules.push({
+                            id: ruleIdCounter++,
+                            type: type.trim(),
+                            protocol: protocol.trim(),
+                            port: port?.trim() || '',
+                            source: source?.trim() || '0.0.0.0/0',
+                            description: description?.trim() || ''
+                        });
+                    }
+                });
+                renderRules();
+            }
+        }
+
+        // Initialize with sample rules
+        function initializeSampleRules() {
+            rules = [
+                {
+                    id: ruleIdCounter++,
+                    type: 'ingress',
+                    protocol: 'tcp',
+                    port: '80',
+                    source: '0.0.0.0/0',
+                    description: 'Allow HTTP from anywhere'
+                },
+                {
+                    id: ruleIdCounter++,
+                    type: 'ingress',
+                    protocol: 'tcp',
+                    port: '443',
+                    source: '0.0.0.0/0',
+                    description: 'Allow HTTPS from anywhere'
+                },
+                {
+                    id: ruleIdCounter++,
+                    type: 'ingress',
+                    protocol: 'tcp',
+                    port: '22',
+                    source: '10.0.0.0/8',
+                    description: 'Allow SSH from private network'
+                }
+            ];
+            renderRules();
+        }
+
+        // Initialize
+        window.addEventListener('load', () => {
+            initializeSampleRules();
+        });
+    </script>
+
+  <!-- Add New Tool Info -->
+        <div class="mt-16 bg-gradient-to-r from-orange-600 to-green-600 text-white rounded-xl p-8 text-center">
+            <h2 class="text-2xl font-bold mb-4">More Devops Tools Coming Soon!</h2>
+            <p class="text-lg mb-6">I'm constantly adding new tools and utilities. Check back regularly for updates.</p>
+            <div class="flex justify-center gap-4">
+                <a href="https://github.com/bala-murugan-s" target="_blank" class="bg-white text-orange-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+                    View on GitHub
+                </a>
+                <a href="mailto:s-balamurugan@zohomail.in" class="bg-orange-800 text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-900 transition">
+                    Suggest a Tool
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-16">
+        <div class="container mx-auto px-4 text-center">
+            <p class="mb-2">© 2025 Balamurugan Sivaraman - Security Tools</p>
+            <p class="text-gray-400 text-sm">Cloud & Network Security Specialist | 14+ Years Experience</p>
+        </div>
+    </footer>
+</body>
+</html>
+</body>
+</html>
