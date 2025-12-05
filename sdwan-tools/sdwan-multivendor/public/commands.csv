@@ -1,0 +1,23 @@
+id,vendor,category,command,description,options,example
+pa_tunnel_status,paloalto,tunnels,show vpn ike-sa,Display IKE Security Association status,"gateway <n>|Filter by gateway name;peer-address <ip>|Filter by peer IP address","Gateway: branch-vpn-1
+Peer-Address: 10.20.30.40
+Role: Initiator
+State: Established"
+pa_tunnel_detail,paloalto,tunnels,show vpn ipsec-sa tunnel <n>,Show detailed IPSec tunnel information,"<n>|Tunnel name to display","Tunnel: branch-vpn-1
+State: Active
+TX Packets: 152341
+Encryption: AES-256-GCM"
+forti_tunnel_status,fortinet,tunnels,get vpn ipsec tunnel summary,Display summary of all IPSec tunnels,,"'branch-01' 10.20.30.1:0 -> 10.20.30.40:0
+rx:(esp/bytes/pkts) = (0x2f4a/2453421/18234)"
+forti_routing_table,fortinet,routing,get router info routing-table all,Display complete routing table,"database|Show routing database;details|Show detailed information","Codes: K - kernel, C - connected
+S* 0.0.0.0/0 [10/0] via 192.168.1.1, wan1
+C 10.10.10.0/24 is directly connected"
+sp_tunnel_status,silverpeek,tunnels,show tunnels,Display all tunnel status information,"detail|Show detailed tunnel statistics","Tunnel      Remote IP     State  Uptime
+branch-hq   10.20.30.40   Up     12d 4h
+branch-dc   10.20.30.50   Up     8d 2h"
+viptela_control,viptela,control,show control connections,Display control plane connection status,,"PEER    PROTOCOL  PUBLIC IP
+vsmart  dtls      10.20.30.40
+vbond   dtls      10.20.30.50"
+meraki_vpn,meraki,tunnels,show vpn status,Display Auto VPN status,,"Network: Branch-Network
+Peers Connected: 12/12
+VPN Mode: Hub (Spoke)"
