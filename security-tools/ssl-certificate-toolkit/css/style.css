@@ -445,6 +445,28 @@ textarea {
     color: var(--text-primary);
     font-family: 'Courier New', monospace;
 }
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.back-home {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.back-home:hover {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    transform: translateY(-1px);
+}
+
 
 footer {
     text-align: center;
@@ -461,4 +483,5 @@ footer {
     .tabs {
         flex-wrap: wrap;
     }
+
 }
