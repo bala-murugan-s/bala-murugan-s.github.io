@@ -80,4 +80,9 @@ function downloadFileFixed(filename, content) {
         showAlert('Download failed: ' + error.message, 'danger');
         console.error('Download error:', error);
     }
+
+}
+
+function goHome() {
+    window.location.href = "../../index.html";
 }
