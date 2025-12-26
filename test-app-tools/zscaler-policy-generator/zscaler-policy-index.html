@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Zscaler Policy Generator (ZIA + ZPA)</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-dark">
+  <header class="app-header">
+    <h1>🛡️ Zscaler Policy Generator — ZIA (Internet Access) & ZPA (Private Access)</h1>
+    <div class="header-actions">
+      <button id="btnTheme" class="secondary" title="Toggle dark/light">🌗 Theme</button>
+      <div class="split">
+        <button id="btnSaveLS" class="secondary" title="Save to localStorage">💾 Save</button>
+        <button id="btnExportJSON" class="secondary" title="Export JSON">⤴️ Export</button>
+        <label class="file-btn secondary" title="Import JSON">
+          ⤵️ Import
+          <input id="fileImportJSON" type="file" accept="application/json">
+        </label>
+      </div>
+      <div class="split">
+        <button id="btnLoadLS" class="secondary" title="Load from localStorage">🌐 Load (Local)</button>
+        <label class="file-btn secondary" title="Load from JSON file">
+          📂 Load (File)
+          <input id="fileLoadJSON" type="file" accept="application/json">
+        </label>
+      </div>
+      <button id="btnClear" class="danger" title="Clear everything">🗑️ Clear</button>
+    </div>
+  </header>
+
+  <main>
+    <aside class="sidebar" id="liveSidebar">
+      <h3>Live Summary</h3>
+      <ul>
+        <li><strong>Cloud:</strong> <span id="sumCloud">—</span></li>
+        <li><strong>Tenant:</strong> <span id="sumTenant">—</span></li>
+        <li><strong>Product:</strong> <span id="sumProduct">—</span></li>
+        <li><strong>Rule Count:</strong> <span id="sumRules">0</span></li>
+      </ul>
+    </aside>
+
+    <section class="content">
+      <nav class="steps">
+        <ol id="stepList">
+          <li class="active" data-step="1">1 Product</li>
+          <li data-step="2">2 Tenant & Auth</li>
+          <li data-step="3">3 Policy Types</li>
+          <li data-step="4">4 Build Rules</li>
+          <li data-step="5">5 Review & Generate</li>
+        </ol>
+      </nav>
+
+      <!-- Step 1: Product -->
+      <section id="step-1" class="panel active">
+        <h2>Step 1 · Select Product</h2>
+        <div class="vendor-grid">
+          <label class="card"><input type="radio" name="product" value="zia"><div><h3>🔷 Zscaler Internet Access (ZIA)</h3><p>URL Filtering, Cloud Firewall, SSL Exceptions, DLP Web</p></div></label>
+          <label class="card"><input type="radio" name="product" value="zpa"><div><h3>🔷 Zscaler Private Access (ZPA)</h3><p>Access Policies, Application Segments</p></div></label>
+        </div>
+      </section>
+
+      <!-- Step 2: Tenant/Auth -->
+      <section id="step-2" class="panel">
+        <h2>Step 2 · Tenant & Auth</h2>
+        <div class="grid-3">
+          <div class="form-group"><label>Cloud Base URL *</label><input id="baseUrl" placeholder="https://admin.zscaler.net/api/v1 (ZIA) / https://help.zscaler.com (ZPA examples)"></div>
+          <div class="form-group"><label>Tenant/Org *</label><input id="tenant" placeholder="Your tenant name or customerId (ZPA)"></div>
+          <div class="form-group"><label>Auth Type</label><select id="authType"><option>ZIA Session Cookie (JSESSIONID)</option><option>Bearer Token (ZPA)</option></select></div>
+          <div class="form-group"><label>API Token / Cookie *</label><input id="apiToken" placeholder="ZPA Bearer token or ZIA JSESSIONID value"></div>
+          <div class="form-group"><label>Notes</label><input id="notes" placeholder="Any context"></div>
+        </div>
+        <div class="callout">ZIA commonly authenticates via session (JSESSIONID) using <code>/authenticatedSession</code>, while ZPA uses OAuth Bearer tokens; you can paste whichever applies.</div>
+      </section>
+
+      <!-- Step 3: Policy Types -->
+      <section id="step-3" class="panel">
+        <h2>Step 3 · Select Policy Types</h2>
+        <div class="grid-2">
+          <fieldset id="types-zia" class="types" hidden>
+            <legend>ZIA Policies</legend>
+            <label><input type="checkbox" class="polType" value="zia-url"> URL Filtering</label>
+            <label><input type="checkbox" class="polType" value="zia-firewall"> Cloud Firewall</label>
+            <label><input type="checkbox" class="polType" value="zia-ssl"> SSL Inspection Exceptions</label>
+            <label><input type="checkbox" class="polType" value="zia-dlp"> DLP Web Rules</label>
+          </fieldset>
+          <fieldset id="types-zpa" class="types" hidden>
+            <legend>ZPA Policies</legend>
+            <label><input type="checkbox" class="polType" value="zpa-access"> Access Policy Rule</label>
+            <label><input type="checkbox" class="polType" value="zpa-appseg"> Application Segment</label>
+          </fieldset>
+        </div>
+      </section>
+
+      <!-- Step 4: Build Rules -->
+      <section id="step-4" class="panel">
+        <h2>Step 4 · Build Rules</h2>
+        <p>Use ⎘ Clone to duplicate, 🔒 Del to remove.</p>
+
+        <div class="builder" id="builder-zia-url" hidden>
+          <h3>ZIA · URL Filtering Rules</h3>
+          <table class="data-table" id="tblZiaUrl">
+            <thead><tr><th>Name</th><th>Action</th><th>URL Categories</th><th>Protocols</th><th>Methods</th><th>Users/Groups</th><th>Order</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <button class="secondary" id="btnAddZiaUrl">＋ Add URL Rule</button>
+        </div>
+
+        <div class="builder" id="builder-zia-firewall" hidden>
+          <h3>ZIA · Cloud Firewall Rules</h3>
+          <table class="data-table" id="tblZiaFw">
+            <thead><tr><th>Name</th><th>Action</th><th>Src IPs</th><th>Dest IPs/FQDN</th><th>Services</th><th>Labels/Groups</th><th>Order</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <button class="secondary" id="btnAddZiaFw">＋ Add FW Rule</button>
+        </div>
+
+        <div class="builder" id="builder-zia-ssl" hidden>
+          <h3>ZIA · SSL Inspection Exceptions</h3>
+          <table class="data-table" id="tblZiaSsl">
+            <thead><tr><th>Name</th><th>Domains/IPs</th><th>Action</th><th>Order</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <button class="secondary" id="btnAddZiaSsl">＋ Add SSL Exception</button>
+        </div>
+
+        <div class="builder" id="builder-zia-dlp" hidden>
+          <h3>ZIA · DLP Web Rules</h3>
+          <table class="data-table" id="tblZiaDlp">
+            <thead><tr><th>Name</th><th>DLP Dictionaries</th><th>Action</th><th>Groups/Users</th><th>Order</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <button class="secondary" id="btnAddZiaDlp">＋ Add DLP Rule</button>
+        </div>
+
+        <div class="builder" id="builder-zpa-access" hidden>
+          <h3>ZPA · Access Policy Rules</h3>
+          <table class="data-table" id="tblZpaAccess">
+            <thead><tr><th>Name</th><th>Action</th><th>App Segments</th><th>Users/Groups</th><th>Conditions (Device/Network)</th><th>Order</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <button class="secondary" id="btnAddZpaAccess">＋ Add Access Rule</button>
+        </div>
+
+        <div class="builder" id="builder-zpa-appseg" hidden>
+          <h3>ZPA · Application Segments</h3>
+          <table class="data-table" id="tblZpaAppseg">
+            <thead><tr><th>Name</th><th>Domains</th><th>TCP Ports</th><th>UDP Ports</th><th>Segment Group</th><th>Server Groups</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <button class="secondary" id="btnAddZpaAppseg">＋ Add App Segment</button>
+        </div>
+
+        <canvas id="rulesChart" width="720" height="220" class="chart"></canvas>
+      </section>
+
+      <!-- Step 5: Review & Generate -->
+      <section id="step-5" class="panel">
+        <h2>Step 5 · Review & Generate</h2>
+        <div class="summary" id="summary"></div>
+        <div class="actions">
+          <button id="btnGenerate" class="primary">💾 Generate Payloads</button>
+          <button id="btnViewCode" class="secondary">🖥️ View Generated Files</button>
+          <button id="btnCopyAll" class="secondary">📋 Copy all Payloads</button>
+          <button id="btnDownloadZip" class="secondary">🗜️ Download All (ZIP)</button>
+        </div>
+      </section>
+
+      <footer class="pager">
+        <button id="btnPrev" class="secondary">← Previous</button>
+        <button id="btnNext" class="primary">Next →</button>
+      </footer>
+    </section>
+  </main>
+
+  <!-- Modal -->
+  <dialog id="codeModal">
+    <div class="modal-header">
+      <h3>Generated Files</h3>
+      <button id="btnCloseModal" class="secondary">✕ Close</button>
+    </div>
+    <div class="tabbar" id="tabbar"></div>
+    <pre id="codeBox"><code># Generate to preview...</code></pre>
+    <div class="modal-actions">
+      <button id="btnDownloadActive" class="primary">Download Active File</button>
+    </div>
+  </dialog>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

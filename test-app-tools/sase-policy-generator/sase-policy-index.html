@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SASE Policy Generator (Vanilla)</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="theme-dark">
+  <header class="app-header">
+    <h1>🛡️ SASE Policy Generator — Zscaler, Prisma, Umbrella, Cloudflare, Netskope</h1>
+    <div class="header-actions">
+      <button id="btnTheme" class="secondary" title="Toggle dark/light">🌗 Theme</button>
+      <div class="split">
+        <button id="btnSaveLS" class="secondary" title="Save to localStorage">💾 Save</button>
+        <button id="btnExportJSON" class="secondary" title="Export JSON">⤴️ Export</button>
+        <label class="file-btn secondary" title="Import JSON">
+          ⤵️ Import
+          <input id="fileImportJSON" type="file" accept="application/json">
+        </label>
+      </div>
+      <div class="split">
+        <button id="btnLoadLS" class="secondary" title="Load from localStorage">🌐 Load (Local)</button>
+        <label class="file-btn secondary" title="Load from JSON file">
+          📂 Load (File)
+          <input id="fileLoadJSON" type="file" accept="application/json">
+        </label>
+      </div>
+      <button id="btnClear" class="danger" title="Clear everything">🗑️ Clear</button>
+    </div>
+  </header>
+
+  <main>
+    <aside class="sidebar" id="liveSidebar">
+      <h3>Live Summary</h3>
+      <ul>
+        <li><strong>Vendor:</strong> <span id="sumVendor">—</span></li>
+        <li><strong>Tenant:</strong> <span id="sumTenant">—</span></li>
+        <li><strong>Policy Types:</strong> <span id="sumPolicyTypes">—</span></li>
+        <li><strong>Rules:</strong> <span id="sumRules">0</span></li>
+      </ul>
+    </aside>
+
+    <section class="content">
+      <nav class="steps">
+        <ol id="stepList">
+          <li class="active" data-step="1">1 Vendor</li>
+          <li data-step="2">2 Tenant</li>
+          <li data-step="3">3 Policy Types</li>
+          <li data-step="4">4 Build Rules</li>
+          <li data-step="5">5 Review & Generate</li>
+        </ol>
+      </nav>
+
+      <!-- Step 1: Vendor -->
+      <section id="step-1" class="panel active">
+        <h2>Step 1 · Select SASE Vendor</h2>
+        <div class="vendor-grid">
+          <label class="card"><input type="radio" name="vendor" value="zscaler-zia"><div><h3>🔷 Zscaler ZIA</h3><p>URL Filtering, Cloud Firewall, SSL/DLP</p></div></label>
+          <label class="card"><input type="radio" name="vendor" value="zscaler-zpa"><div><h3>🔷 Zscaler ZPA</h3><p>Access Policies, App Segments</p></div></label>
+          <label class="card"><input type="radio" name="vendor" value="prisma-access"><div><h3>🟧 Prisma Access</h3><p>Config / Policy APIs</p></div></label>
+          <label class="card"><input type="radio" name="vendor" value="umbrella"><div><h3>🟦 Cisco Umbrella</h3><p>Web/DNS policies, Destination Lists</p></div></label>
+          <label class="card"><input type="radio" name="vendor" value="cloudflare-one"><div><h3>🌀 Cloudflare One</h3><p>Zero Trust Access, Gateway policies</p></div></label>
+          <label class="card"><input type="radio" name="vendor" value="netskope"><div><h3>🟩 Netskope</h3><p>CASB/DLP/API Data Protection</p></div></label>
+        </div>
+      </section>
+
+      <!-- Step 2: Tenant -->
+      <section id="step-2" class="panel">
+        <h2>Step 2 · Tenant & Auth</h2>
+        <div class="grid-3">
+          <div class="form-group"><label>Tenant/Cloud</label><input id="tenant" placeholder="e.g., admin.zscaler.net / api.umbrella.com / customer.goskope.com"></div>
+          <div class="form-group"><label>Account/Org ID</label><input id="accountId" placeholder="Account / Org / Customer ID"></div>
+          <div class="form-group"><label>API Token / Key</label><input id="apiToken" placeholder="Scoped API Token"></div>
+          <div class="form-group"><label>Auth Type</label><select id="authType"><option>Bearer</option><option>Basic</option><option>API Key Header</option></select></div>
+          <div class="form-group"><label>Base URL</label><input id="baseUrl" placeholder="https://..."></div>
+          <div class="form-group"><label>Notes</label><input id="notes" placeholder="Any context"></div>
+        </div>
+        <div class="callout">We generate vendor‑specific JSON payloads and cURL/Ansible scaffolds using these values. No credentials are transmitted—everything runs locally.</div>
+      </section>
+
+      <!-- Step 3: Policy Types -->
+      <section id="step-3" class="panel">
+        <h2>Step 3 · Select Policy Types</h2>
+        <div class="grid-2">
+          <fieldset id="types-zia" class="types" hidden>
+            <legend>Zscaler ZIA</legend>
+            <label><input type="checkbox" class="polType" value="zia-url"> URL Filtering</label>
+            <label><input type="checkbox" class="polType" value="zia-firewall"> Cloud Firewall</label>
+            <label><input type="checkbox" class="polType" value="zia-ssl"> SSL Inspection Exceptions</label>
+            <label><input type="checkbox" class="polType" value="zia-dlp"> DLP Web Rules</label>
+          </fieldset>
+          <fieldset id="types-zpa" class="types" hidden>
+            <legend>Zscaler ZPA</legend>
+            <label><input type="checkbox" class="polType" value="zpa-access"> Access Policy Rule</label>
+            <label><input type="checkbox" class="polType" value="zpa-appseg"> Application Segment</label>
+          </fieldset>
+          <fieldset id="types-prisma" class="types" hidden>
+            <legend>Prisma Access</legend>
+            <label><input type="checkbox" class="polType" value="prisma-policy"> Policy (Config API)</label>
+          </fieldset>
+          <fieldset id="types-umbrella" class="types" hidden>
+            <legend>Cisco Umbrella</legend>
+            <label><input type="checkbox" class="polType" value="umbrella-dest"> Destination List</label>
+            <label><input type="checkbox" class="polType" value="umbrella-web"> Web/DNS Policy Rule</label>
+          </fieldset>
+          <fieldset id="types-cloudflare" class="types" hidden>
+            <legend>Cloudflare One</legend>
+            <label><input type="checkbox" class="polType" value="cf-access"> Zero Trust Access Policy</label>
+            <label><input type="checkbox" class="polType" value="cf-gateway"> Gateway HTTP/DNS Policy</label>
+          </fieldset>
+          <fieldset id="types-netskope" class="types" hidden>
+            <legend>Netskope</legend>
+            <label><input type="checkbox" class="polType" value="netskope-api"> API Data Protection Policy</label>
+          </fieldset>
+        </div>
+      </section>
+
+      <!-- Step 4: Build Rules -->
+      <section id="step-4" class="panel">
+        <h2>Step 4 · Build Rules</h2>
+        <p>Select a policy type below and add rules. Use ⎘ Clone to duplicate, 🔒 Del to remove.</p>
+
+        <div class="builder" id="builder-zia-url" hidden>
+          <h3>ZIA · URL Filtering Rules</h3>
+          <table class="data-table" id="tblZiaUrl">
+            <thead><tr><th>Name</th><th>Action</th><th>URL Categories</th><th>Protocols</th><th>Methods</th><th>Users/Groups</th><th>Order</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <button class="secondary" id="btnAddZiaUrl">＋ Add URL Rule</button>
+        </div>
+
+        <div class="builder" id="builder-zia-firewall" hidden>
+          <h3>ZIA · Cloud Firewall Rules</h3>
+          <table class="data-table" id="tblZiaFw">
+            <thead><tr><th>Name</th><th>Action</th><th>Src IPs</th><th>Dest IPs/FQDN</th><th>Services</th><th>Users/Groups</th><th>Order</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <button class="secondary" id="btnAddZiaFw">＋ Add FW Rule</button>
+        </div>
+
+        <div class="builder" id="builder-zpa-access" hidden>
+          <h3>ZPA · Access Policy Rules</h3>
+          <table class="data-table" id="tblZpaAccess">
+            <thead><tr><th>Name</th><th>Action</th><th>App Segments</th><th>Users/Groups</th><th>Conditions (Device/Network)</th><th>Order</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <button class="secondary" id="btnAddZpaAccess">＋ Add Access Rule</button>
+        </div>
+
+        <div class="builder" id="builder-zpa-appseg" hidden>
+          <h3>ZPA · Application Segments</h3>
+          <table class="data-table" id="tblZpaAppseg">
+            <thead><tr><th>Name</th><th>Domains</th><th>TCP Ports</th><th>UDP Ports</th><th>Segment Group</th><th>Server Groups</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <button class="secondary" id="btnAddZpaAppseg">＋ Add App Segment</button>
+        </div>
+
+        <div class="builder" id="builder-umbrella-dest" hidden>
+          <h3>Umbrella · Destination Lists</h3>
+          <table class="data-table" id="tblUmbDest">
+            <thead><tr><th>Name</th><th>Type</th><th>Domains/IPs</th><th>Description</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <button class="secondary" id="btnAddUmbDest">＋ Add Destination List</button>
+        </div>
+
+        <div class="builder" id="builder-umbrella-web" hidden>
+          <h3>Umbrella · Web/DNS Policy Rules</h3>
+          <table class="data-table" id="tblUmbWeb">
+            <thead><tr><th>Name</th><th>Identity</th><th>Categories</th><th>Action</th><th>Order</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <button class="secondary" id="btnAddUmbWeb">＋ Add Web/DNS Rule</button>
+        </div>
+
+        <div class="builder" id="builder-cf-access" hidden>
+          <h3>Cloudflare One · Zero Trust Access Policies</h3>
+          <table class="data-table" id="tblCfAccess">
+            <thead><tr><th>Name</th><th>Decision</th><th>Include</th><th>Exclude</th><th>Require</th><th>Session (h)</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <button class="secondary" id="btnAddCfAccess">＋ Add Access Policy</button>
+        </div>
+
+        <div class="builder" id="builder-cf-gateway" hidden>
+          <h3>Cloudflare One · Gateway HTTP/DNS Policies</h3>
+          <table class="data-table" id="tblCfGateway">
+            <thead><tr><th>Name</th><th>Type</th><th>Selector</th><th>Action</th><th>Description</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <button class="secondary" id="btnAddCfGateway">＋ Add Gateway Policy</button>
+        </div>
+
+        <div class="builder" id="builder-prisma-policy" hidden>
+          <h3>Prisma Access · Policy (Config API)</h3>
+          <table class="data-table" id="tblPrisma">
+            <thead><tr><th>Name</th><th>Type</th><th>Source</th><th>Destination</th><th>App/Service</th><th>Action</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <button class="secondary" id="btnAddPrisma">＋ Add Prisma Rule</button>
+        </div>
+
+        <div class="builder" id="builder-netskope-api" hidden>
+          <h3>Netskope · API Data Protection</h3>
+          <table class="data-table" id="tblNetskope">
+            <thead><tr><th>Name</th><th>App</th><th>Instance</th><th>Content/Activity</th><th>DLP Profile</th><th>Action</th><th></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <button class="secondary" id="btnAddNetskope">＋ Add API DP Policy</button>
+        </div>
+
+        <canvas id="rulesChart" width="720" height="220" class="chart"></canvas>
+      </section>
+
+      <!-- Step 5: Review & Generate -->
+      <section id="step-5" class="panel">
+        <h2>Step 5 · Review & Generate</h2>
+        <div class="summary" id="summary"></div>
+        <div class="actions">
+          <button id="btnGenerate" class="primary">💾 Generate Payloads</button>
+          <button id="btnViewCode" class="secondary">🖥️ View Generated Files</button>
+          <button id="btnCopyAll" class="secondary">📋 Copy all Payloads</button>
+          <button id="btnDownloadZip" class="secondary">🗜️ Download All (ZIP)</button>
+        </div>
+      </section>
+
+      <footer class="pager">
+        <button id="btnPrev" class="secondary">← Previous</button>
+        <button id="btnNext" class="primary">Next →</button>
+      </footer>
+    </section>
+  </main>
+
+  <!-- Modal -->
+  <dialog id="codeModal">
+    <div class="modal-header">
+      <h3>Generated Files</h3>
+      <button id="btnCloseModal" class="secondary">✕ Close</button>
+    </div>
+    <div class="tabbar" id="tabbar">
+      <!-- tabs injected by JS based on files map -->
+    </div>
+    <pre id="codeBox"><code># Generate to preview...</code></pre>
+    <div class="modal-actions">
+      <button id="btnDownloadActive" class="primary">Download Active File</button>
+    </div>
+  </dialog>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
