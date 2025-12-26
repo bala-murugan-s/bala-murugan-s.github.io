@@ -1,38 +1,325 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
-
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
-
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
-
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
-  <base href="/">
-
-  <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
-
-  <!-- iOS meta tags & icons -->
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="test_web_tools">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
-
-  <title>test_web_tools</title>
-  <link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balamurugan S - Cloud & Network Security Specialist</title>
+    <meta name="description" content="Cloud & Network Security Consultant with 14+ years experience in SASE, SD-WAN, DevSecOps">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .gradient-bg-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .gradient-bg-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .card-hover { 
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card-hover:hover { 
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.2);
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        .tech-badge {
+            transition: all 0.3s ease;
+        }
+        .tech-badge:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+    </style>
 </head>
-<body>
-  <script src="flutter_bootstrap.js" async></script>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3">
+                    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-800">Balamurugan S</h1>
+                        <p class="text-xs text-gray-500">Security Architect</p>
+                    </div>
+                </div>
+                <div class="hidden md:flex gap-6">
+                    <a href="#about" class="text-gray-600 hover:text-blue-600 font-medium transition">About</a>
+                    <a href="#tools" class="text-gray-600 hover:text-blue-600 font-medium transition">Tools</a>
+                    <a href="#projects" class="text-gray-600 hover:text-blue-600 font-medium transition">Projects</a>
+                    <a href="#contact" class="text-gray-600 hover:text-blue-600 font-medium transition">Contact</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white py-20">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="animate-float">
+                    <h1 class="text-5xl md:text-6xl font-bold mb-4">Cloud & Network Security Specialist</h1>
+                    <p class="text-xl md:text-2xl mb-6 opacity-90">Architecting secure, scalable infrastructures with 14+ years of global experience</p>
+                    <div class="flex flex-wrap gap-4">
+                        <a href="#tools" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition shadow-lg">
+                            Explore Tools
+                        </a>
+                        <a href="https://github.com/bala-murugan-s" target="_blank" class="bg-blue-800 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-900 transition">
+                            View GitHub
+                        </a>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white/10 backdrop-blur rounded-xl p-6 text-center">
+                        <p class="text-4xl font-bold mb-2">14+</p>
+                        <p class="opacity-90">Years Experience</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur rounded-xl p-6 text-center">
+                        <p class="text-4xl font-bold mb-2">70+</p>
+                        <p class="opacity-90">Sites Deployed</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur rounded-xl p-6 text-center">
+                        <p class="text-4xl font-bold mb-2">60%</p>
+                        <p class="opacity-90">Cost Reduction</p>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur rounded-xl p-6 text-center">
+                        <p class="text-4xl font-bold mb-2">6+</p>
+                        <p class="opacity-90">Certifications</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12">Expertise Overview</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center p-8 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 card-hover">
+                    <svg class="w-16 h-16 text-blue-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                    </svg>
+                    <h3 class="text-2xl font-bold mb-3">SASE & Zero Trust</h3>
+                    <p class="text-gray-700">Architected enterprise SASE solutions with Prisma Access & Zscaler, reducing gateway reliance by 60%</p>
+                </div>
+                <div class="text-center p-8 rounded-xl bg-gradient-to-br from-green-50 to-green-100 card-hover">
+                    <svg class="w-16 h-16 text-green-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                    </svg>
+                    <h3 class="text-2xl font-bold mb-3">SD-WAN Excellence</h3>
+                    <p class="text-gray-700">Deployed Cisco Viptela & Meraki SD-WAN across 70+ sites, cutting MPLS costs by 50%</p>
+                </div>
+                <div class="text-center p-8 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 card-hover">
+                    <svg class="w-16 h-16 text-purple-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                    </svg>
+                    <h3 class="text-2xl font-bold mb-3">DevSecOps & IaC</h3>
+                    <p class="text-gray-700">Automated security provisioning with Terraform, Ansible & Python, reducing manual effort by 40%</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tools Section -->
+    <section id="tools" class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-4">Interactive Tools & Resources</h2>
+            <p class="text-center text-gray-600 mb-12 text-lg">Practical tools built for security and network professionals</p>
+            
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <!-- Security Tools -->
+                <a href="/security-tools/" class="block">
+                    <div class="bg-gradient-to-br from-red-500 to-pink-600 text-white rounded-2xl p-8 card-hover shadow-xl">
+                        <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                        <h3 class="text-3xl font-bold mb-3">Security Tools</h3>
+                        <p class="text-lg mb-4 opacity-90">Password analyzer, hash generator, OWASP Top 10 reference, and security best practices</p>
+                        <div class="flex items-center gap-2 text-lg font-semibold">
+                            <span>Explore Security Tools</span>
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Network Tools -->
+                <a href="/network-tools/" class="block">
+                    <div class="bg-gradient-to-br from-blue-500 to-cyan-600 text-white rounded-2xl p-8 card-hover shadow-xl">
+                        <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                        </svg>
+                        <h3 class="text-3xl font-bold mb-3">Network Tools</h3>
+                        <p class="text-lg mb-4 opacity-90">Subnet calculator, CIDR calculator, port reference, and network planning utilities</p>
+                        <div class="flex items-center gap-2 text-lg font-semibold">
+                            <span>Explore Network Tools</span>
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+
+                 <!-- Firewall Tools -->
+                <a href="/firewall-tools/" class="block">
+                    <div class="bg-gradient-to-br from-green-500 to-emerald-600 text-white rounded-2xl p-8 card-hover shadow-xl">
+                        <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 
+                                     9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                        <h3 class="text-3xl font-bold mb-3">Firewall Tools</h3>
+                        <p class="text-lg mb-4 opacity-90">
+                            CLI commands, troubleshooting guides, VPN configurations, and admin utilities for Palo Alto, Fortinet, Cisco, and Check Point firewalls
+                        </p>
+                        <div class="flex items-center gap-2 text-lg font-semibold">
+                            <span>Explore Firewall Tools</span>
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                                </svg>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- DevOps Tools -->
+                <a href="/devops-tools/" class="block">
+                    <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-2xl p-8 card-hover shadow-xl">
+                        <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 
+                                     9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                        <h3 class="text-3xl font-bold mb-3">DevOps Tools</h3>
+                        <p class="text-lg mb-4 opacity-90">
+                            Automation scripts, deployment workflows, and infrastructure-as-code resources for Terraform, Ansible, Kubernetes, and modern CI/CD environments.
+                        </p>
+                        <div class="flex items-center gap-2 text-lg font-semibold">
+                            <span>Explore DevOps Tools</span>
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+                <!-- SDWAN Tools -->
+                <a href="/sdwan-tools/" class="block">
+                    <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-2xl p-8 card-hover shadow-xl">
+                        <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 
+                                     9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                        <h3 class="text-3xl font-bold mb-3">Sdwan Tools</h3>
+                        <p class="text-lg mb-4 opacity-90">
+                            Automation scripts, deployment workflows, and IaC, Troubleshooting, CLI reference for SDWNA.
+                        </p>
+                        <div class="flex items-center gap-2 text-lg font-semibold">
+                            <span>Explore SDWAN Tools</span>
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                            </svg>
+                        </div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-20 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12">Key Projects & Achievements</h2>
+            <div class="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+                <div class="border-l-4 border-blue-600 bg-blue-50 p-6 rounded-r-xl">
+                    <h3 class="text-xl font-bold mb-2">Zero Trust & SASE Automation</h3>
+                    <p class="text-gray-700 mb-3">Migrated enterprise to Prisma Access using Terraform + Ansible automation</p>
+                    <p class="text-blue-600 font-bold">Result: 60% reduction in gateway reliance</p>
+                </div>
+                <div class="border-l-4 border-green-600 bg-green-50 p-6 rounded-r-xl">
+                    <h3 class="text-xl font-bold mb-2">Enterprise SD-WAN Deployment</h3>
+                    <p class="text-gray-700 mb-3">Global Cisco Viptela & Meraki SD-WAN rollout across 70+ sites</p>
+                    <p class="text-green-600 font-bold">Result: 50% MPLS cost savings</p>
+                </div>
+                <div class="border-l-4 border-purple-600 bg-purple-50 p-6 rounded-r-xl">
+                    <h3 class="text-xl font-bold mb-2">Multi-Cloud Security Architecture</h3>
+                    <p class="text-gray-700 mb-3">Built secure AWS/Azure landing zones with Aviatrix & Prisma Cloud</p>
+                    <p class="text-purple-600 font-bold">Result: 70% faster provisioning time</p>
+                </div>
+                <div class="border-l-4 border-orange-600 bg-orange-50 p-6 rounded-r-xl">
+                    <h3 class="text-xl font-bold mb-2">SOC Automation & Response</h3>
+                    <p class="text-gray-700 mb-3">Automated incident response with Splunk ES & Cortex XSOAR</p>
+                    <p class="text-orange-600 font-bold">Result: 40% reduction in manual triage</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section class="py-20 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-12">Technical Competencies</h2>
+            <div class="max-w-5xl mx-auto">
+                <div class="flex flex-wrap justify-center gap-3">
+                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Palo Alto Networks</span>
+                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Zscaler ZIA/ZPA</span>
+                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Cisco Viptela</span>
+                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Aviatrix</span>
+                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Prisma Cloud</span>
+                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">AWS Security</span>
+                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Azure Security</span>
+                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Terraform</span>
+                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Ansible</span>
+                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Python</span>
+                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">SD-WAN</span>
+                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Zero Trust</span>
+                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">SASE</span>
+                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Kubernetes</span>
+                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">F5 WAF</span>
+                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Splunk ES</span>
+                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Microsoft Sentinel</span>
+                    <span class="tech-badge px-5 py-2 bg-white rounded-full text-sm font-semibold shadow-md">Cortex XSOAR</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 gradient-bg text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-4xl font-bold mb-6">Let's Connect</h2>
+            <p class="text-xl mb-8 opacity-90">Interested in collaborating or learning more about my work?</p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="https://www.linkedin.com/in/bala-murugan-s" target="_blank" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition shadow-lg">
+                    LinkedIn Profile
+                </a>
+                <a href="https://github.com/bala-murugan-s" target="_blank" class="bg-gray-800 text-white px-8 py-3 rounded-lg font-bold hover:bg-gray-900 transition">
+                    GitHub Repositories
+                </a>
+                <a href="mailto:s-balamurugan@zohomail.in" class="bg-blue-800 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-900 transition">
+                    Email Me
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="container mx-auto px-4 text-center">
+            <p class="mb-2">© 2025 Balamurugan Sivaraman</p>
+            <p class="text-gray-400 text-sm">Cloud & Network Security Specialist | 14+ Years Global Experience</p>
+            <p class="text-gray-500 text-xs mt-4">SASE | SD-WAN | DevSecOps | Zero Trust Architecture</p>
+        </div>
+    </footer>
 </body>
 </html>
