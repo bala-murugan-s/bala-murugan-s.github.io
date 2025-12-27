@@ -246,4 +246,4 @@ function v(tds,i){ const el=tds[i].querySelector('input'); return (el?el.value.t
 function s(tds,i){ const el=tds[i].querySelector('select'); return (el?el.value:''); }
 function num(tds,i){ const el=tds[i].querySelector('input'); return Number(el?el.value:0); }
 
-export { collectAll };
+//export { collectAll };

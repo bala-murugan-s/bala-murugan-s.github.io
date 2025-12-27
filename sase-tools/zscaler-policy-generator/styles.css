@@ -1,5 +1,4 @@
 
-/* Reuse the same theme & layout from earlier, with a few tweaks */
 :root{ --bg:#0f172a; --panel:#111827; --text:#e5e7eb; --muted:#9ca3af; --primary:#2563eb; --secondary:#374151; --accent:#10b981; --danger:#ef4444; --table:#0b1220; }
 :root.light{ --bg:#f3f4f6; --panel:#ffffff; --text:#111827; --muted:#6b7280; --primary:#1d4ed8; --secondary:#e5e7eb; --accent:#059669; --danger:#dc2626; --table:#ffffff; }
 *{box-sizing:border-box}
@@ -51,3 +50,14 @@ dialog::backdrop{background:rgba(0,0,0,.55)}
 .modal-actions{display:flex;justify-content:flex-end;gap:.5rem;padding:.5rem;border-top:1px solid #1f2937}
 @media (max-width:1000px){ main{flex-direction:column} .sidebar{position:relative;height:auto} .grid-3{grid-template-columns:repeat(2,minmax(0,1fr))} }
 @media (max-width:700px){ .grid-3{grid-template-columns:1fr} .vendor-grid{grid-template-columns:1fr} }
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.back-home {
+  text-decoration: none;
+  font-weight: 600;
+  padding: 6px 10px;
+  b

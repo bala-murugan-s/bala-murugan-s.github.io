@@ -4,12 +4,18 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Zscaler Policy Generator (ZIA + ZPA)</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="./styles.css">
 </head>
 <body class="theme-dark">
   <header class="app-header">
+  <div class="header-left">
+    <a href="/" class="secondary back-home" title="Back to Home">
+      ← Home
+    </a>
     <h1>🛡️ Zscaler Policy Generator — ZIA (Internet Access) & ZPA (Private Access)</h1>
-    <div class="header-actions">
+  </div>  
+
+  <div class="header-actions">
       <button id="btnTheme" class="secondary" title="Toggle dark/light">🌗 Theme</button>
       <div class="split">
         <button id="btnSaveLS" class="secondary" title="Save to localStorage">💾 Save</button>
@@ -19,6 +25,7 @@
           <input id="fileImportJSON" type="file" accept="application/json">
         </label>
       </div>
+
       <div class="split">
         <button id="btnLoadLS" class="secondary" title="Load from localStorage">🌐 Load (Local)</button>
         <label class="file-btn secondary" title="Load from JSON file">
@@ -26,6 +33,7 @@
           <input id="fileLoadJSON" type="file" accept="application/json">
         </label>
       </div>
+
       <button id="btnClear" class="danger" title="Clear everything">🗑️ Clear</button>
     </div>
   </header>
@@ -187,6 +195,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/main.js"></script>
+  <script type="module" src="./js/main.js"></script>
 </body>
 </html>

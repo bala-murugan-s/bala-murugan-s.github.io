@@ -4,31 +4,41 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>SASE Policy Generator (Vanilla)</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="./styles.css">
 </head>
 <body class="theme-dark">
   <header class="app-header">
+  <div class="header-left">
+    <a href="/" class="secondary back-home" title="Back to Home">
+      ← Home
+    </a>
     <h1>🛡️ SASE Policy Generator — Zscaler, Prisma, Umbrella, Cloudflare, Netskope</h1>
-    <div class="header-actions">
-      <button id="btnTheme" class="secondary" title="Toggle dark/light">🌗 Theme</button>
-      <div class="split">
-        <button id="btnSaveLS" class="secondary" title="Save to localStorage">💾 Save</button>
-        <button id="btnExportJSON" class="secondary" title="Export JSON">⤴️ Export</button>
-        <label class="file-btn secondary" title="Import JSON">
-          ⤵️ Import
-          <input id="fileImportJSON" type="file" accept="application/json">
-        </label>
-      </div>
-      <div class="split">
-        <button id="btnLoadLS" class="secondary" title="Load from localStorage">🌐 Load (Local)</button>
-        <label class="file-btn secondary" title="Load from JSON file">
-          📂 Load (File)
-          <input id="fileLoadJSON" type="file" accept="application/json">
-        </label>
-      </div>
-      <button id="btnClear" class="danger" title="Clear everything">🗑️ Clear</button>
+  </div>
+
+  <div class="header-actions">
+    <button id="btnTheme" class="secondary" title="Toggle dark/light">🌗 Theme</button>
+
+    <div class="split">
+      <button id="btnSaveLS" class="secondary" title="Save to localStorage">💾 Save</button>
+      <button id="btnExportJSON" class="secondary" title="Export JSON">⤴️ Export</button>
+      <label class="file-btn secondary" title="Import JSON">
+        ⤵️ Import
+        <input id="fileImportJSON" type="file" accept="application/json">
+      </label>
     </div>
-  </header>
+
+    <div class="split">
+      <button id="btnLoadLS" class="secondary" title="Load from localStorage">🌐 Load (Local)</button>
+      <label class="file-btn secondary" title="Load from JSON file">
+        📂 Load (File)
+        <input id="fileLoadJSON" type="file" accept="application/json">
+      </label>
+    </div>
+
+    <button id="btnClear" class="danger" title="Clear everything">🗑️ Clear</button>
+  </div>
+</header>
+
 
   <main>
     <aside class="sidebar" id="liveSidebar">
@@ -248,6 +258,6 @@
     </div>
   </dialog>
 
-  <script type="module" src="js/main.js"></script>
+  <script type="module" src="./js/main.js"></script>
 </body>
 </html>
