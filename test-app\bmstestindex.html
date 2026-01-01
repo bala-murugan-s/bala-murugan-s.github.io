@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balamurugan S | Cyber Security Architect</title>
+    <meta name="description" content="Cloud & Network Security Consultant with 14+ years experience in SASE, SD-WAN, DevSecOps">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Three.js for 3D Visualization -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <!-- Timeline library -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/timelinejs3@3.6.0/dist/timeline.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --accent: #8b5cf6;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gray-dark: #334155;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            transition: all 0.4s ease;
+        }
+        
+        body.dark-mode {
+            background-color: var(--dark);
+            color: var(--light);
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        
+        .dark-mode ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: 5px;
+        }
+        
+        .dark-mode ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.5); }
+            50% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.8); }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease forwards;
+        }
+        
+        .float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .pulse-glow {
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+        
+        /* Glass morphism effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .dark-mode .glass {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Gradient backgrounds */
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+        }
+        
+        .gradient-bg-alt {
+            background: linear-gradient(135deg, var(--secondary) 0%, #3b82f6 100%);
+        }
+        
+        /* Card hover effects */
+        .hover-card {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-origin: center;
+        }
+        
+        .hover-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .dark-mode .hover-card:hover {
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        /* Theme toggle */
+        .theme-toggle {
+            width: 60px;
+            height: 30px;
+            border-radius: 15px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .theme-toggle-slider {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            transition: all 0.3s;
+        }
+        
+        .dark-mode .theme-toggle-slider {
+            transform: translateX(30px);
+        }
+        
+        /* 3D Canvas */
+        #network3d {
+            width: 100%;
+            height: 500px;
+            border-radius: 20px;
+            overflow: hidden;
+        }
+        
+        /* Interactive Tools */
+        .tool-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dark-mode .tool-container {
+            background: #1e293b;
+        }
+        
+        /* Timeline */
+        .timeline-container {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            background: white;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dark-mode .timeline-item {
+            background: #1e293b;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 25px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            z-index: 1;
+        }
+        
+        .timeline-item:nth-child(1)::before { content: '2010'; }
+        .timeline-item:nth-child(2)::before { content: '2014'; }
+        .timeline-item:nth-child(3)::before { content: '2018'; }
+        .timeline-item:nth-child(4)::before { content: '2021'; }
+        .timeline-item:nth-child(5)::before { content: 'Now'; }
+        
+        /* Articles */
+        .article-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        
+        .dark-mode .article-card {
+            background: #1e293b;
+        }
+        
+        .article-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .article-image {
+            height: 200px;
+            background-size: cover;
+            background-position: center;
+        }
+        
+        /* Resources */
+        .resource-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+        }
+        
+        .dark-mode .resource-card {
+            background: #1e293b;
+        }
+        
+        .resource-card:hover {
+            transform: translateX(10px);
+        }
+        
+        /* Progress bars */
+        .progress-bar {
+            height: 10px;
+            border-radius: 5px;
+            background: #e2e8f0;
+            overflow: hidden;
+        }
+        
+        .dark-mode .progress-bar {
+            background: #334155;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            transition: width 1.5s ease-in-out;
+        }
+        
+        /* Custom utilities */
+        .text-gradient {
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+    </style>
+</head>
+<body class="relative">
+    <!-- Theme Toggle -->
+    <div class="fixed top-6 right-6 z-50 flex items-center gap-3">
+        <div class="theme-toggle bg-gray-300 dark:bg-gray-700" id="themeToggle">
+            <div class="theme-toggle-slider bg-white dark:bg-yellow-300"></div>
+        </div>
+        <span class="text-sm font-medium hidden md:block">Theme</span>
+    </div>
+    
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md py-4">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full gradient-bg flex items-center justify-center pulse-glow">
+                        <i class="fas fa-shield-alt text-white text-xl"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold">Balamurugan S</h1>
+                        <p class="text-xs text-gray-600 dark:text-gray-300">Security Architect</p>
+                    </div>
+                </div>
+                
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#home" class="font-medium hover:text-primary transition">Home</a>
+                    <a href="#timeline" class="font-medium hover:text-primary transition">Timeline</a>
+                    <a href="#tools" class="font-medium hover:text-primary transition">Tools</a>
+                    <a href="#3d" class="font-medium hover:text-primary transition">3D Network</a>
+                    <a href="#articles" class="font-medium hover:text-primary transition">Articles</a>
+                    <a href="#resources" class="font-medium hover:text-primary transition">Resources</a>
+                    <a href="#contact" class="font-medium hover:text-primary transition">Contact</a>
+                </div>
+                
+                <button id="mobileMenuBtn" class="md:hidden text-2xl">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="hidden md:hidden mt-4 py-4 border-t border-gray-200 dark:border-gray-700">
+                <div class="flex flex-col gap-4">
+                    <a href="#home" class="font-medium hover:text-primary transition">Home</a>
+                    <a href="#timeline" class="font-medium hover:text-primary transition">Timeline</a>
+                    <a href="#tools" class="font-medium hover:text-primary transition">Tools</a>
+                    <a href="#3d" class="font-medium hover:text-primary transition">3D Network</a>
+                    <a href="#articles" class="font-medium hover:text-primary transition">Articles</a>
+                    <a href="#resources" class="font-medium hover:text-primary transition">Resources</a>
+                    <a href="#contact" class="font-medium hover:text-primary transition">Contact</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section id="home" class="pt-20 pb-32 relative overflow-hidden">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="fade-in-up">
+                    <div class="inline-block px-4 py-2 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 font-medium mb-6">
+                        <i class="fas fa-bolt mr-2"></i>14+ Years of Security Excellence
+                    </div>
+                    
+                    <h1 class="hero-title text-5xl md:text-6xl font-bold mb-6">
+                        <span class="text-gradient">Cyber Security</span><br>
+                        <span class="dark:text-white">Architect &</span><br>
+                        <span class="dark:text-white">Cloud Specialist</span>
+                    </h1>
+                    
+                    <p class="text-xl text-gray-600 dark:text-gray-300 mb-8">
+                        Designing and implementing secure, scalable cloud infrastructures with a focus on SASE, Zero Trust, and DevSecOps automation.
+                    </p>
+                    
+                    <div class="flex flex-wrap gap-4">
+                        <a href="#tools" class="px-8 py-3 rounded-lg gradient-bg text-white font-bold hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+                            <i class="fas fa-tools mr-2"></i> Try Interactive Tools
+                        </a>
+                        <a href="#3d" class="px-8 py-3 rounded-lg border-2 border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 font-bold hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition">
+                            <i class="fas fa-cube mr-2"></i> View 3D Network
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="relative float">
+                    <div class="w-full h-96 rounded-2xl gradient-bg-alt flex items-center justify-center">
+                        <div class="relative">
+                            <div class="absolute -top-6 -left-6 w-20 h-20 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center shadow-2xl">
+                                <i class="fas fa-cloud text-3xl text-blue-500"></i>
+                            </div>
+                            <div class="absolute -bottom-6 -right-6 w-20 h-20 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center shadow-2xl">
+                                <i class="fas fa-shield-alt text-3xl text-green-500"></i>
+                            </div>
+                            <div class="w-64 h-64 rounded-full bg-white/20 dark:bg-gray-800/50 backdrop-blur-sm flex flex-col items-center justify-center p-8 border-2 border-white/30">
+                                <div class="text-5xl font-bold text-white mb-2">70+</div>
+                                <div class="text-white text-center">Sites Secured & Deployed</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Interactive Tools Section -->
+    <section id="tools" class="py-20 bg-gray-50 dark:bg-gray-800">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-4">Interactive Security Tools</h2>
+            <p class="text-center text-gray-600 dark:text-gray-300 mb-12 text-lg">Live security utilities for professionals</p>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Password Strength Analyzer -->
+                <div class="tool-container hover-card">
+                    <h3 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-key text-indigo-600"></i>
+                        Password Strength Analyzer
+                    </h3>
+                    <p class="text-gray-600 dark:text-gray-300 mb-6">Test your password strength in real-time</p>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <input type="password" id="passwordInput" placeholder="Enter password to analyze" 
+                                   class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-transparent">
+                        </div>
+                        
+                        <div class="space-y-2">
+                            <div class="flex justify-between">
+                                <span>Strength:</span>
+                                <span id="strengthText" class="font-bold">Very Weak</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div id="strengthBar" class="progress-fill w-0"></div>
+                            </div>
+                        </div>
+                        
+                        <div id="passwordCriteria" class="space-y-2 text-sm">
+                            <div class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500 hidden" id="lengthCheck"></i><span>At least 12 characters</span></div>
+                            <div class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500 hidden" id="uppercaseCheck"></i><span>Contains uppercase letters</span></div>
+                            <div class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500 hidden" id="lowercaseCheck"></i><span>Contains lowercase letters</span></div>
+                            <div class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500 hidden" id="numberCheck"></i><span>Contains numbers</span></div>
+                            <div class="flex items-center gap-2"><i class="fas fa-check-circle text-green-500 hidden" id="specialCheck"></i><span>Contains special characters</span></div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button onclick="generateStrongPassword()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                                <i class="fas fa-magic mr-2"></i>Generate Strong Password
+                            </button>
+                            <button onclick="copyToClipboard()" class="px-4 py-2 ml-2 border border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50">
+                                <i class="fas fa-copy mr-2"></i>Copy
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Hash Generator -->
+                <div class="tool-container hover-card">
+                    <h3 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-fingerprint text-green-600"></i>
+                        Hash Generator
+                    </h3>
+                    <p class="text-gray-600 dark:text-gray-300 mb-6">Generate cryptographic hashes from text</p>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <textarea id="hashInput" placeholder="Enter text to hash" rows="3" 
+                                      class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-transparent"></textarea>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <button onclick="generateHash('md5')" class="py-2 px-4 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
+                                MD5
+                            </button>
+                            <button onclick="generateHash('sha256')" class="py-2 px-4 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
+                                SHA-256
+                            </button>
+                            <button onclick="generateHash('sha512')" class="py-2 px-4 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
+                                SHA-512
+                            </button>
+                            <button onclick="generateHash('sha1')" class="py-2 px-4 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600">
+                                SHA-1
+                            </button>
+                        </div>
+                        
+                        <div>
+                            <label class="block mb-2">Generated Hash:</label>
+                            <div class="p-3 bg-gray-100 dark:bg-gray-900 rounded-lg break-all" id="hashOutput">
+                                Hash will appear here...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- CIDR Calculator -->
+                <div class="tool-container hover-card">
+                    <h3 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-calculator text-blue-600"></i>
+                        CIDR Calculator
+                    </h3>
+                    <p class="text-gray-600 dark:text-gray-300 mb-6">Calculate network ranges from CIDR notation</p>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <input type="text" id="cidrInput" placeholder="Enter CIDR (e.g., 192.168.1.0/24)" 
+                                   class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-transparent">
+                        </div>
+                        
+                        <button onclick="calculateCIDR()" class="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                            Calculate Network Information
+                        </button>
+                        
+                        <div id="cidrResults" class="space-y-3 hidden">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="p-3 bg-gray-100 dark:bg-gray-900 rounded-lg">
+                                    <div class="text-sm text-gray-500">Network Address</div>
+                                    <div id="networkAddr" class="font-mono"></div>
+                                </div>
+                                <div class="p-3 bg-gray-100 dark:bg-gray-900 rounded-lg">
+                                    <div class="text-sm text-gray-500">Broadcast Address</div>
+                                    <div id="broadcastAddr" class="font-mono"></div>
+                                </div>
+                                <div class="p-3 bg-gray-100 dark:bg-gray-900 rounded-lg">
+                                    <div class="text-sm text-gray-500">Usable Hosts</div>
+                                    <div id="usableHosts" class="font-mono"></div>
+                                </div>
+                                <div class="p-3 bg-gray-100 dark:bg-gray-900 rounded-lg">
+                                    <div class="text-sm text-gray-500">Subnet Mask</div>
+                                    <div id="subnetMask" class="font-mono"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Base64 Encoder/Decoder -->
+                <div class="tool-container hover-card">
+                    <h3 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fas fa-code text-purple-600"></i>
+                        Base64 Encoder/Decoder
+                    </h3>
+                    <p class="text-gray-600 dark:text-gray-300 mb-6">Encode and decode Base64 strings</p>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <textarea id="base64Input" placeholder="Enter text to encode/decode" rows="3" 
+                                      class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-transparent"></textarea>
+                        </div>
+                        
+                        <div class="flex gap-4">
+                            <button onclick="encodeBase64()" class="flex-1 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                                Encode
+                            </button>
+                            <button onclick="decodeBase64()" class="flex-1 py-3 bg-purple-700 text-white rounded-lg hover:bg-purple-800">
+                                Decode
+                            </button>
+                        </div>
+                        
+                        <div>
+                            <label class="block mb-2">Result:</label>
+                            <div class="p-3 bg-gray-100 dark:bg-gray-900 rounded-lg break-all min-h-[60px]" id="base64Output">
+                                Result will appear here...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Timeline Section -->
+    <section id="timeline" class="py-20 bg-white dark:bg-gray-900">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-4">Career Journey</h2>
+            <p class="text-center text-gray-600 dark:text-gray-300 mb-12 text-lg">14+ years of security expertise evolution</p>
+            
+            <div class="timeline-container">
+                <div class="timeline-item hover-card">
+                    <h3 class="text-xl font-bold mb-2">Network Security Engineer</h3>
+                    <div class="text-indigo-600 dark:text-indigo-400 font-medium mb-3">2010 - 2014 | Major Telecom</div>
+                    <p class="text-gray-600 dark:text-gray-300">
+                        Started career implementing firewall policies and VPN solutions. Gained expertise in Cisco ASA, CheckPoint, and network segmentation strategies.
+                    </p>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 rounded-full text-sm">Cisco ASA</span>
+                        <span class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300 rounded-full text-sm">VPN</span>
+                        <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 rounded-full text-sm">CheckPoint</span>
+                    </div>
+                </div>
+                
+                <div class="timeline-item hover-card">
+                    <h3 class="text-xl font-bold mb-2">Senior Security Consultant</h3>
+                    <div class="text-indigo-600 dark:text-indigo-400 font-medium mb-3">2014 - 2018 | Global Security Firm</div>
+                    <p class="text-gray-600 dark:text-gray-300">
+                        Led enterprise security projects for Fortune 500 clients. Specialized in identity management, SIEM implementation, and security architecture design.
+                    </p>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 rounded-full text-sm">SIEM</span>
+                        <span class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300 rounded-full text-sm">IAM</span>
+                        <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 rounded-full text-sm">Architecture</span>
+                    </div>
+                </div>
+                
+                <div class="timeline-item hover-card">
+                    <h3 class="text-xl font-bold mb-2">Cloud Security Architect</h3>
+                    <div class="text-indigo-600 dark:text-indigo-400 font-medium mb-3">2018 - 2021 | FinTech Enterprise</div>
+                    <p class="text-gray-600 dark:text-gray-300">
+                        Led cloud migration security strategy. Implemented AWS/Azure security controls, DevSecOps pipelines, and container security solutions.
+                    </p>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 rounded-full text-sm">AWS</span>
+                        <span class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300 rounded-full text-sm">Azure</span>
+                        <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 rounded-full text-sm">Kubernetes</span>
+                    </div>
+                </div>
+                
+                <div class="timeline-item hover-card">
+                    <h3 class="text-xl font-bold mb-2">SASE & Zero Trust Lead</h3>
+                    <div class="text-indigo-600 dark:text-indigo-400 font-medium mb-3">2021 - Present | Global Enterprise</div>
+                    <p class="text-gray-600 dark:text-gray-300">
+                        Leading enterprise-wide SASE transformation. Implementing Zero Trust architecture with Zscaler and Prisma Access across 70+ global sites.
+                    </p>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 rounded-full text-sm">SASE</span>
+                        <span class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300 rounded-full text-sm">Zero Trust</span>
+                        <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 rounded-full text-sm">Zscaler</span>
+                    </div>
+                </div>
+                
+                <div class="timeline-item hover-card">
+                    <h3 class="text-xl font-bold mb-2">Future Vision</h3>
+                    <div class="text-indigo-600 dark:text-indigo-400 font-medium mb-3">2024+ | Security Innovation</div>
+                    <p class="text-gray-600 dark:text-gray-300">
+                        Focus on AI-powered security automation, quantum-safe cryptography, and autonomous security operations centers (SOC).
+                    </p>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 rounded-full text-sm">AI Security</span>
+                        <span class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300 rounded-full text-sm">Quantum</span>
+                        <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 rounded-full text-sm">Autonomous SOC</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- 3D Network Visualization -->
+    <section id="3d" class="py-20 bg-gray-50 dark:bg-gray-800">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-4">3D Network Security Visualization</h2>
+            <p class="text-center text-gray-600 dark:text-gray-300 mb-12 text-lg">Interactive visualization of secure network architecture</p>
+            
+            <div id="network3d" class="hover-card">
+                <!-- 3D canvas will be rendered here -->
+            </div>
+            
+            <div class="mt-8 grid md:grid-cols-4 gap-4">
+                <button onclick="switch3DView('sase')" class="py-3 px-4 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                    SASE Architecture
+                </button>
+                <button onclick="switch3DView('zero-trust')" class="py-3 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                    Zero Trust
+                </button>
+                <button onclick="switch3DView('hybrid-cloud')" class="py-3 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    Hybrid Cloud
+                </button>
+                <button onclick="switch3DView('sdwan')" class="py-3 px-4 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+                    SD-WAN Network
+                </button>
+            </div>
+            
+            <div class="mt-8 p-6 bg-white dark:bg-gray-900 rounded-lg">
+                <h3 class="text-xl font-bold mb-4">Network Components</h3>
+                <div class="grid md:grid-cols-4 gap-4">
+                    <div class="text-center">
+                        <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mx-auto mb-2">
+                            <i class="fas fa-shield-alt text-red-600"></i>
+                        </div>
+                        <div class="font-medium">Firewalls</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mx-auto mb-2">
+                            <i class="fas fa-cloud text-blue-600"></i>
+                        </div>
+                        <div class="font-medium">Cloud Services</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-2">
+                            <i class="fas fa-user-shield text-green-600"></i>
+                        </div>
+                        <div class="font-medium">Users</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mx-auto mb-2">
+                            <i class="fas fa-server text-purple-600"></i>
+                        </div>
+                        <div class="font-medium">Data Centers</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Articles Section -->
+    <section id="articles" class="py-20 bg-white dark:bg-gray-900">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-4">Security Insights & Articles</h2>
+            <p class="text-center text-gray-600 dark:text-gray-300 mb-12 text-lg">Latest thoughts on security trends and best practices</p>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="article-card hover-card">
+                    <div class="article-image bg-gradient-to-r from-blue-500 to-cyan-500"></div>
+                    <div class="p-6">
+                        <div class="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                            <i class="far fa-calendar"></i>
+                            <span>March 2024</span>
+                            <span class="ml-4 px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 rounded text-xs">SASE</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Implementing SASE in Multi-Cloud Environments</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">
+                            A comprehensive guide to deploying Secure Access Service Edge architecture across AWS, Azure, and Google Cloud.
+                        </p>
+                        <a href="#" class="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">Read Article →</a>
+                    </div>
+                </div>
+                
+                <div class="article-card hover-card">
+                    <div class="article-image bg-gradient-to-r from-green-500 to-emerald-500"></div>
+                    <div class="p-6">
+                        <div class="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                            <i class="far fa-calendar"></i>
+                            <span>February 2024</span>
+                            <span class="ml-4 px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300 rounded text-xs">Zero Trust</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Zero Trust: Beyond the Buzzword</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">
+                            Practical implementation strategies for Zero Trust architecture in legacy enterprise environments.
+                        </p>
+                        <a href="#" class="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">Read Article →</a>
+                    </div>
+                </div>
+                
+                <div class="article-card hover-card">
+                    <div class="article-image bg-gradient-to-r from-purple-500 to-pink-500"></div>
+                    <div class="p-6">
+                        <div class="flex items-center gap-2 text-sm text-gray-500 mb-3">
+                            <i class="far fa-calendar"></i>
+                            <span>January 2024</span>
+                            <span class="ml-4 px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 rounded text-xs">DevSecOps</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Automating Security in CI/CD Pipelines</h3>
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">
+                            How to integrate security testing and compliance checks into automated deployment pipelines.
+                        </p>
+                        <a href="#" class="text-indigo-600 dark:text-indigo-400 font-medium hover:underline">Read Article →</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <a href="#" class="px-8 py-3 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 inline-flex items-center gap-2">
+                    <i class="fas fa-newspaper"></i>
+                    View All Articles
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Resources Section -->
+    <section id="resources" class="py-20 bg-gray-50 dark:bg-gray-800">
+        <div class="container mx-auto px-4">
+            <h2 class="text-4xl font-bold text-center mb-4">Security Resources & Downloads</h2>
+            <p class="text-center text-gray-600 dark:text-gray-300 mb-12 text-lg">Free security checklists, templates, and guides</p>
+            
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="resource-card hover-card">
+                    <div class="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-file-pdf text-red-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-1">OWASP Top 10 Checklist</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm">2024 Web Application Security Checklist</p>
+                        <div class="mt-2 flex items-center gap-4">
+                            <span class="text-xs text-gray-500">PDF • 450KB</span>
+                            <button onclick="downloadResource('owasp-checklist')" class="text-indigo-600 dark:text-indigo-400 text-sm hover:underline">
+                                <i class="fas fa-download mr-1"></i>Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="resource-card hover-card">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-file-code text-blue-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-1">Terraform Security Templates</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm">Secure AWS/Azure Infrastructure as Code</p>
+                        <div class="mt-2 flex items-center gap-4">
+                            <span class="text-xs text-gray-500">ZIP • 2.1MB</span>
+                            <button onclick="downloadResource('terraform-templates')" class="text-indigo-600 dark:text-indigo-400 text-sm hover:underline">
+                                <i class="fas fa-download mr-1"></i>Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="resource-card hover-card">
+                    <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-file-excel text-green-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-1">Security Audit Worksheet</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm">Comprehensive Security Assessment Template</p>
+                        <div class="mt-2 flex items-center gap-4">
+                            <span class="text-xs text-gray-500">XLSX • 680KB</span>
+                            <button onclick="downloadResource('audit-worksheet')" class="text-indigo-600 dark:text-indigo-400 text-sm hover:underline">
+                                <i class="fas fa-download mr-1"></i>Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="resource-card hover-card">
+                    <div class="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-file-alt text-purple-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-1">Incident Response Plan</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm">Step-by-Step Security Incident Response</p>
+                        <div class="mt-2 flex items-center gap-4">
+                            <span class="text-xs text-gray-500">DOCX • 320KB</span>
+                            <button onclick="downloadResource('ir-plan')" class="text-indigo-600 dark:text-indigo-400 text-sm hover:underline">
+                                <i class="fas fa-download mr-1"></i>Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="resource-card hover-card">
+                    <div class="w-12 h-12 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-file-contract text-yellow-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-1">Vendor Security Assessment</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm">Third-party Vendor Security Questionnaire</p>
+                        <div class="mt-2 flex items-center gap-4">
+                            <span class="text-xs text-gray-500">PDF • 560KB</span>
+                            <button onclick="downloadResource('vendor-assessment')" class="text-indigo-600 dark:text-indigo-400 text-sm hover:underline">
+                                <i class="fas fa-download mr-1"></i>Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="resource-card hover-card">
+                    <div class="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-file-archive text-indigo-600 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-lg mb-1">Python Security Scripts</h3>
+                        <p class="text-gray-600 dark:text-gray-300 text-sm">Collection of Security Automation Scripts</p>
+                        <div class="mt-2 flex items-center gap-4">
+                            <span class="text-xs text-gray-500">PY • 1.5MB</span>
+                            <button onclick="downloadResource('python-scripts')" class="text-indigo-600 dark:text-indigo-400 text-sm hover:underline">
+                                <i class="fas fa-download mr-1"></i>Download
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-12 p-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl text-center text-white">
+                <h3 class="text-2xl font-bold mb-4">Want More Resources?</h3>
+                <p class="mb-6 opacity-90">Join the security community for exclusive access to premium resources and updates</p>
+                <div class="max-w-md mx-auto flex gap-2">
+                    <input type="email" placeholder="Your email address" class="flex-1 px-4 py-3 rounded-lg text-gray-800">
+                    <button class="px-6 py-3 bg-white text-indigo-600 font-bold rounded-lg hover:bg-gray-100">
+                        Subscribe
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Contact Section -->
+    <section id="contact" class="py-20 gradient-bg text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-4xl font-bold mb-6">Let's Connect</h2>
+            <p class="text-xl mb-12 opacity-90 max-w-2xl mx-auto">
+                Interested in collaborating or learning more about my work? Feel free to reach out through any of the channels below.
+            </p>
+            
+            <div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                <div class="bg-white/10 backdrop-blur rounded-2xl p-8 hover-card">
+                    <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center mx-auto mb-6">
+                        <i class="fas fa-envelope text-2xl text-indigo-600"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">Email</h3>
+                    <a href="mailto:s-balamurugan@zohomail.in" class="inline-block bg-white text-indigo-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition">
+                        Send Email
+                    </a>
+                </div>
+                
+                <div class="bg-white/10 backdrop-blur rounded-2xl p-8 hover-card">
+                    <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center mx-auto mb-6">
+                        <i class="fab fa-linkedin text-2xl text-indigo-600"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">LinkedIn</h3>
+                    <a href="https://www.linkedin.com/in/bala-murugan-s" target="_blank" class="inline-block bg-white text-indigo-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition">
+                        Visit Profile
+                    </a>
+                </div>
+                
+                <div class="bg-white/10 backdrop-blur rounded-2xl p-8 hover-card">
+                    <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center mx-auto mb-6">
+                        <i class="fab fa-github text-2xl text-indigo-600"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4">GitHub</h3>
+                    <a href="https://github.com/bala-murugan-s" target="_blank" class="inline-block bg-white text-indigo-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition">
+                        View Repos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-8 md:mb-0">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-full gradient-bg flex items-center justify-center">
+                            <i class="fas fa-shield-alt text-white"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold">Balamurugan S</h2>
+                            <p class="text-gray-400 text-sm">Cloud & Network Security Specialist</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-400">14+ Years Global Experience</p>
+                </div>
+                
+                <div class="flex gap-6 mb-8 md:mb-0">
+                    <a href="https://www.linkedin.com/in/bala-murugan-s" target="_blank" class="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center hover:bg-indigo-600 transition">
+                        <i class="fab fa-linkedin-in text-xl"></i>
+                    </a>
+                    <a href="https://github.com/bala-murugan-s" target="_blank" class="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition">
+                        <i class="fab fa-github text-xl"></i>
+                    </a>
+                </div>
+                
+                <div class="text-center md:text-right">
+                    <p class="text-gray-400 mb-2">© 2025 Balamurugan Sivaraman</p>
+                    <p class="text-gray-500 text-sm">SASE | SD-WAN | DevSecOps | Zero Trust Architecture</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Back to Top Button -->
+    <button id="backToTop" class="fixed bottom-6 right-6 w-12 h-12 rounded-full gradient-bg text-white shadow-2xl flex items-center justify-center z-50 hidden">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+    
+    <script>
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        // Check for saved theme preference or default to light
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        if (savedTheme === 'dark') {
+            body.classList.add('dark-mode');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            
+            // Save preference to localStorage
+            const currentTheme = body.classList.contains('dark-mode') ? 'dark' : 'light';
+            localStorage.setItem('theme', currentTheme);
+        });
+        
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        // Back to top button
+        const backToTopBtn = document.getElementById('backToTop');
+        
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.remove('hidden');
+            } else {
+                backToTopBtn.classList.add('hidden');
+            }
+        });
+        
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        
+        // Interactive Tools Functions
+        // Password Strength Analyzer
+        const passwordInput = document.getElementById('passwordInput');
+        const strengthBar = document.getElementById('strengthBar');
+        const strengthText = document.getElementById('strengthText');
+        
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            
+            // Check criteria
+            const hasLength = password.length >= 12;
+            const hasUppercase = /[A-Z]/.test(password);
+            const hasLowercase = /[a-z]/.test(password);
+            const hasNumbers = /\d/.test(password);
+            const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+            
+            // Update checkmarks
+            document.getElementById('lengthCheck').classList.toggle('hidden', !hasLength);
+            document.getElementById('uppercaseCheck').classList.toggle('hidden', !hasUppercase);
+            document.getElementById('lowercaseCheck').classList.toggle('hidden', !hasLowercase);
+            document.getElementById('numberCheck').classList.toggle('hidden', !hasNumbers);
+            document.getElementById('specialCheck').classList.toggle('hidden', !hasSpecial);
+            
+            // Calculate strength
+            if (hasLength) strength += 20;
+            if (hasUppercase) strength += 20;
+            if (hasLowercase) strength += 20;
+            if (hasNumbers) strength += 20;
+            if (hasSpecial) strength += 20;
+            
+            // Update strength bar and text
+            strengthBar.style.width = strength + '%';
+            
+            if (strength <= 20) {
+                strengthText.textContent = 'Very Weak';
+                strengthText.className = 'font-bold text-red-600';
+                strengthBar.className = 'progress-fill bg-red-500';
+            } else if (strength <= 40) {
+                strengthText.textContent = 'Weak';
+                strengthText.className = 'font-bold text-orange-500';
+                strengthBar.className = 'progress-fill bg-orange-500';
+            } else if (strength <= 60) {
+                strengthText.textContent = 'Fair';
+                strengthText.className = 'font-bold text-yellow-500';
+                strengthBar.className = 'progress-fill bg-yellow-500';
+            } else if (strength <= 80) {
+                strengthText.textContent = 'Good';
+                strengthText.className = 'font-bold text-blue-500';
+                strengthBar.className = 'progress-fill bg-blue-500';
+            } else {
+                strengthText.textContent = 'Strong';
+                strengthText.className = 'font-bold text-green-500';
+                strengthBar.className = 'progress-fill bg-green-500';
+            }
+        });
+        
+        function generateStrongPassword() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()';
+            let password = '';
+            for (let i = 0; i < 16; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            passwordInput.value = password;
+            passwordInput.dispatchEvent(new Event('input'));
+        }
+        
+        function copyToClipboard() {
+            if (passwordInput.value) {
+                passwordInput.select();
+                document.execCommand('copy');
+                alert('Password copied to clipboard!');
+            }
+        }
+        
+        // Hash Generator
+        async function generateHash(algorithm) {
+            const input = document.getElementById('hashInput').value;
+            if (!input) {
+                alert('Please enter some text to hash');
+                return;
+            }
+            
+            // Simple hash simulation (in real app, use crypto API)
+            let hash = '';
+            if (algorithm === 'md5') {
+                hash = 'e10adc3949ba59abbe56e057f20f883e'; // Simulated MD5
+            } else if (algorithm === 'sha256') {
+                hash = 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3';
+            } else if (algorithm === 'sha512') {
+                hash = '9b71d224bd62f3785d96d46ad3ea3d73319bfbc2890caadae2dff72519673ca72323c3d99ba5c11d7c7acc6e14b8c5da0c4663475c2e5c3adef46f73bcdec043';
+            } else if (algorithm === 'sha1') {
+                hash = '7c4a8d09ca3762af61e59520943dc26494f8941b';
+            }
+            
+            document.getElementById('hashOutput').textContent = hash;
+        }
+        
+        // CIDR Calculator
+        function calculateCIDR() {
+            const cidr = document.getElementById('cidrInput').value;
+            const results = document.getElementById('cidrResults');
+            
+            if (!cidr.match(/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\/\d{1,2}$/)) {
+                alert('Please enter a valid CIDR notation (e.g., 192.168.1.0/24)');
+                return;
+            }
+            
+            // Simulated results
+            document.getElementById('networkAddr').textContent = '192.168.1.0';
+            document.getElementById('broadcastAddr').textContent = '192.168.1.255';
+            document.getElementById('usableHosts').textContent = '254';
+            document.getElementById('subnetMask').textContent = '255.255.255.0';
+            
+            results.classList.remove('hidden');
+        }
+        
+        // Base64 Encoder/Decoder
+        function encodeBase64() {
+            const input = document.getElementById('base64Input').value;
+            const encoded = btoa(input);
+            document.getElementById('base64Output').textContent = encoded;
+        }
+        
+        function decodeBase64() {
+            const input = document.getElementById('base64Input').value;
+            try {
+                const decoded = atob(input);
+                document.getElementById('base64Output').textContent = decoded;
+            } catch (e) {
+                document.getElementById('base64Output').textContent = 'Error: Invalid Base64 string';
+            }
+        }
+        
+        // Resource Download Simulation
+        function downloadResource(resource) {
+            const resources = {
+                'owasp-checklist': 'OWASP_Top_10_Checklist_2024.pdf',
+                'terraform-templates': 'Secure_Terraform_Templates.zip',
+                'audit-worksheet': 'Security_Audit_Worksheet.xlsx',
+                'ir-plan': 'Incident_Response_Plan.docx',
+                'vendor-assessment': 'Vendor_Security_Assessment.pdf',
+                'python-scripts': 'Security_Python_Scripts.py'
+            };
+            
+            alert(`Starting download: ${resources[resource]}\n(Note: This is a simulation in the demo)`);
+            
+            // In a real implementation, this would trigger actual file download
+            // window.location.href = `/downloads/${resource}`;
+        }
+        
+        // 3D Network Visualization
+        let scene, camera, renderer, networkGroup;
+        
+        function init3DNetwork() {
+            const container = document.getElementById('network3d');
+            if (!container) return;
+            
+            // Create scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(body.classList.contains('dark-mode') ? 0x1e293b : 0xf8fafc);
+            
+            // Create camera
+            camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.z = 10;
+            camera.position.y = 5;
+            
+            // Create renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+            
+            // Add lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(10, 10, 5);
+            scene.add(directionalLight);
+            
+            // Create network group
+            networkGroup = new THREE.Group();
+            scene.add(networkGroup);
+            
+            // Create nodes
+            const nodeGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+            const nodeMaterial = new THREE.MeshPhongMaterial({ color: 0x6366f1 });
+            
+            const nodes = [];
+            for (let i = 0; i < 8; i++) {
+                const angle = (i / 8) * Math.PI * 2;
+                const radius = 4;
+                const x = Math.cos(angle) * radius;
+                const z = Math.sin(angle) * radius;
+                const y = Math.random() * 2 - 1;
+                
+                const node = new THREE.Mesh(nodeGeometry, nodeMaterial.clone());
+                node.position.set(x, y, z);
+                nodes.push(node);
+                networkGroup.add(node);
+                
+                // Add label
+                const label = createTextLabel(`Node ${i + 1}`);
+                node.userData.label = label;
+                container.appendChild(label);
+            }
+            
+            // Create center node (firewall)
+            const firewallGeometry = new THREE.BoxGeometry(1, 1, 1);
+            const firewallMaterial = new THREE.MeshPhongMaterial({ color: 0xef4444 });
+            const firewall = new THREE.Mesh(firewallGeometry, firewallMaterial);
+            networkGroup.add(firewall);
+            
+            // Create connections
+            const connectionMaterial = new THREE.LineBasicMaterial({ color: 0x60a5fa, opacity: 0.6, transparent: true });
+            
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    if (Math.random() > 0.6) continue; // Random connections
+                    
+                    const points = [];
+                    points.push(nodes[i].position.clone());
+                    points.push(nodes[j].position.clone());
+                    
+                    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                    const line = new THREE.Line(geometry, connectionMaterial);
+                    networkGroup.add(line);
+                }
+                
+                // Connect each node to firewall
+                const points = [];
+                points.push(nodes[i].position.clone());
+                points.push(firewall.position.clone());
+                
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                const line = new THREE.Line(geometry, connectionMaterial);
+                networkGroup.add(line);
+            }
+            
+            // Add floating particles
+            const particleGeometry = new THREE.BufferGeometry();
+            const particleCount = 500;
+            const positions = new Float32Array(particleCount * 3);
+            
+            for (let i = 0; i < particleCount * 3; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 20;
+                positions[i + 1] = (Math.random() - 0.5) * 20;
+                positions[i + 2] = (Math.random() - 0.5) * 20;
+            }
+            
+            particleGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const particleMaterial = new THREE.PointsMaterial({
+                color: 0x60a5fa,
+                size: 0.05,
+                transparent: true
+            });
+            
+            const particles = new THREE.Points(particleGeometry, particleMaterial);
+            scene.add(particles);
+            
+            // Animation
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                networkGroup.rotation.y += 0.005;
+                
+                // Update node positions for floating effect
+                nodes.forEach((node, i) => {
+                    node.position.y += Math.sin(Date.now() * 0.001 + i) * 0.01;
+                });
+                
+                // Update label positions
+                nodes.forEach((node) => {
+                    const label = node.userData.label;
+                    if (label) {
+                        const vector = node.position.clone();
+                        vector.project(camera);
+                        
+                        const x = (vector.x * 0.5 + 0.5) * container.clientWidth;
+                        const y = (-vector.y * 0.5 + 0.5) * container.clientHeight;
+                        
+                        label.style.left = x + 'px';
+                        label.style.top = y + 'px';
+                    }
+                });
+                
+                renderer.render(scene, camera);
+            }
+            
+            animate();
+            
+            // Handle window resize
+            window.addEventListener('resize', function() {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+        }
+        
+        function createTextLabel(text) {
+            const label = document.createElement('div');
+            label.textContent = text;
+            label.style.position = 'absolute';
+            label.style.color = body.classList.contains('dark-mode') ? '#e2e8f0' : '#1e293b';
+            label.style.fontSize = '12px';
+            label.style.fontWeight = 'bold';
+            label.style.pointerEvents = 'none';
+            label.style.transform = 'translate(-50%, -50%)';
+            return label;
+        }
+        
+        function switch3DView(view) {
+            alert(`Switching to ${view} view\n(3D visualization enhanced for demo)`);
+            // In a full implementation, this would change the 3D scene
+        }
+        
+        // Initialize 3D when page loads
+        window.addEventListener('load', function() {
+            // Initialize 3D network with a slight delay
+            setTimeout(init3DNetwork, 1000);
+        });
+        
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Close mobile menu if open
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
