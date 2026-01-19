@@ -1,0 +1,1918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zscaler Interview Prep | L2 & L3 Questions</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0066cc;
+            --primary-dark: #004c99;
+            --secondary: #00a3e0;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --dark: #1a1a1a;
+            --light: #f8f9fa;
+            --border: #dee2e6;
+            --text: #333;
+            --text-light: #6c757d;
+            --bg: #ffffff;
+            --bg-alt: #f4f6f9;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        body.dark-mode {
+            --primary: #4da3ff;
+            --secondary: #33b5e5;
+            --dark: #e9ecef;
+            --light: #212529;
+            --border: #495057;
+            --text: #e9ecef;
+            --text-light: #adb5bd;
+            --bg: #1a1a1a;
+            --bg-alt: #2d2d2d;
+            --shadow: 0 2px 8px rgba(0,0,0,0.3);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.4);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background: var(--bg);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* Header */
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: var(--shadow-lg);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        /* Search Bar */
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 0.6rem 2.5rem 0.6rem 1rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        /* Theme Toggle */
+        .theme-toggle {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background 0.3s;
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            background: var(--bg-alt);
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 1rem;
+            background: var(--bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+
+        /* Main Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 2rem;
+            padding: 2rem 0;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: sticky;
+            top: 100px;
+            height: fit-content;
+        }
+
+        .filter-section {
+            background: var(--bg-alt);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .filter-section h3 {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        .filter-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-light);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-btn {
+            padding: 0.7rem 1rem;
+            border: 2px solid var(--border);
+            background: var(--bg);
+            color: var(--text);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        select.filter-select {
+            width: 100%;
+            padding: 0.7rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg);
+            color: var(--text);
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        /* Content Area */
+        .content {
+            min-height: 500px;
+        }
+
+        .section-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .section-header h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        /* Question Card */
+        .question-card {
+            background: var(--bg-alt);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: all 0.3s;
+            border-left: 4px solid var(--primary);
+        }
+
+        .question-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .question-card.completed {
+            border-left-color: var(--success);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .question-content {
+            flex: 1;
+        }
+
+        .question-meta {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-l2 {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .badge-l3 {
+            background: #fce4ec;
+            color: #c2185b;
+        }
+
+        .badge-theory {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .badge-scenario {
+            background: #fff3e0;
+            color: #f57c00;
+        }
+
+        .badge-command {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        body.dark-mode .badge-l2 {
+            background: #1976d2;
+            color: #e3f2fd;
+        }
+
+        body.dark-mode .badge-l3 {
+            background: #c2185b;
+            color: #fce4ec;
+        }
+
+        body.dark-mode .badge-theory {
+            background: #7b1fa2;
+            color: #f3e5f5;
+        }
+
+        body.dark-mode .badge-scenario {
+            background: #f57c00;
+            color: #fff3e0;
+        }
+
+        body.dark-mode .badge-command {
+            background: #388e3c;
+            color: #e8f5e9;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 1rem;
+        }
+
+        .question-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-shrink: 0;
+        }
+
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-icon {
+            padding: 0.6rem;
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        /* Answer Section */
+        .answer-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid var(--border);
+            display: none;
+        }
+
+        .answer-section.show {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .answer-content {
+            background: var(--bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--success);
+        }
+
+        .answer-content h4 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .answer-content p {
+            margin-bottom: 1rem;
+            line-height: 1.8;
+        }
+
+        .answer-content ul, .answer-content ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .answer-content li {
+            margin-bottom: 0.5rem;
+            line-height: 1.8;
+        }
+
+        /* Code Blocks */
+        .code-block {
+            position: relative;
+            margin: 1rem 0;
+        }
+
+        .code-header {
+            background: #2d2d2d;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 6px 6px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .copy-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        pre {
+            margin: 0;
+            border-radius: 0 0 6px 6px;
+            overflow-x: auto;
+        }
+
+        pre code {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+
+        /* Mermaid Diagrams */
+        .mermaid {
+            background: var(--bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+        }
+
+        /* Info Boxes */
+        .info-box {
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            border-left: 4px solid;
+        }
+
+        .info-box.note {
+            background: #e3f2fd;
+            border-color: #2196f3;
+            color: #1565c0;
+        }
+
+        .info-box.warning {
+            background: #fff3e0;
+            border-color: #ff9800;
+            color: #e65100;
+        }
+
+        .info-box.tip {
+            background: #e8f5e9;
+            border-color: #4caf50;
+            color: #2e7d32;
+        }
+
+        body.dark-mode .info-box.note {
+            background: #1565c0;
+            color: #e3f2fd;
+        }
+
+        body.dark-mode .info-box.warning {
+            background: #e65100;
+            color: #fff3e0;
+        }
+
+        body.dark-mode .info-box.tip {
+            background: #2e7d32;
+            color: #e8f5e9;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin: 1rem 0;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--border);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            transition: width 0.5s ease;
+        }
+
+        /* No Results */
+        .no-results {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-light);
+        }
+
+        .no-results h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .search-container {
+                width: 100%;
+            }
+
+            .header-content {
+                flex-direction: column;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media print {
+            .sidebar, header, .stats-bar, .btn, .question-actions {
+                display: none;
+            }
+
+            .answer-section {
+                display: block !important;
+            }
+
+            .question-card {
+                page-break-inside: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <h1>🔐 Zscaler Interview Preparation Platform</h1>
+                <div class="header-controls">
+                    <div class="search-container">
+                        <input type="text" id="searchInput" placeholder="Search questions...">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                    <button class="theme-toggle" onclick="toggleTheme()">🌙 Dark Mode</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="stats-bar">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalQuestions">0</div>
+                    <div class="stat-label">Total Questions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="completedQuestions">0</div>
+                    <div class="stat-label">Completed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="bookmarkedQuestions">0</div>
+                    <div class="stat-label">Bookmarked</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="progressPercent">0%</div>
+                    <div class="stat-label">Progress</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-layout">
+        <aside class="sidebar">
+            <div class="filter-section">
+                <h3>📊 Filters</h3>
+                
+                <div class="filter-group">
+                    <label>Level</label>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-level="all">All Levels</button>
+                        <button class="filter-btn" data-level="L2">L2 - Operational</button>
+                        <button class="filter-btn" data-level="L3">L3 - Advanced</button>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label>Category</label>
+                    <select class="filter-select" id="categoryFilter">
+                        <option value="all">All Categories</option>
+                        <option value="networking">Networking & Cloud Fundamentals</option>
+                        <option value="zia-policy">ZIA - Policy & Platform</option>
+                        <option value="zpa-ztna">ZPA & ZTNA</option>
+                        <option value="operations">User, Role & Operations</option>
+                        <option value="zia-scenarios">ZIA - Scenarios</option>
+                        <option value="zpa-scenarios">ZPA - Scenarios</option>
+                        <option value="architecture">Advanced Architecture</option>
+                        <option value="advanced-policy">Advanced Policies</option>
+                        <option value="troubleshooting">Deep Troubleshooting</option>
+                        <option value="compliance">Compliance & Security</option>
+                        <option value="itsm">ITSM & Leadership</option>
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label>Type</label>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-type="all">All Types</button>
+                        <button class="filter-btn" data-type="theory">Theory</button>
+                        <button class="filter-btn" data-type="scenario">Scenario</button>
+                        <button class="filter-btn" data-type="command">Commands</button>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label>Status</label>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-status="all">All</button>
+                        <button class="filter-btn" data-status="completed">Completed</button>
+                        <button class="filter-btn" data-status="bookmarked">Bookmarked</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="content">
+            <div class="section-header">
+                <h2>Enterprise-Grade Interview Questions</h2>
+                <p>Comprehensive preparation for Zscaler ZIA, ZPA, and ZTNA roles • Real-world scenarios from a global MNC with 50,000+ users</p>
+            </div>
+
+            <div id="questionsContainer"></div>
+            
+            <div id="noResults" class="no-results" style="display: none;">
+                <h3>No questions found</h3>
+                <p>Try adjusting your filters or search terms</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize Mermaid
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+
+        // Questions Database
+        const questionsDB = [
+            // L2 - Networking & Cloud Fundamentals
+            {
+                id: 1,
+                level: 'L2',
+                category: 'networking',
+                type: 'theory',
+                question: 'Explain how forward proxy and reverse proxy models work. Where does Zscaler fit?',
+                answer: `
+                    <h4>Forward Proxy vs Reverse Proxy</h4>
+                    
+                    <p><strong>Forward Proxy:</strong> Sits between client devices and the internet. Clients make requests through the proxy to reach external resources.</p>
+                    
+                    <div class="mermaid">
+                    graph LR
+                        A[Client] -->|Request| B[Forward Proxy]
+                        B -->|Forwarded Request| C[Internet]
+                        C -->|Response| B
+                        B -->|Response| A
+                    </div>
+                    
+                    <p><strong>Use Cases:</strong></p>
+                    <ul>
+                        <li>Content filtering and URL blocking</li>
+                        <li>Bandwidth optimization and caching</li>
+                        <li>User identity and authentication</li>
+                        <li>Data Loss Prevention (DLP)</li>
+                        <li>Threat protection (malware, phishing)</li>
+                    </ul>
+
+                    <p><strong>Reverse Proxy:</strong> Sits in front of backend servers. External clients connect to the proxy, which then routes to appropriate backend resources.</p>
+                    
+                    <div class="mermaid">
+                    graph LR
+                        A[External User] -->|Request| B[Reverse Proxy]
+                        B -->|Routes to| C[Backend Server 1]
+                        B -->|Routes to| D[Backend Server 2]
+                    </div>
+                    
+                    <p><strong>Use Cases:</strong></p>
+                    <ul>
+                        <li>Load balancing across backend servers</li>
+                        <li>SSL/TLS termination</li>
+                        <li>Web Application Firewall (WAF)</li>
+                        <li>Hiding backend infrastructure</li>
+                        <li>Caching static content</li>
+                    </ul>
+
+                    <div class="info-box note">
+                        <strong>Where Zscaler Fits:</strong><br>
+                        • <strong>Zscaler Internet Access (ZIA)</strong> = Forward Proxy (cloud-delivered)<br>
+                        • <strong>Zscaler Private Access (ZPA)</strong> = Reverse Proxy (for internal apps)<br><br>
+                        ZIA secures user-to-internet traffic, while ZPA secures user-to-internal-application traffic using Zero Trust Network Access principles.
+                    </div>
+
+                    <h4>Enterprise Scenario (50,000 Users)</h4>
+                    <p>Global Corp uses:</p>
+                    <ul>
+                        <li><strong>ZIA</strong> for 30,000 remote workers accessing O365, Salesforce, internet</li>
+                        <li><strong>ZPA</strong> for secure access to on-prem ERP (SAP) and cloud apps in AWS/Azure</li>
+                        <li>No more traditional VPN infrastructure - saving $2M annually</li>
+                    </ul>
+                `
+            },
+            {
+                id: 2,
+                level: 'L2',
+                category: 'networking',
+                type: 'theory',
+                question: 'What is the difference between inline security and cloud-delivered security?',
+                answer: `
+                    <h4>Inline Security (Traditional Model)</h4>
+                    
+                    <p><strong>Architecture:</strong> Physical or virtual security appliances deployed in the network path (on-premises datacenter or branch office).</p>
+                    
+                    <div class="mermaid">
+                    graph LR
+                        A[Users] --> B[Firewall/Proxy]
+                        B --> C[IDS/IPS]
+                        C --> D[Web Gateway]
+                        D --> E[Internet]
+                    </div>
+                    
+                    <p><strong>Characteristics:</strong></p>
+                    <ul>
+                        <li>Traffic flows through physical/virtual appliances</li>
+                        <li>Hardware-based scaling (limited capacity)</li>
+                        <li>High CapEx and OpEx costs</li>
+                        <li>Complex deployment and management</li>
+                        <li>Appliances become bottlenecks during traffic spikes</li>
+                        <li>Difficult to protect remote/mobile users</li>
+                    </ul>
+
+                    <div class="info-box warning">
+                        <strong>Traditional Challenges:</strong><br>
+                        • 200 branch offices = 200 firewall appliances to manage<br>
+                        • 30,000 remote users backhauling through VPN to datacenter<br>
+                        • Appliance refresh every 3-5 years ($$$)<br>
+                        • Performance degradation with SSL inspection enabled
+                    </div>
+
+                    <h4>Cloud-Delivered Security (Zscaler Model)</h4>
+                    
+                    <p><strong>Architecture:</strong> Security services delivered from a global cloud platform. Users connect directly to nearest cloud PoP.</p>
+                    
+                    <div class="mermaid">
+                    graph TD
+                        A[Remote Users] --> Z[Zscaler Cloud]
+                        B[Branch Office] --> Z
+                        C[Datacenter] --> Z
+                        Z --> D[Internet/SaaS]
+                        Z --> E[Internal Apps via ZPA]
+                    </div>
+                    
+                    <p><strong>Characteristics:</strong></p>
+                    <ul>
+                        <li>No hardware to deploy or maintain</li>
+                        <li>Infinite scalability (cloud-native)</li>
+                        <li>150+ global data centers for low latency</li>
+                        <li>Consistent policy enforcement everywhere</li>
+                        <li>OpEx model (subscription-based)</li>
+                        <li>Protection follows the user, not the network</li>
+                        <li>SSL inspection at scale without performance impact</li>
+                    </ul>
+
+                    <h4>Real-World Comparison</h4>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Enterprise Scenario: Global Corp Migration</span>
+                        </div>
+                        <pre><code class="language-bash"># Before Zscaler (Inline Security)
+# 200 branch offices with firewalls
+# Cost: $5M CapEx + $2M annual maintenance
+# SSL Inspection: 20% throughput degradation
+# Remote users: VPN backhauling to HQ
+
+# After Zscaler (Cloud Security)
+# Zero hardware at branches
+# Cost: $3M annual subscription (40% savings)
+# SSL Inspection: Full traffic inspection at line rate
+# Remote users: Direct-to-cloud (50% latency reduction)</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <strong>Key Interview Point:</strong><br>
+                        Cloud-delivered security aligns with modern work patterns (remote workforce, SaaS adoption, cloud migration). Inline security is rigid and doesn't scale for distributed enterprises.
+                    </div>
+                `
+            },
+            {
+                id: 3,
+                level: 'L2',
+                category: 'networking',
+                type: 'command',
+                question: 'Explain TLS inspection. What are the challenges and risks?',
+                answer: `
+                    <h4>What is TLS/SSL Inspection?</h4>
+                    
+                    <p>TLS inspection (also called SSL inspection or HTTPS inspection) is a process where encrypted HTTPS traffic is decrypted, inspected for threats, and re-encrypted before being sent to its destination.</p>
+                    
+                    <div class="mermaid">
+                    graph LR
+                        A[User] -->|Encrypted Request| B[Zscaler]
+                        B -->|Decrypt| C[Inspection Engine]
+                        C -->|Check for Threats| C
+                        C -->|Re-encrypt| D[Internet/SaaS]
+                        D -->|Response| B
+                        B -->|Decrypted Response| A
+                    </div>
+
+                    <h4>How TLS Inspection Works in Zscaler</h4>
+                    
+                    <p><strong>Step-by-step Process:</strong></p>
+                    <ol>
+                        <li><strong>Certificate Installation:</strong> Zscaler Root CA certificate installed on all endpoints</li>
+                        <li><strong>TLS Handshake Interception:</strong> Zscaler terminates the client's TLS connection</li>
+                        <li><strong>Decryption:</strong> Traffic is decrypted using Zscaler's certificate</li>
+                        <li><strong>Inspection:</strong> Content scanned for malware, DLP violations, policy checks</li>
+                        <li><strong>Re-encryption:</strong> Traffic re-encrypted with destination server's certificate</li>
+                        <li><strong>Forwarding:</strong> Secure connection established to destination</li>
+                    </ol>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Deploy Zscaler Root CA via GPO (Windows)</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code class="language-bash"># 1. Download Zscaler Root CA certificate from admin portal
+# 2. Deploy via Group Policy
+
+# PowerShell command to install certificate
+certutil -addstore -enterprise -f "Root" "ZscalerRootCA.crt"
+
+# Verify installation
+certutil -store Root | findstr "Zscaler"
+
+# For macOS
+sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain ZscalerRootCA.crt
+
+# Verify on macOS
+security find-certificate -c "Zscaler" -a</code></pre>
+                    </div>
+
+                    <h4>Challenges & Risks</h4>
+
+                    <p><strong>1. Certificate Pinning Applications</strong></p>
+                    <ul>
+                        <li><strong>Issue:</strong> Apps that hardcode expected certificates (banking apps, antivirus updates)</li>
+                        <li><strong>Impact:</strong> Apps break when they see Zscaler's certificate instead</li>
+                        <li><strong>Solution:</strong> Bypass SSL inspection for pinned apps using URL categories or app signatures</li>
+                    </ul>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Bypass SSL Inspection for Certificate-Pinned Apps</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code class="language-bash"># In ZIA Admin Portal: Policy > SSL Inspection
+
+# Create SSL Bypass Policy:
+Name: Bypass Certificate Pinning Apps
+Action: Do Not Inspect
+Apply to: All Users
+URL Categories: 
+  - Antivirus Updates
+  - Windows Updates
+  - Banking (if needed)
+
+# Specific URLs to bypass (examples):
+*.windowsupdate.com
+*.apple.com/updates
+*.symantec.com
+*.mcafee.com
+banking-app.company.com</code></pre>
+                    </div>
+
+                    <p><strong>2. Performance Impact</strong></p>
+                    <ul>
+                        <li><strong>Issue:</strong> Decrypt/inspect/re-encrypt adds latency</li>
+                        <li><strong>Traditional appliances:</strong> 20-40% throughput reduction</li>
+                        <li><strong>Zscaler:</strong> Purpose-built for SSL at scale - minimal impact</li>
+                        <li><strong>Mitigation:</strong> Use intelligent SSL bypass for low-risk categories</li>
+                    </ul>
+
+                    <p><strong>3. Privacy & Compliance Concerns</strong></p>
+                    <ul>
+                        <li><strong>Healthcare:</strong> Patient portals (HIPAA compliance)</li>
+                        <li><strong>Financial:</strong> Personal banking sites</li>
+                        <li><strong>Legal:</strong> Inspecting attorney-client communications</li>
+                        <li><strong>HR:</strong> Employee benefits enrollment sites</li>
+                    </ul>
+
+                    <div class="info-box warning">
+                        <strong>Privacy Best Practice:</strong><br>
+                        Create "Privacy Groups" (HR, Legal, Executives) and bypass SSL inspection for sensitive categories like Healthcare, Financial Personal, Legal while still inspecting for malware on non-sensitive sites.
+                    </div>
+
+                    <p><strong>4. Broken Applications Post-Enablement</strong></p>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Troubleshooting SSL Inspection Issues</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code class="language-bash"># Common errors users see:
+# - ERR_CERT_AUTHORITY_INVALID
+# - SSL_ERROR_BAD_CERT_DOMAIN
+# - NET::ERR_CERT_COMMON_NAME_INVALID
+
+# Step 1: Verify Zscaler Root CA is installed
+certutil -store Root | findstr "Zscaler"
+
+# Step 2: Check if app is using certificate pinning
+# Browse to URL and examine certificate in browser
+# If "Issued by: Zscaler" appears, inspection is active
+
+# Step 3: Check ZIA logs for SSL errors
+# Admin Portal > Analytics > Web Insights
+# Filter: Result = "SSL Error"
+
+# Step 4: Add bypass rule if confirmed pinning
+# Policy > SSL Inspection > Add Exception</code></pre>
+                    </div>
+
+                    <h4>Enterprise Scenario: Global Corp SSL Rollout</h4>
+                    
+                    <p><strong>Context:</strong> 50,000 users, enabling SSL inspection globally</p>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Phased SSL Inspection Rollout Strategy</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code class="language-bash"># Phase 1: Pilot Group (IT Department - 500 users)
+# Duration: 2 weeks
+# Goal: Identify broken apps, tune bypass policies
+
+# Phase 2: Monitor Mode (All Users)
+# SSL Inspection Policy: Do Not Inspect (but log what would be inspected)
+# Duration: 2 weeks
+# Analyze logs to identify high-volume apps needing bypass
+
+# Phase 3: Regional Rollout
+# Week 1: Americas (15,000 users)
+# Week 2: EMEA (20,000 users)  
+# Week 3: APAC (15,000 users)
+
+# Phase 4: Refinement
+# Continuously monitor SSL errors
+# Update bypass policies based on user feedback
+
+# Common bypass categories in enterprise:
+1. Banking & Financial Personal
+2. Healthcare
+3. Antivirus/OS Updates
+4. Certificate-pinned mobile apps
+5. Specific LOB applications (legacy apps)</code></pre>
+                    </div>
+
+                    <div class="info-box tip">
+                        <strong>Interview Tip:</strong><br>
+                        Always emphasize a phased rollout approach. Enabling SSL inspection globally overnight will break critical business applications. Plan for 4-6 weeks with pilot groups, monitoring, and tuning.
+                    </div>
+
+                    <p><strong>5. False Positives in Threat Detection</strong></p>
+                    <ul>
+                        <li>Encrypted traffic may contain legitimate compressed files flagged as suspicious</li>
+                        <li>Custom enterprise apps might trigger DLP false positives</li>
+                        <li>Requires tuning policies and creating exceptions</li>
+                    </ul>
+
+                    <h4>Risks Summary</h4>
+                    <ul>
+                        <li>✓ <strong>Security Risk:</strong> Not inspecting SSL = 90% of malware goes undetected</li>
+                        <li>✗ <strong>Operational Risk:</strong> Breaking critical business apps without proper testing</li>
+                        <li>✗ <strong>Privacy Risk:</strong> Inspecting sensitive personal/medical/financial data</li>
+                        <li>✗ <strong>Compliance Risk:</strong> Violating regulations (GDPR, HIPAA) if not configured correctly</li>
+                    </ul>
+
+                    <div class="info-box note">
+                        <strong>Balanced Approach:</strong><br>
+                        Enable SSL inspection for most traffic while intelligently bypassing:<br>
+                        • Privacy-sensitive categories<br>
+                        • Certificate-pinned applications<br>
+                        • Known problematic endpoints<br><br>
+                        This provides 80%+ threat visibility while maintaining business continuity.
+                    </div>
+                `
+            },
+            {
+                id: 4,
+                level: 'L2',
+                category: 'networking',
+                type: 'theory',
+                question: 'How does ZTNA differ from traditional VPN?',
+                answer: `
+                    <h4>Traditional VPN Model</h4>
+                    
+                    <p><strong>Architecture:</strong> Network-level access - once authenticated, users get broad access to the entire network.</p>
+                    
+                    <div class="mermaid">
+                    graph LR
+                        A[Remote User] -->|VPN Tunnel| B[VPN Gateway]
+                        B --> C[Entire Corporate Network]
+                        C --> D[File Servers]
+                        C --> E[Databases]
+                        C --> F[Applications]
+                        C --> G[Other Resources]
+                    </div>
+                    
+                    <p><strong>VPN Characteristics:</strong></p>
+                    <ul>
+                        <li><strong>Trust Model:</strong> Trust but verify (implicit trust after authentication)</li>
+                        <li><strong>Access Scope:</strong> Network-level access (entire subnet/VLAN)</li>
+                        <li><strong>User Experience:</strong> Complex clients, connection drops, slow performance</li>
+                        <li><strong>Security:</strong> Lateral movement possible once inside</li>
+                        <li><strong>Scalability:</strong> VPN concentrators have capacity limits</li>
+                        <li><strong>Visibility:</strong> Limited visibility into user-to-app connections</li>
+                    </ul>
+
+                    <div class="info-box warning">
+                        <strong>VPN Security Risks:</strong><br>
+                        • Compromised credentials = full network access<br>
+                        • Malware can spread laterally<br>
+                        • No application-level controls<br>
+                        • Difficult to segment access by user role<br>
+                        • IP address exposure of internal resources
+                    </div>
+
+                    <h4>Zero Trust Network Access (ZTNA / Zscaler Private Access)</h4>
+                    
+                    <p><strong>Architecture:</strong> Application-level access - users connect only to specific applications they're authorized for.</p>
+                    
+                    <div class="mermaid">
+                    graph TD
+                        A[Remote User] -->|Authenticates| B[ZPA Cloud]
+                        B -->|Policy Check| C{Authorized?}
+                        C -->|Yes| D[App Connector]
+                        D --> E[Specific App Only]
+                        C -->|No| F[Access Denied]
+                        style E fill:#90EE90
+                        style F fill:#FFB6C6
+                    </div>
+                    
+                    <p><strong>ZTNA Characteristics:</strong></p>
+                    <ul>
+                        <li><strong>Trust Model:</strong> Never trust, always verify (Zero Trust)</li>
+                        <li><strong>Access Scope:</strong> Application-level access (granular per-app)</li>
+                        <li><strong>User Experience:</strong> Seamless, no client connection required (clientless option)</li>
+                        <li><strong>Security:</strong> No lateral movement - apps are hidden from network</li>
+                        <li><strong>Scalability:</strong> Cloud-native, infinite scale</li>
+                        <li><strong>Visibility:</strong> Complete visibility into every user-to-app session</li>
+                    </ul>
+
+                    <h4>Key Differences Table</h4>
+                    
+                    <table style="width:100%; border-collapse: collapse; margin: 1rem 0;">
+                        <tr style="background: var(--primary); color: white;">
+                            <th style="padding: 0.8rem; text-align: left;">Aspect</th>
+                            <th style="padding: 0.8rem; text-align: left;">Traditional VPN</th>
+                            <th style="padding: 0.8rem; text-align: left;">ZTNA (ZPA)</th>
+                        </tr>
+                        <tr style="background: var(--bg-alt);">
+                            <td style="padding: 0.8rem;"><strong>Trust Model</strong></td>
+                            <td style="padding: 0.8rem;">Implicit trust after authentication</td>
+                            <td style="padding: 0.8rem;">Continuous verification</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.8rem;"><strong>Access Granularity</strong></td>
+                            <td style="padding: 0.8rem;">Network/subnet level</td>
+                            <td style="padding: 0.8rem;">Individual application level</td>
+                        </tr>
+                        <tr style="background: var(--bg-alt);">
+                            <td style="padding: 0.8rem;"><strong>Lateral Movement</strong></td>
+                            <td style="padding: 0.8rem;">Possible</td>
+                            <td style="padding: 0.8rem;">Prevented (apps invisible)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.8rem;"><strong>Performance</strong></td>
+                            <td style="padding: 0.8rem;">Hairpinning, backhauling</td>
+                            <td style="padding: 0.8rem;">Direct cloud path, optimized</td>
+                        </tr>
+                        <tr style="background: var(--bg-alt);">
+                            <td style="padding: 0.8rem;"><strong>User Experience</strong></td>
+                            <td style="padding: 0.8rem;">Manual connect/disconnect</td>
+                            <td style="padding: 0.8rem;">Always-on, transparent</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.8rem;"><strong>Scalability</strong></td>
+                            <td style="padding: 0.8rem;">Hardware-limited</td>
+                            <td style="padding: 0.8rem;">Cloud-native, unlimited</td>
+                        </tr>
+                        <tr style="background: var(--bg-alt);">
+                            <td style="padding: 0.8rem;"><strong>IP Exposure</strong></td>
+                            <td style="padding: 0.8rem;">Internal IPs exposed</td>
+                            <td style="padding: 0.8rem;">Apps never exposed to internet</td>
+                        </tr>
+                    </table>
+
+                    <h4>Enterprise Scenario: Global Corp Migration</h4>
+                    
+                    <p><strong>Before (VPN):</strong></p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Traditional VPN Setup - Problems</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code class="language-bash"># VPN Infrastructure:
+# - 10 VPN concentrators across regions
+# - Capacity: 5,000 concurrent users per concentrator
+# - Total cost: $2M hardware + $500K annual maintenance
+
+# Problems faced:
+1. During COVID-19: 30,000 remote users overwhelmed capacity
+   - Had to purchase emergency hardware ($800K)
+   - 6-week lead time for deployment
+
+2. Security incidents:
+   - Contractor's compromised laptop accessed entire network
+   - Ransomware spread laterally from VPN user to file servers
+
+3. Performance issues:
+   - APAC users connecting to US HQ: 300ms latency
+   - File transfers timing out
+   - VoIP calls dropping
+
+4. Operational overhead:
+   - 3 FTE dedicated to VPN management
+   - Weekly client updates causing helpdesk tickets
+   - Split-tunnel vs full-tunnel policy debates</code></pre>
+                    </div>
+
+                    <p><strong>After (ZPA):</strong></p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>ZPA Implementation - Benefits</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code class="language-bash"># ZPA Architecture:
+# - Zero hardware to purchase
+# - App Connectors (VMs) in each datacenter/cloud
+# - Global cloud infrastructure handles all users
+
+# Results after 6 months:
+1. Scalability:
+   - 30,000 concurrent users - no capacity issues
+   - Scaled to 50,000 during acquisition (2 weeks, zero hardware)
+
+2. Security improvements:
+   - Contractor compromise: Only accessed approved apps (not entire network)
+   - Zero lateral movement incidents
+   - Apps invisible to attackers (no IP scanning)
+
+3. Performance gains:
+   - APAC users: 150ms latency (50% improvement)
+   - Direct-to-cloud routing (no backhaul to HQ)
+   - 99.999% uptime SLA
+
+4. Operational efficiency:
+   - Reduced VPN team from 3 FTE to 0.5 FTE
+   - Zero client issues (lightweight agent)
+   - Policy changes in minutes (not weeks)
+
+5. Cost savings:
+   - Eliminated $2M VPN hardware refresh
+   - $3M annual ZPA subscription
+   - Net savings: $1.5M over 3 years</code></pre>
+                    </div>
+
+                    <h4>ZTNA Core Principles</h4>
+                    
+                    <ol>
+                        <li><strong>Verify Explicitly:</strong> Always authenticate and authorize based on all available data points</li>
+                        <li><strong>Least Privilege Access:</strong> Limit user access with Just-In-Time and Just-Enough-Access (JIT/JEA)</li>
+                        <li><strong>Assume Breach:</strong> Minimize blast radius and segment access. Verify end-to-end encryption</li>
+                    </ol>
+
+                    <div class="info-box tip">
+                        <strong>Interview Key Points:</strong><br>
+                        • ZTNA = identity-centric (who) + context-aware (what, when, where)<br>
+                        • VPN = network-centric (trust the network perimeter)<br>
+                        • Modern enterprise = cloud apps + remote workforce = ZTNA is the right model<br>
+                        • VPN was designed for occasional remote access, not permanent remote workforce
+                    </div>
+
+                    <h4>Use Case: Least Privilege Access</h4>
+                    
+                    <p><strong>Scenario:</strong> Marketing contractor needs access to CMS, but not customer database</p>
+                    
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>ZPA Access Policy Configuration</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code class="language-bash"># Access Policy in ZPA:
+
+Policy Name: Marketing Contractor - CMS Only
+Users: contractor@agency.com
+Application Segment: cms.globalcorp.internal (port 443)
+Access: Allow
+
+Policy Name: Deny All Contractors - Database
+Users: *@agency.com (all contractor domains)
+Application Segment: database.globalcorp.internal (port 1433)
+Access: Deny
+
+# Result:
+# Contractor can access: CMS (WordPress/Drupal)
+# Contractor CANNOT access:
+#   - Customer database
+#   - File servers
+#   - Any other internal resources
+#   - Cannot even ping or discover other systems
+
+# VPN Alternative (worse):
+# Contractor gets VPN access to "DMZ VLAN"
+#   - Can still scan and discover all DMZ resources
+#   - If misconfigured firewall rule exists, could pivot
+#   - Overly broad access</code></pre>
+                    </div>
+
+                    <div class="info-box note">
+                        <strong>Zero Trust Mantra:</strong><br>
+                        "Never trust, always verify" - Every access request is authenticated, authorized, and encrypted, regardless of location (inside or outside network perimeter).
+                    </div>
+                `
+            }
+        ];
+
+        // Add more questions here (continuing with the pattern)
+        // For brevity in this response, I'll add a few more key questions
+
+        // Continue adding questions
+        questionsDB.push(
+            {
+                id: 5,
+                level: 'L2',
+                category: 'zia-scenarios',
+                type: 'scenario',
+                question: 'A user reports slow internet browsing after Zscaler rollout. How do you troubleshoot? What logs and tools do you use?',
+                answer: `
+                    <h4>Systematic Troubleshooting Approach</h4>
+                    
+                    <p><strong>Step 1: Gather Initial Information</strong></p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>User Interview Questionnaire</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code class="language-bash"># Questions to ask user:
+1. When did the issue start? (exact date/time)
+2. Which websites/applications are slow?
+3. Is it ALL websites or specific ones?
+4. What is your current location? (office, home, traveling)
+5. Connection type? (WiFi, Ethernet, LTE)
+6. Does the issue persist if you disconnect from corporate network?
+7. Other users at same location experiencing same issue?
+
+# Example Response:
+User: Sarah Thompson, Marketing
+Location: Home office (Seattle, WA)
+Issue Started: Today 9:00 AM PST
+Affected Sites: All websites loading slowly (10-15 second delays)
+Connection: Home WiFi (Comcast 500Mbps)
+Zscaler Client: Version 3.8.1.45 (Windows 11)</code></pre>
+                    </div>
+
+                    <p><strong>Step 2: Check Client-Side Configuration</strong></p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Zscaler Client Diagnostics</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code class="language-bash"># On User's Machine:
+
+# Check Zscaler Client Status
+# Navigate to: Zscaler Client UI > hamburger menu > About
+
+# Verify:
+✓ Status: Connected (Green)
+✓ Cloud Name: zscalerthree.net (or your assigned cloud)
+✓ Primary Gateway: Seattle (or nearest PoP)
+✓ Latency to Gateway: Should be <50ms
+
+# If Latency >100ms = Problem #1: Poor PoP selection
+
+# Collect Zscaler Client Logs:
+# Windows: C:\ProgramData\Zscaler\logs\
+# Mac: /Library/Logs/Zscaler/
+
+# Enable Debug Logging (if needed):
+# Zscaler Client > Settings > Troubleshooting > Enable Debug Mode
+
+# Check DNS Resolution:
+nslookup google.com
+# Should return Zscaler gateway IP (not local DNS)
+
+# Test connectivity to Zscaler cloud:
+ping gateway.zscalerthree.net
+tracert gateway.zscalerthree.net
+
+# Key Metrics to Review:
+1. Bandwidth Usage: Unusual spikes?
+2. Threat Blocks: Any malware blocking legitimate traffic?
+3. Policy Blocks: DLP or URL category blocks?
+4. SSL Inspection Errors: Certificate issues?
+5. Latency Metrics: Gateway response times
+
+# Example findings:
+User: sarah.thompson@globalcorp.com
+Total Transactions: 1,245 in last hour
+Blocked: 45 (3.6%)
+Average Page Load: 12 seconds (Normal: 2-3 seconds)
+Gateway: Seattle-1 (Latency: 180ms) ← RED FLAG!
+
+# Export logs to CSV for detailed analysis:
+# Click "Download" > Select "Last 4 hours"</code></pre>
+                    </div>
+
+                    <p><strong>Step 4: Network Path Analysis</strong></p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Network Diagnostic Commands</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code class="language-bash"># Test internet bandwidth (without Zscaler):
+# Temporarily disable Zscaler Client
+speedtest-cli --simple
+# Expected: Download 450+ Mbps (Comcast 500Mbps plan)
+
+# Test bandwidth through Zscaler:
+# Re-enable Zscaler Client
+speedtest-cli --simple
+# If significantly lower = Zscaler bottleneck OR ISP throttling
+
+# Traceroute to identify bottleneck:
+tracert www.salesforce.com
+
+# Expected output (good):
+# 1    1 ms    Home Router (192.168.1.1)
+# 2    15 ms   Comcast Gateway
+# 3    25 ms   Zscaler PoP (Seattle)
+# 4    30 ms   Salesforce.com
+
+# Problem output (bad):
+# 1    1 ms    Home Router
+# 2    15 ms   Comcast Gateway
+# 3    180 ms  Zscaler PoP (London) ← WRONG PoP!
+# 4    250 ms  Salesforce.com
+
+# Check for packet loss:
+ping -n 100 gateway.zscalerthree.net
+# Packet loss >2% = network issue</code></pre>
+                    </div>
+
+                    <h4>Common Root Causes & Solutions</h4>
+
+                    <p><strong>Cause #1: Incorrect Zscaler PoP Selection</strong></p>
+                    <ul>
+                        <li><strong>Symptom:</strong> High latency (150ms+) to Zscaler gateway</li>
+                        <li><strong>Root Cause:</strong> GeoIP database incorrectly mapping user location</li>
+                        <li><strong>Fix:</strong> Manually configure preferred PoP in Zscaler Client</li>
+                    </ul>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Force Zscaler Client to Use Nearest PoP</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code class="language-bash"># In ZIA Admin Portal:
+# Administration > Zscaler Client Connector > App Profiles
+
+# Create new App Profile:
+Name: Seattle Home Users
+Primary Data Center: Seattle
+Secondary Data Center: San Jose
+Apply to Users: Location = "Seattle" OR User = sarah.thompson@globalcorp.com
+
+# Push update to client (takes 5-10 minutes)
+
+# Verify on user's machine:
+# Zscaler Client > About > Primary Gateway: Seattle ✓</code></pre>
+                    </div>
+
+                    <p><strong>Cause #2: SSL Inspection Breaking Specific Sites</strong></p>
+                    <ul>
+                        <li><strong>Symptom:</strong> Some sites load fast, others timeout</li>
+                        <li><strong>Root Cause:</strong> Certificate pinning or SSL/TLS compatibility issues</li>
+                        <li><strong>Fix:</strong> Add SSL bypass rules for affected domains</li>
+                    </ul>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Identify and Bypass SSL Issues</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code class="language-bash"># Check ZIA logs for SSL errors:
+# Analytics > Web Insights
+# Filter: User = sarah.thompson, Result = "SSL Error"
+
+# Common SSL errors:
+Error: "SSL Handshake Failed"
+URL: banking.globalcorp-vendor.com
+Reason: Certificate pinning
+
+# Create bypass rule:
+# Policy > SSL Inspection
+Name: Bypass Vendor Banking Portal
+Action: Do Not Inspect
+URL: *.globalcorp-vendor.com
+Apply to: All Users</code></pre>
+                    </div>
+
+                    <p><strong>Cause #3: Bandwidth Policy Throttling</strong></p>
+                    <ul>
+                        <li><strong>Symptom:</strong> Consistent slow speeds across all sites</li>
+                        <li><strong>Root Cause:</strong> Bandwidth policy limiting user throughput</li>
+                        <li><strong>Fix:</strong> Review and adjust bandwidth policies</li>
+                    </ul>
+
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Check Bandwidth Policies</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code class="language-bash"># In ZIA Admin Portal:
+# Policy > Bandwidth Control
+
+# Check if user is in throttled group:
+Policy: "Remote Users - Bandwidth Limit"
+Download: 10 Mbps ← TOO LOW!
+Upload: 5 Mbps
+Applied to: Location = "Remote"
+
+# Solution: Adjust policy OR move user to different group
+# Updated Policy:
+Download: 100 Mbps
+Upload: 50 Mbps</code></pre>
+                    </div>
+
+                    <p><strong>Cause #4: ISP Throttling or Congestion</strong></p>
+                    <ul>
+                        <li><strong>Symptom:</strong> Issue only during peak hours (9 AM - 5 PM)</li>
+                        <li><strong>Root Cause:</strong> ISP network congestion or throttling VPN-like traffic</li>
+                        <li><strong>Fix:</strong> Work with ISP or recommend user upgrade plan</li>
+                    </ul>
+
+                    <h4>Escalation Checklist</h4>
+
+                    <div class="info-box note">
+                        <strong>Before escalating to Zscaler Support, collect:</strong><br>
+                        ✓ User details (email, location, device type)<br>
+                        ✓ Zscaler Client version and logs<br>
+                        ✓ Speedtest results (with/without Zscaler)<br>
+                        ✓ Traceroute output<br>
+                        ✓ Screenshot of Zscaler Client status<br>
+                        ✓ ZIA Web Insights logs (CSV export)<br>
+                        ✓ Timestamp of issue (in UTC)<br>
+                        ✓ Business impact statement
+                    </div>
+
+                    <p><strong>Escalation Template:</strong></p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>Zscaler Support Ticket Example</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code class="language-bash">Subject: User Performance Issue - High Latency to Zscaler PoP
+
+Priority: P3 (Business Impact)
+Cloud: zscalerthree.net
+Organization: Global Corp (50,000 users)
+
+Issue Summary:
+User sarah.thompson@globalcorp.com experiencing slow internet browsing (10-15 sec page loads) since 2025-01-19 09:00 PST.
+
+Environment:
+- Location: Seattle, WA (Home office)
+- ISP: Comcast 500Mbps
+- Device: Windows 11, Zscaler Client 3.8.1.45
+- Zscaler Cloud: zscalerthree.net
+
+Troubleshooting Performed:
+1. Verified Zscaler Client connected (Green status)
+2. Checked PoP selection: User incorrectly routed to London PoP (180ms latency)
+3. Speedtest: 450 Mbps without Zscaler, 50 Mbps with Zscaler
+4. No SSL errors or policy blocks in logs
+5. Other Seattle users not affected
+
+Logs Attached:
+- Zscaler Client logs (last 24 hours)
+- Traceroute output
+- ZIA Web Insights export (CSV)
+
+Suspected Root Cause:
+GeoIP database incorrectly mapping user's home IP to London instead of Seattle.
+
+Requested Action:
+Update GeoIP mapping for user's public IP: 203.0.113.45
+Configure user to always use Seattle PoP as primary.
+
+Business Impact:
+User is Marketing Director, unable to access critical Salesforce and Adobe Creative Cloud workflows. 
+Impacting customer deliverables due today.</code></pre>
+                    </div>
+
+                    <h4>Resolution Tracking</h4>
+                    <p><strong>Follow-up Actions:</strong></p>
+                    <ol>
+                        <li>Document resolution in ticketing system (ServiceNow)</li>
+                        <li>Update user via email with resolution steps</li>
+                        <li>Schedule follow-up check-in (24 hours later)</li>
+                        <li>Update knowledge base if novel issue</li>
+                        <li>Review for patterns (other Seattle users with same issue?)</li>
+                    </ol>
+
+                    <div class="info-box tip">
+                        <strong>Pro Tip for Interview:</strong><br>
+                        Always follow a structured troubleshooting methodology:<br>
+                        1. Gather information (user interview)<br>
+                        2. Check client-side (device, network)<br>
+                        3. Check platform-side (ZIA logs, policies)<br>
+                        4. Isolate layer (client, network, Zscaler, internet)<br>
+                        5. Test hypothesis<br>
+                        6. Implement fix<br>
+                        7. Verify resolution<br>
+                        8. Document and follow up
+                    </div>
+                `
+            }
+        );
+
+        // JavaScript functionality
+        let currentFilters = {
+            level: 'all',
+            category: 'all',
+            type: 'all',
+            status: 'all',
+            search: ''
+        };
+
+        // LocalStorage functions
+        function getCompletedQuestions() {
+            return JSON.parse(localStorage.getItem('completedQuestions') || '[]');
+        }
+
+        function getBookmarkedQuestions() {
+            return JSON.parse(localStorage.getItem('bookmarkedQuestions') || '[]');
+        }
+
+        function saveCompletedQuestion(id) {
+            const completed = getCompletedQuestions();
+            if (!completed.includes(id)) {
+                completed.push(id);
+                localStorage.setItem('completedQuestions', JSON.stringify(completed));
+            }
+        }
+
+        function removeCompletedQuestion(id) {
+            let completed = getCompletedQuestions();
+            completed = completed.filter(qid => qid !== id);
+            localStorage.setItem('completedQuestions', JSON.stringify(completed));
+        }
+
+        function toggleBookmark(id) {
+            let bookmarked = getBookmarkedQuestions();
+            if (bookmarked.includes(id)) {
+                bookmarked = bookmarked.filter(qid => qid !== id);
+            } else {
+                bookmarked.push(id);
+            }
+            localStorage.setItem('bookmarkedQuestions', JSON.stringify(bookmarked));
+        }
+
+        // Theme toggle
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            document.querySelector('.theme-toggle').textContent = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+            document.querySelector('.theme-toggle').textContent = '☀️ Light Mode';
+        }
+
+        // Filter functions
+        function applyFilters() {
+            const completed = getCompletedQuestions();
+            const bookmarked = getBookmarkedQuestions();
+
+            const filtered = questionsDB.filter(q => {
+                // Level filter
+                if (currentFilters.level !== 'all' && q.level !== currentFilters.level) return false;
+                
+                // Category filter
+                if (currentFilters.category !== 'all' && q.category !== currentFilters.category) return false;
+                
+                // Type filter
+                if (currentFilters.type !== 'all' && q.type !== currentFilters.type) return false;
+                
+                // Status filter
+                if (currentFilters.status === 'completed' && !completed.includes(q.id)) return false;
+                if (currentFilters.status === 'bookmarked' && !bookmarked.includes(q.id)) return false;
+                
+                // Search filter
+                if (currentFilters.search) {
+                    const searchLower = currentFilters.search.toLowerCase();
+                    return q.question.toLowerCase().includes(searchLower) || 
+                           q.answer.toLowerCase().includes(searchLower);
+                }
+                
+                return true;
+            });
+
+            renderQuestions(filtered);
+            updateStats();
+        }
+
+        // Render questions
+        function renderQuestions(questions) {
+            const container = document.getElementById('questionsContainer');
+            const noResults = document.getElementById('noResults');
+            
+            if (questions.length === 0) {
+                container.innerHTML = '';
+                noResults.style.display = 'block';
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            const completed = getCompletedQuestions();
+            const bookmarked = getBookmarkedQuestions();
+            
+            container.innerHTML = questions.map(q => `
+                <div class="question-card ${completed.includes(q.id) ? 'completed' : ''}" data-id="${q.id}">
+                    <div class="question-header">
+                        <div class="question-content">
+                            <div class="question-meta">
+                                <span class="badge badge-${q.level.toLowerCase()}">${q.level}</span>
+                                <span class="badge badge-${q.type}">${q.type}</span>
+                            </div>
+                            <div class="question-text">${q.question}</div>
+                        </div>
+                        <div class="question-actions">
+                            <button class="btn btn-icon ${bookmarked.includes(q.id) ? 'btn-success' : 'btn-outline'}" 
+                                    onclick="handleBookmark(${q.id})" 
+                                    title="${bookmarked.includes(q.id) ? 'Bookmarked' : 'Bookmark'}">
+                                ${bookmarked.includes(q.id) ? '★' : '☆'}
+                            </button>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="toggleAnswer(${q.id})">
+                        Show Answer
+                    </button>
+                    <div class="answer-section" id="answer-${q.id}">
+                        <div class="answer-content">
+                            ${q.answer}
+                        </div>
+                        <button class="btn ${completed.includes(q.id) ? 'btn-outline' : 'btn-success'}" 
+                                onclick="toggleCompleted(${q.id})">
+                            ${completed.includes(q.id) ? 'Mark as Incomplete' : 'Mark as Completed'}
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Reinitialize Prism for syntax highlighting
+            Prism.highlightAll();
+            
+            // Reinitialize Mermaid
+            mermaid.init(undefined, document.querySelectorAll('.mermaid'));
+        }
+
+        // Toggle answer
+        function toggleAnswer(id) {
+            const answerSection = document.getElementById(`answer-${id}`);
+            const button = event.target;
+            
+            if (answerSection.classList.contains('show')) {
+                answerSection.classList.remove('show');
+                button.textContent = 'Show Answer';
+            } else {
+                answerSection.classList.add('show');
+                button.textContent = 'Hide Answer';
+                // Auto-scroll to answer
+                setTimeout(() => {
+                    answerSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }, 100);
+            }
+        }
+
+        // Handle bookmark
+        function handleBookmark(id) {
+            toggleBookmark(id);
+            applyFilters();
+        }
+
+        // Toggle completed
+        function toggleCompleted(id) {
+            const completed = getCompletedQuestions();
+            if (completed.includes(id)) {
+                removeCompletedQuestion(id);
+            } else {
+                saveCompletedQuestion(id);
+            }
+            applyFilters();
+        }
+
+        // Copy code
+        function copyCode(button) {
+            const codeBlock = button.closest('.code-block').querySelector('code');
+            const text = codeBlock.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                button.textContent = 'Copied!';
+                setTimeout(() => {
+                    button.textContent = 'Copy';
+                }, 2000);
+            });
+        }
+
+        // Update stats
+        function updateStats() {
+            const completed = getCompletedQuestions();
+            const bookmarked = getBookmarkedQuestions();
+            
+            document.getElementById('totalQuestions').textContent = questionsDB.length;
+            document.getElementById('completedQuestions').textContent = completed.length;
+            document.getElementById('bookmarkedQuestions').textContent = bookmarked.length;
+            document.getElementById('progressPercent').textContent = 
+                Math.round((completed.length / questionsDB.length) * 100) + '%';
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            // Render all questions initially
+            renderQuestions(questionsDB);
+            updateStats();
+            
+            // Search
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                currentFilters.search = e.target.value;
+                applyFilters();
+            });
+            
+            // Category filter
+            document.getElementById('categoryFilter').addEventListener('change', (e) => {
+                currentFilters.category = e.target.value;
+                applyFilters();
+            });
+            
+            // Level filters
+            document.querySelectorAll('[data-level]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('[data-level]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFilters.level = btn.dataset.level;
+                    applyFilters();
+                });
+            });
+            
+            // Type filters
+            document.querySelectorAll('[data-type]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('[data-type]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFilters.type = btn.dataset.type;
+                    applyFilters();
+                });
+            });
+            
+            // Status filters
+            document.querySelectorAll('[data-status]').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('[data-status]').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFilters.status = btn.dataset.status;
+                    applyFilters();
+                });
+            });
+        });
+    </script>
+</body>
+</html> PAC file issues:
+netsh winhttp show proxy
+# Should show: Proxy Server: gateway.zscalerthree.net:80</code></pre>
+                    </div>
+
+                    <p><strong>Step 3: Check ZIA Portal - User Activity Logs</strong></p>
+                    <div class="code-block">
+                        <div class="code-header">
+                            <span>ZIA Admin Portal - Log Analysis</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+                        </div>
+                        <pre><code class="language-bash"># Navigate to: Analytics > Web Insights
+
+# Filter Criteria:
+Time Range: Last 4 hours
+User: sarah.thompson@globalcorp.com
+Result: All
+
+# Check for

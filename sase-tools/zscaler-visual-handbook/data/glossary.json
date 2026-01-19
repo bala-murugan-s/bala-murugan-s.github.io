@@ -1,0 +1,52 @@
+{
+  "terms": [
+    {
+      "term": "ZIA",
+      "fullName": "Zscaler Internet Access",
+      "definition": "Cloud-native secure web gateway that provides secure internet and SaaS access for users, regardless of location or device.",
+      "category": "Product"
+    },
+    {
+      "term": "ZPA",
+      "fullName": "Zscaler Private Access",
+      "definition": "Zero Trust Network Access (ZTNA) service that provides secure access to internal applications without placing users on the network.",
+      "category": "Product"
+    },
+    {
+      "term": "ZTNA",
+      "fullName": "Zero Trust Network Access",
+      "definition": "Security framework that requires strict identity verification for every user and device attempting to access resources, regardless of location.",
+      "category": "Concept"
+    },
+    {
+      "term": "App Connector",
+      "fullName": "ZPA Application Connector",
+      "definition": "Lightweight software deployed in data centers or public clouds that creates an outbound connection to ZPA, enabling secure application access.",
+      "category": "Component"
+    },
+    {
+      "term": "SSL Inspection",
+      "fullName": "SSL/TLS Inspection",
+      "definition": "Process of decrypting, inspecting, and re-encrypting SSL/TLS traffic to detect threats and enforce policies on encrypted communications.",
+      "category": "Feature"
+    },
+    {
+      "term": "PAC File",
+      "fullName": "Proxy Auto-Configuration",
+      "definition": "JavaScript file that determines whether web requests should go through a proxy server based on defined rules.",
+      "category": "Technology"
+    },
+    {
+      "term": "GRE Tunnel",
+      "fullName": "Generic Routing Encapsulation",
+      "definition": "Tunneling protocol used to encapsulate and route traffic from branch offices to Zscaler cloud.",
+      "category": "Technology"
+    },
+    {
+      "term": "Cloud Firewall",
+      "fullName": "Zscaler Cloud Firewall",
+      "definition": "Cloud-delivered next-generation firewall capability integrated into the Zscaler platform.",
+      "category": "Feature"
+    }
+  ]
+}

@@ -1,0 +1,68 @@
+{
+  "menuItems": [
+    {
+      "id": "architecture",
+      "label": "Architecture Overview",
+      "category": "Fundamentals",
+      "path": "sections/architecture.html",
+      "icon": "🏗️",
+      "priority": 1
+    },
+    {
+      "id": "zia",
+      "label": "ZIA Deep Dive",
+      "category": "Fundamentals",
+      "path": "sections/zia.html",
+      "icon": "🌐",
+      "priority": 2
+    },
+    {
+      "id": "zpa",
+      "label": "ZPA Deep Dive",
+      "category": "Fundamentals",
+      "path": "sections/zpa.html",
+      "icon": "🔐",
+      "priority": 3
+    },
+    {
+      "id": "tunnels",
+      "label": "Tunnel Technologies",
+      "category": "Infrastructure",
+      "path": "sections/tunnels.html",
+      "icon": "🔌",
+      "priority": 4
+    },
+    {
+      "id": "ssl",
+      "label": "SSL Inspection",
+      "category": "Security",
+      "path": "sections/ssl.html",
+      "icon": "🔒",
+      "priority": 5
+    },
+    {
+      "id": "dlp",
+      "label": "Data Loss Prevention",
+      "category": "Security",
+      "path": "sections/dlp.html",
+      "icon": "🛡️",
+      "priority": 6
+    },
+    {
+      "id": "cli",
+      "label": "CLI Simulator",
+      "category": "Tools",
+      "path": "sections/cli.html",
+      "icon": "💻",
+      "priority": 7
+    },
+    {
+      "id": "incidents",
+      "label": "Incident Response",
+      "category": "Operations",
+      "path": "sections/incidents.html",
+      "icon": "🚨",
+      "priority": 8
+    }
+  ]
+}
