@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Network Tools · Security Architecture Console</title>
+
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --panel: #0f1623;
+      --border: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;     
+	  --accent: #6366f1; /* Indigo */
+	  --accent-soft: rgba(99,102,241,0.16);
+      --radius: 12px;
+      --transition-fast: 180ms ease-out;
+
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+
+    [data-theme="light"] {
+      --bg: #f9fafb;
+      --panel: #ffffff;
+      --border: #e5e7eb;
+      --text: #111827;
+      --muted: #4b5563;
+      --accent: #6366f1;
+	  --accent-soft: rgba(99,102,241,0.10);
+      --success: #16a34a;
+      --warning: #d97706;
+      --danger: #dc2626;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top, #111827 0, var(--bg) 55%);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    /* App layout */
+    .app {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      border-right: 1px solid var(--border);
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: rgba(15,23,42,0.96);
+    }
+
+    [data-theme="light"] .sidebar {
+      background: #ffffff;
+    }
+
+    .brand-block {
+      margin-bottom: 8px;
+    }
+
+    .brand {
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .role {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .meta {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    .nav {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+
+    .nav a {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      font-size: 13px;
+      border-radius: 8px;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background var(--transition-fast), color var(--transition-fast), transform 120ms ease-out;
+    }
+
+    .nav a span.label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav a .hint {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      opacity: 0.6;
+    }
+
+    .nav a:hover {
+      background: rgba(15,23,42,0.6);
+      color: var(--text);
+    }
+
+    [data-theme="light"] .nav a:hover {
+      background: rgba(243,244,246,0.9);
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      font-size: 11px;
+      color: var(--muted);
+      font-family: "JetBrains Mono", monospace;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34,197,94,0.25);
+    }
+
+    /* Main */
+    .main {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    /* Topbar */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      background: linear-gradient(to bottom, rgba(15,23,42,0.92), rgba(15,23,42,0.80));
+    }
+
+    [data-theme="light"] .topbar {
+      background: linear-gradient(to bottom, rgba(255,255,255,0.96), rgba(249,250,251,0.94));
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .headline {
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .sub {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .topbar-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      font-size: 12px;
+      background: rgba(15,23,42,0.7);
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    [data-theme="light"] .btn-link {
+      background: #ffffff;
+    }
+
+    .btn-link i {
+      font-size: 12px;
+    }
+
+    .toggle {
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--muted);
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15,23,42,0.7);
+    }
+
+    [data-theme="light"] .toggle {
+      background: #ffffff;
+    }
+
+    .toggle i {
+      font-size: 12px;
+    }
+
+    /* Content */
+    .content {
+      padding: 16px 20px 20px;
+      min-height: 0;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Panels */
+    .panel {
+      background: radial-gradient(circle at top left,
+				  rgba(99,102,241,0.18), transparent 55%), /* soft indigo glow */
+				  var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .panel h3 {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .panel h4 {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .panel p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .panel-body {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .panel-footer {
+      margin-top: 4px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--muted);
+      opacity: 0.9;
+    }
+
+    .tag {
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      padding: 2px 8px;
+      font-size: 11px;
+      font-family: "JetBrains Mono", monospace;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    /* Two-column layout for this workspace */
+    .tools-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.9fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 1024px) {
+      .tools-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    /* Cards grid */
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .tool-card {
+      border-radius: 14px;
+      padding: 0;
+      background: radial-gradient(circle at top left,
+              rgba(99,102,241,0.20), transparent 55%),
+              var(--panel);
+      border: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: transform 160ms ease-out, box-shadow 160ms ease-out, border-color 160ms ease-out;
+    }
+
+    .tool-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 30px rgba(15,23,42,0.55);
+      border-color: var(--accent);
+    }
+
+    .tool-card-header {
+      padding: 10px 12px;
+      color: #ffffff;
+    }
+
+    .tool-card-header h3 {
+      margin: 0 0 2px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .tool-card-header p {
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    .tool-card-body {
+      padding: 10px 12px 8px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .tool-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-bottom: 6px;
+    }
+
+    .tool-tag-pill {
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .tool-card-footer {
+      padding: 0 12px 10px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      color: inherit;
+      font-weight: 500;
+    }
+
+    .tool-card-footer span.icon {
+      margin-left: 6px;
+      font-size: 13px;
+    }
+
+    /* Colored header variants */
+    .tool-header-blue {
+      background: linear-gradient(to bottom right, #3b82f6, #1d4ed8);
+    }
+
+    .tool-header-green {
+      background: linear-gradient(to bottom right, #22c55e, #15803d);
+    }
+
+    .tool-header-purple {
+      background: linear-gradient(to bottom right, #8b5cf6, #6d28d9);
+    }
+
+    .tool-header-indigo {
+      background: linear-gradient(to bottom right, #6366f1, #4f46e5);
+    }
+
+    .tool-header-orange {
+      background: linear-gradient(to bottom right, #f97316, #ea580c);
+    }
+
+    .tool-header-pink {
+      background: linear-gradient(to bottom right, #ec4899, #db2777);
+    }
+
+    /* Stats row */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 6px;
+    }
+
+    .stat-card {
+      border-radius: 10px;
+      padding: 6px 8px;
+      border: 1px solid var(--border);
+      background: rgba(15,23,42,0.7);
+      font-size: 11px;
+      text-align: left;
+    }
+
+    [data-theme="light"] .stat-card {
+      background: #f9fafb;
+    }
+
+    .stat-label {
+      color: var(--muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .stat-value {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    /* Upcoming section in right panel */
+    .bullets {
+      margin: 0;
+      padding-left: 16px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+      .sidebar {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        padding: 10px 12px;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+      .brand-block {
+        flex: 1 1 100%;
+      }
+      .nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 4px;
+      }
+      .nav a {
+        font-size: 12px;
+        padding: 6px 8px;
+      }
+      .sidebar-footer {
+        flex: 1 1 100%;
+        margin-top: 6px;
+      }
+    }
+  </style>
+</head>
+
+<body data-theme="dark">
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand-block">
+      <div class="brand">BALAMURUGAN SIVARAMAN</div>
+      <div class="role">Principal Cloud &amp; Network Security Architect</div>
+    </div>
+
+    <div class="meta">
+      <div>14+ yrs · Enterprise Security &amp; Global Networks</div>
+      <div>SASE · Zero Trust · SD‑WAN · Multi‑Cloud Security</div>
+    </div>
+
+    <div class="nav">
+      <div class="nav-label">Console</div>
+
+      <!-- All go back to main console index (T2 behavior: Tools view lives on main console) -->
+      <a href="../index.html">
+        <span class="label">Overview</span>
+        <span class="hint">01</span>
+      </a>
+      <a href="../index.html">
+        <span class="label">Architecture</span>
+        <span class="hint">02</span>
+      </a>
+      <a href="../index.html">
+        <span class="label">Tools</span>
+        <span class="hint">03</span>
+      </a>
+      <a href="../index.html">
+        <span class="label">Experience</span>
+        <span class="hint">04</span>
+      </a>
+      <a href="../index.html">
+        <span class="label">Projects</span>
+        <span class="hint">05</span>
+      </a>
+      <a href="../index.html">
+        <span class="label">Writing</span>
+        <span class="hint">06</span>
+      </a>
+      <a href="../index.html">
+        <span class="label">Contact</span>
+        <span class="hint">07</span>
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="pill">
+        <span class="pill-dot"></span>
+        <span>Network Tools workspace</span>
+      </div>
+      <div>Part of Security Architecture Console</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <section class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="title-block">
+        <div class="headline">Network Tools Suite</div>
+        <div class="sub">Subnetting, CIDR, ports, OSI reference, and planning helpers.</div>
+      </div>
+      <div class="topbar-actions">
+        <a class="btn-link" href="../index.html">
+          <i class="fas fa-arrow-left"></i>
+          <span>Back to Console</span>
+        </a>
+        <div class="toggle" id="themeToggle">
+          <i class="fas fa-moon"></i>
+          <span>Dark / Light</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- Overview -->
+      <div class="panel">
+        <h3>Workspace Overview</h3>
+        <div class="panel-body">
+          <h4>Everyday networking utilities, collected in one place</h4>
+          <p>
+            This workspace brings together subnet calculators, CIDR tables, port references,
+            and OSI model helpers — the kind of tools you open constantly while designing,
+            troubleshooting, or reviewing network architectures.
+          </p>
+          <div class="stats-row">
+            <div class="stat-card">
+              <div class="stat-label">Tools</div>
+              <div class="stat-value">6+ modules</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">IP Support</div>
+              <div class="stat-value">IPv4 &amp; IPv6</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Focus</div>
+              <div class="stat-value">Subnet · CIDR · Ports</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-label">Delivery</div>
+              <div class="stat-value">Client-side</div>
+            </div>
+          </div>
+        </div>
+        <div class="panel-footer">
+          <span class="tag">Network Engineering</span>
+          <span class="tag">Design &amp; Troubleshooting</span>
+        </div>
+      </div>
+
+      <!-- Layout: tools + upcoming -->
+      <div class="tools-layout">
+
+        <!-- Left: Tool launchers -->
+        <div class="panel">
+          <h3>Tools Catalog</h3>
+          <div class="panel-body">
+            <p>Launch into dedicated tools from this workspace.</p>
+            <div class="tools-grid">
+
+              <!-- Subnet Calculator -->
+              <a class="tool-card" href="subnet-calculator/subnet-calculator-index.html">
+                <div class="tool-card-header tool-header-blue">
+                  <h3>Subnet Calculator</h3>
+                  <p>IPv4 &amp; IPv6 subnet calculations with binary representation.</p>
+                </div>
+                <div class="tool-card-body">
+                  <div class="tool-tags">
+                    <span class="tool-tag-pill" style="background:#dbeafe;color:#1d4ed8;">IPv4</span>
+                    <span class="tool-tag-pill" style="background:#dbeafe;color:#1d4ed8;">IPv6</span>
+                    <span class="tool-tag-pill" style="background:#dbeafe;color:#1d4ed8;">CIDR</span>
+                    <span class="tool-tag-pill" style="background:#dbeafe;color:#1d4ed8;">Subnetting</span>
+                  </div>
+                  <p>Calculate network address, host range, masks, and see the binary layout.</p>
+                </div>
+                <div class="tool-card-footer" style="color:#1d4ed8;">
+                  Launch Tool <span class="icon">➜</span>
+                </div>
+              </a>
+
+              <!-- CIDR Reference -->
+              <a class="tool-card" href="cidr-reference/">
+                <div class="tool-card-header tool-header-green">
+                  <h3>CIDR Reference</h3>
+                  <p>Complete CIDR notation reference table.</p>
+                </div>
+                <div class="tool-card-body">
+                  <div class="tool-tags">
+                    <span class="tool-tag-pill" style="background:#dcfce7;color:#166534;">Reference</span>
+                    <span class="tool-tag-pill" style="background:#dcfce7;color:#166534;">Quick Lookup</span>
+                  </div>
+                  <p>View masks, prefix lengths, total hosts, and usable addresses at a glance.</p>
+                </div>
+                <div class="tool-card-footer" style="color:#166534;">
+                  Launch Tool <span class="icon">➜</span>
+                </div>
+              </a>
+
+              <!-- Port Reference -->
+              <a class="tool-card" href="port-reference/">
+                <div class="tool-card-header tool-header-purple">
+                  <h3>Port Reference</h3>
+                  <p>Common network ports, protocols, and services.</p>
+                </div>
+                <div class="tool-card-body">
+                  <div class="tool-tags">
+                    <span class="tool-tag-pill" style="background:#ede9fe;color:#5b21b6;">Ports</span>
+                    <span class="tool-tag-pill" style="background:#ede9fe;color:#5b21b6;">Protocols</span>
+                    <span class="tool-tag-pill" style="background:#ede9fe;color:#5b21b6;">Services</span>
+                  </div>
+                  <p>Quick lookup table for TCP/UDP ports used in real environments.</p>
+                </div>
+                <div class="tool-card-footer" style="color:#5b21b6;">
+                  Launch Tool <span class="icon">➜</span>
+                </div>
+              </a>
+
+              <!-- OSI Model Reference -->
+              <a class="tool-card" href="osi-model/">
+                <div class="tool-card-header tool-header-indigo">
+                  <h3>OSI Model Reference</h3>
+                  <p>7‑layer OSI model with common protocols.</p>
+                </div>
+                <div class="tool-card-body">
+                  <div class="tool-tags">
+                    <span class="tool-tag-pill" style="background:#e0e7ff;color:#4338ca;">OSI Layers</span>
+                    <span class="tool-tag-pill" style="background:#e0e7ff;color:#4338ca;">Reference</span>
+                  </div>
+                  <p>Layer responsibilities and example protocols, useful for troubleshooting workflows.</p>
+                </div>
+                <div class="tool-card-footer" style="color:#4338ca;">
+                  Launch Tool <span class="icon">➜</span>
+                </div>
+              </a>
+
+              <!-- IP Converter (Coming Soon) -->
+              <a class="tool-card" href="ip-converter/">
+                <div class="tool-card-header tool-header-orange">
+                  <h3>IP Converter</h3>
+                  <p>Convert between IPv4 formats.</p>
+                </div>
+                <div class="tool-card-body">
+                  <div class="tool-tags">
+                    <span class="tool-tag-pill" style="background:#ffedd5;color:#c2410c;">Binary</span>
+                    <span class="tool-tag-pill" style="background:#ffedd5;color:#c2410c;">Decimal</span>
+                    <span class="tool-tag-pill" style="background:#ffedd5;color:#c2410c;">Hex</span>
+                  </div>
+                  <p>Planned: convert IP addresses between decimal, binary, and hex formats.</p>
+                </div>
+                <div class="tool-card-footer" style="color:#c2410c;">
+                  Coming Soon <span class="icon">⏱</span>
+                </div>
+              </a>
+
+              <!-- Bandwidth Calculator (Coming Soon) -->
+              <a class="tool-card" href="bandwidth-calculator/">
+                <div class="tool-card-header tool-header-pink">
+                  <h3>Bandwidth Calculator</h3>
+                  <p>Plan bandwidth and transfer times.</p>
+                </div>
+                <div class="tool-card-body">
+                  <div class="tool-tags">
+                    <span class="tool-tag-pill" style="background:#fce7f3;color:#9d174d;">Calculator</span>
+                    <span class="tool-tag-pill" style="background:#fce7f3;color:#9d174d;">Planning</span>
+                  </div>
+                  <p>Planned: estimate required bandwidth and time for given data volumes.</p>
+                </div>
+                <div class="tool-card-footer" style="color:#9d174d;">
+                  Coming Soon <span class="icon">⏱</span>
+                </div>
+              </a>
+
+            </div>
+          </div>
+          <div class="panel-footer">
+            <span class="tag">Launch to dedicated pages</span>
+          </div>
+        </div>
+
+        <!-- Right: Notes / Roadmap -->
+        <div class="panel">
+          <h3>Usage &amp; Roadmap</h3>
+          <div class="panel-body">
+            <h4>Where this fits in daily work</h4>
+            <p>
+              These tools are meant to sit open next to architecture diagrams, change
+              plans, and troubleshooting sessions — lightweight helpers that speed up
+              calculations and lookups without switching context.
+            </p>
+            <ul class="bullets">
+              <li>Designing new IP plans or reviewing existing CIDR allocations.</li>
+              <li>Checking port usage and OSI mappings during troubleshooting.</li>
+              <li>Quick sanity checks in workshops or design reviews.</li>
+            </ul>
+            <p style="margin-top:8px;">
+              Additional modules (IP conversion, bandwidth planning, latency calculators)
+              will be added over time as patterns repeat in real projects.
+            </p>
+          </div>
+          <div class="panel-footer">
+            <span class="tag">Network Design Aids</span>
+            <span class="tag">Troubleshooting Support</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div> <!-- /content -->
+  </section>
+</div>
+
+<script>
+  // Theme toggle (shared behavior)
+  (function() {
+    const body = document.body;
+    const toggle = document.getElementById('themeToggle');
+
+    const prefersDark = window.matchMedia &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const savedTheme = localStorage.getItem('theme') || (prefersDark ? 'dark' : 'light');
+    body.dataset.theme = savedTheme;
+
+    toggle.addEventListener('click', () => {
+      const current = body.dataset.theme || 'dark';
+      const next = current === 'dark' ? 'light' : 'dark';
+      body.dataset.theme = next;
+      localStorage.setItem('theme', next);
+    });
+  })();
+</script>
+
+</body>
+</html>
