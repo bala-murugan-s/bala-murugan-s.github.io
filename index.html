@@ -1,1226 +1,1216 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Balamurugan S | Cyber Security Architect</title>
-    <meta name="description" content="Cloud & Network Security Consultant with 14+ years experience in SASE, SD-WAN, DevSecOps">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
-        
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #10b981;
-            --accent: #8b5cf6;
-            --dark: #0f172a;
-            --light: #f8fafc;
-            --gray: #64748b;
-            --gray-dark: #334155;
-        }
-        
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--light);
-            color: var(--dark);
-            transition: all 0.4s ease;
-        }
-        
-        body.dark-mode {
-            background-color: var(--dark);
-            color: var(--light);
-        }
-        
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Space Grotesk', sans-serif;
-            font-weight: 700;
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 10px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        
-        .dark-mode ::-webkit-scrollbar-track {
-            background: #1e293b;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 5px;
-        }
-        
-        .dark-mode ::-webkit-scrollbar-thumb {
-            background: var(--accent);
-        }
-        
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-15px); }
-        }
-        
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.5); }
-            50% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.8); }
-        }
-        
-        @keyframes slideInLeft {
-            from {
-                opacity: 0;
-                transform: translateX(-50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-        
-        .fade-in-up {
-            animation: fadeInUp 0.8s ease forwards;
-        }
-        
-        .float {
-            animation: float 6s ease-in-out infinite;
-        }
-        
-        .pulse-glow {
-            animation: pulse-glow 3s ease-in-out infinite;
-        }
-        
-        .slide-in-left {
-            animation: slideInLeft 0.8s ease forwards;
-        }
-        
-        /* Glass morphism effect */
-        .glass {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .dark-mode .glass {
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        /* Gradient backgrounds */
-        .gradient-bg {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
-        }
-        
-        .gradient-bg-alt {
-            background: linear-gradient(135deg, var(--secondary) 0%, #3b82f6 100%);
-        }
-        
-        /* Card hover effects */
-        .hover-card {
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform-origin: center;
-        }
-        
-        .hover-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-        }
-        
-        .dark-mode .hover-card:hover {
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-        }
-        
-        /* Tech badge styling */
-        .tech-badge {
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .tech-badge::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-        
-        .tech-badge:hover::before {
-            left: 100%;
-        }
-        
-        /* Theme toggle */
-        .theme-toggle {
-            width: 60px;
-            height: 30px;
-            border-radius: 15px;
-            position: relative;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .theme-toggle-slider {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            transition: all 0.3s;
-        }
-        
-        .dark-mode .theme-toggle-slider {
-            transform: translateX(30px);
-        }
-        
-        /* Section dividers */
-        .wave-divider {
-            height: 100px;
-            width: 100%;
-            overflow: hidden;
-            line-height: 0;
-        }
-        
-        .wave-divider svg {
-            width: calc(100% + 1.3px);
-            height: 100px;
-        }
-        
-        /* Particle background */
-        #particles-js {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            z-index: -1;
-        }
-        
-		/* Back to Home Button */
-        .back-home {
-            position: fixed;
-            bottom: 30px;
-            left: 30px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background-color: var(--primary-color);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            box-shadow: var(--shadow-lg);
-            z-index: 100;
-            transition: var(--transition);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Balamurugan Sivaraman · Security Architecture Console</title>
 
-        .back-home:hover {
-            transform: translateY(-5px) scale(1.1);
-            background-color: var(--secondary-color);
-        }
-        /* Timeline */
-        .timeline-item {
-            position: relative;
-            padding-left: 30px;
-            margin-bottom: 30px;
-        }
-        
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 5px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--primary);
-        }
-        
-        .timeline-item::after {
-            content: '';
-            position: absolute;
-            left: 5px;
-            top: 20px;
-            width: 2px;
-            height: calc(100% + 10px);
-            background: var(--primary);
-            opacity: 0.3;
-        }
-        
-        .timeline-item:last-child::after {
-            display: none;
-        }
-        
-		/* Articles */
-        .article-card {
-            background: white;
-            border-radius: 15px;
-            overflow: hidden;
-            transition: all 0.3s;
-        }
-        
-        .dark-mode .article-card {
-            background: #1e293b;
-        }
-        
-        .article-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .article-image {
-            height: 200px;
-            background-size: cover;
-            background-position: center;
-        }
-        
-        /* Resources */
-        .resource-card {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            transition: all 0.3s;
-        }
-        
-        .dark-mode .resource-card {
-            background: #1e293b;
-        }
-        
-        .resource-card:hover {
-            transform: translateX(10px);
-        }
-		
-        /* Progress bars */
-        .progress-bar {
-            height: 10px;
-            border-radius: 5px;
-            background: #e2e8f0;
-            overflow: hidden;
-        }
-        
-        .dark-mode .progress-bar {
-            background: #334155;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            border-radius: 5px;
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            transition: width 1.5s ease-in-out;
-        }
-		
-		/* Interactive Tools */
-        .tool-container {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-        
-        .dark-mode .tool-container {
-            background: #1e293b;
-        }
-        
-        /* Custom utilities */
-        .text-gradient {
-            background: linear-gradient(90deg, var(--primary), var(--accent));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-        
-        .border-gradient {
-            border: 2px solid transparent;
-            background: linear-gradient(var(--light), var(--light)) padding-box,
-                        linear-gradient(90deg, var(--primary), var(--accent)) border-box;
-        }
-        
-        .dark-mode .border-gradient {
-            background: linear-gradient(var(--dark), var(--dark)) padding-box,
-                        linear-gradient(90deg, var(--primary), var(--accent)) border-box;
-        }
-        
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .hero-title {
-                font-size: 2.5rem;
-            }
-        }
-    </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --panel: #0f1623;
+      --border: #1f2937;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56,189,248,0.12);
+      --radius: 12px;
+      --transition-fast: 180ms ease-out;
+    }
+
+    [data-theme="light"] {
+      --bg: #f9fafb;
+      --panel: #ffffff;
+      --border: #e5e7eb;
+      --text: #111827;
+      --muted: #4b5563;
+      --accent: #2563eb;
+      --accent-soft: rgba(37,99,235,0.08);
+    }
+	
+	/* NEW – light-mode topbar */
+	  --topbar-bg: linear-gradient(to bottom, rgba(255,255,255,0.96), rgba(249,250,251,0.94));
+	  --topbar-border: var(--border);
+	}
+
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top, #111827 0, var(--bg) 55%);
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden; /* minimal scroll for home console */
+    }
+
+    /* App Layout */
+    .app {
+      display: grid;
+      grid-template-columns: 260px minmax(0, 1fr);
+      height: 100vh;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      border-right: 1px solid var(--border);
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .brand-block {
+      margin-bottom: 8px;
+    }
+
+    .brand {
+      font-weight: 600;
+      font-size: 15px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .role {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .meta {
+      font-size: 11px;
+      color: var(--muted);
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    .meta span {
+      opacity: 0.9;
+    }
+
+    .nav {
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+
+    .nav a {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 10px;
+      font-size: 13px;
+      border-radius: 8px;
+      color: var(--muted);
+      text-decoration: none;
+      transition: background var(--transition-fast), color var(--transition-fast), transform 120ms ease-out;
+      cursor: pointer;
+    }
+
+    .nav a span.label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav a .hint {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      opacity: 0.6;
+    }
+
+    .nav a.active {
+      background: var(--accent-soft);
+      color: var(--text);
+      transform: translateX(1px);
+    }
+
+    .nav a:hover {
+      background: rgba(15,23,42,0.6);
+      color: var(--text);
+    }
+
+    .sidebar-footer {
+      margin-top: auto;
+      font-size: 11px;
+      color: var(--muted);
+      font-family: "JetBrains Mono", monospace;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .pill-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34,197,94,0.25);
+    }
+
+    /* Main */
+    .main {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr);
+    }
+
+    /* Top Bar */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 20px;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      background: var(--topbar-bg); /* instead of fixed dark gradient */
+    }
+
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .title-block .headline {
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .title-block .sub {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .kbd {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      border: 1px solid var(--border);
+      padding: 4px 8px;
+      border-radius: 6px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .toggle {
+      cursor: pointer;
+      font-size: 12px;
+      color: var(--muted);
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15,23,42,0.6);
+    }
+
+    /* Content / Views */
+    .content {
+      position: relative;
+      padding: 16px 20px 20px;
+      height: calc(100vh - 52px); /* 52px ≈ topbar */
+      overflow: hidden; /* keep it “console-like” */
+    }
+
+    .view {
+      position: absolute;
+      inset: 16px 20px 20px 20px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+      grid-auto-rows: minmax(0, 1fr);
+      gap: 16px;
+      opacity: 0;
+      transform: translateY(8px);
+      pointer-events: none;
+      transition: opacity 220ms ease-out, transform 220ms ease-out;
+    }
+
+    .view.active {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    /* Panels */
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 14px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0; /* important for flex children */
+    }
+
+    .panel h3 {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .panel h4 {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .panel p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .panel-body {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-height: 0;
+    }
+
+    .panel-footer {
+      margin-top: auto;
+      display: flex;
+      justify-content: flex-start;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--muted);
+      opacity: 0.9;
+    }
+
+    .tag {
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      padding: 2px 8px;
+      font-size: 11px;
+      font-family: "JetBrains Mono", monospace;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+	
+	/* Tools grid inside Tools view */
+	.tools-grid {
+	  display: grid;
+	  grid-template-columns: repeat(3, minmax(0, 1fr));
+	  gap: 12px;
+	  margin-top: 8px;
+	}
+
+	.tool-card {
+	  border-radius: 16px;
+	  padding: 10px 12px;
+	  color: #ffffff;
+	  text-decoration: none;
+	  display: flex;
+	  flex-direction: column;
+	  gap: 8px;
+	  min-height: 120px;
+	  transition: transform 140ms ease-out, box-shadow 140ms ease-out, opacity 140ms ease-out;
+	  box-shadow: 0 10px 25px rgba(15,23,42,0.45);
+	}
+
+	.tool-card:hover {
+	  transform: translateY(-2px);
+	  box-shadow: 0 14px 30px rgba(15,23,42,0.6);
+	}
+
+	.tool-card-header {
+	  display: flex;
+	  align-items: center;
+	  justify-content: space-between;
+	  font-size: 18px;
+	}
+
+	.tool-card-title {
+	  font-size: 14px;
+	  font-weight: 600;
+	}
+
+	.tool-card-desc {
+	  font-size: 12px;
+	  opacity: 0.9;
+	}
+
+	.tool-card-tags {
+	  display: flex;
+	  flex-wrap: wrap;
+	  gap: 4px;
+	}
+
+	.tool-tag {
+	  padding: 2px 8px;
+	  border-radius: 999px;
+	  background: rgba(255,255,255,0.2);
+	  font-size: 11px;
+	}
+
+	/* Gradient variants (matching your existing style) */
+	.tool-security {
+	  background: linear-gradient(135deg, #ef4444, #ec4899);
+	}
+
+	.tool-network {
+	  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+	}
+
+	.tool-firewall {
+	  background: linear-gradient(135deg, #22c55e, #059669);
+	}
+
+	.tool-devops {
+	  background: linear-gradient(135deg, #f97316, #f59e0b);
+	}
+
+	.tool-sdwan {
+	  background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+	}
+
+	.tool-sase {
+	  background: linear-gradient(135deg, #06b6d4, #0ea5e9);
+	}
+
+	@media (max-width: 1100px) {
+	  .tools-grid {
+		grid-template-columns: repeat(2, minmax(0,1fr));
+	  }
+	}
+	@media (max-width: 700px) {
+	  .tools-grid {
+		grid-template-columns: minmax(0,1fr);
+	  }
+	}
+
+
+    /* Status grid */
+    .status-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 10px;
+      font-size: 13px;
+    }
+
+    .status-item .label {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 2px;
+    }
+
+    .status-item div.value {
+      font-size: 13px;
+    }
+
+    /* Lists */
+    ul.clean {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    ul.clean li {
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      gap: 6px;
+      align-items: flex-start;
+    }
+
+    ul.clean li::before {
+      content: "•";
+      font-size: 10px;
+      line-height: 1.6;
+      margin-top: 3px;
+      color: var(--accent);
+    }
+
+    .inline-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .inline-list span {
+      font-size: 12px;
+      border-radius: 999px;
+      padding: 2px 8px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    /* Buttons (for future deep links) */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      font-size: 12px;
+      color: var(--text);
+      text-decoration: none;
+      cursor: pointer;
+      background: rgba(15,23,42,0.7);
+      transition: background 160ms ease-out, border-color 160ms ease-out, transform 100ms ease-out;
+    }
+
+    .btn span.icon {
+      font-size: 12px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #0ea5e9);
+      border-color: transparent;
+      color: #0b1120;
+      font-weight: 500;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      background: rgba(15,23,42,0.9);
+    }
+
+    .btn-primary:hover {
+      filter: brightness(1.05);
+    }
+
+    /* Small helper areas */
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 8px;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .mono {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+    }
+
+    /* Responsive (basic) */
+	@media (max-width: 1024px) {
+	  .app {
+		grid-template-columns: 220px minmax(0,1fr);
+	  }
+	}
+
+	@media (max-width: 900px) {
+	  body {
+		overflow: auto; /* allow scroll on smaller screens */
+	  }
+
+	  .app {
+		grid-template-columns: 1fr; /* stack sidebar on top */
+		height: auto;
+		min-height: 100vh;
+	  }
+
+	  .sidebar {
+		flex-direction: row;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 10px;
+		padding: 10px 12px;
+		border-right: none;
+		border-bottom: 1px solid var(--border);
+	  }
+
+	  .brand-block {
+		flex: 1 1 100%;
+	  }
+
+	  .nav {
+		flex-direction: row;
+		flex-wrap: wrap;
+		gap: 4px;
+		margin-top: 4px;
+	  }
+
+	  .nav a {
+		font-size: 12px;
+		padding: 6px 8px;
+	  }
+
+	  .sidebar-footer {
+		flex: 1 1 100%;
+		margin-top: 6px;
+	  }
+
+	  .content {
+		height: auto;
+		padding: 12px;
+	  }
+
+	  .view {
+		position: relative;
+		inset: 0;
+		grid-template-columns: minmax(0,1fr);
+		grid-auto-rows: auto;
+		gap: 12px;
+		opacity: 0;
+		transform: translateY(6px);
+	  }
+
+	  .view.active {
+		opacity: 1;
+		transform: translateY(0);
+	  }
+	}
+  </style>
 </head>
-<body class="relative">
-    <!-- Particles Background -->
-    <div id="particles-js"></div>
-    
-    <!-- Theme Toggle -->
-	<div class="fixed top-0 left-1/2 transform -translate-x-1/2 z-50 flex items-center gap-3">
-		
-		<div id="themeToggle"
-			 class="relative w-14 h-7 flex items-center rounded-full cursor-pointer
-					bg-gray-300 dark:bg-gray-700 transition-colors duration-300">
 
-			<!-- Moon Icon (Dark Mode) -->
-			<i class="fas fa-moon text-gray-600 text-xs absolute left-2 dark:opacity-0 transition-opacity"></i>
+<body data-theme="dark">
+<div class="app">
 
-			<!-- Sun Icon (Light Mode) -->
-			<i class="fas fa-sun text-yellow-400 text-xs absolute right-2 opacity-0 dark:opacity-100 transition-opacity"></i>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand-block">
+      <div class="brand">BALAMURUGAN SIVARAMAN</div>
+      <div class="role">Principal Cloud &amp; Network Security Architect</div>
+    </div>
 
-			<!-- Slider -->
-			<div class="theme-toggle-slider
-						w-6 h-6 bg-white dark:bg-yellow-300 rounded-full shadow-md
-						transform translate-x-1 dark:translate-x-7 transition-transform duration-300">
+    <div class="meta">
+      <div><span>14+ yrs · Enterprise Security &amp; Global Networks</span></div>
+      <div><span>SASE · Zero Trust · SD‑WAN · Multi‑Cloud Security</span></div>
+    </div>
+
+    <div class="nav">
+      <div class="nav-label">Console</div>
+      <a class="active" data-view="overview">
+        <span class="label">Overview</span>
+        <span class="hint">01</span>
+      </a>
+      <a data-view="architecture">
+        <span class="label">Architecture</span>
+        <span class="hint">02</span>
+      </a>
+      <a data-view="tools">
+        <span class="label">Tools</span>
+        <span class="hint">03</span>
+      </a>
+      <a data-view="experience">
+        <span class="label">Experience</span>
+        <span class="hint">04</span>
+      </a>
+      <a data-view="projects">
+        <span class="label">Projects</span>
+        <span class="hint">05</span>
+      </a>
+      <a data-view="writing">
+        <span class="label">Writing</span>
+        <span class="hint">06</span>
+      </a>
+      <a data-view="contact">
+        <span class="label">Contact</span>
+        <span class="hint">07</span>
+      </a>
+	   <a data-view="resume">
+        <span class="label">Resume</span>
+        <span class="hint">08</span>
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="pill">
+        <span class="pill-dot"></span>
+        <span>Available for architecture &amp; design engagements</span>
+      </div>
+      <div>Console v1.0</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <section class="main">
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <div class="title-block">
+        <div class="headline">Security Architecture Console</div>
+        <div class="sub">A compact view of how I design, secure, and automate global networks.</div>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div class="kbd">
+          <span>⌘K</span>
+          <span>Quick palette (coming soon)</span>
+        </div>
+        <div class="toggle" id="themeToggle">
+          <span>Dark / Light</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CONTENT / VIEWS -->
+    <div class="content">
+
+      <!-- OVERVIEW VIEW -->
+      <div class="view active" id="view-overview">
+        <div class="panel">
+          <h3>Profile Snapshot</h3>
+          <div class="panel-body">
+            <h4>Cloud &amp; Network Security, End‑to‑End</h4>
+            <p>
+              I help enterprises modernize their network and security architecture —
+              from legacy WAN and perimeter models to SASE, Zero Trust, and
+              cloud‑native designs, with automation built in from day one.
+            </p>
+            <ul class="clean">
+              <li>Bridge between architecture, engineering, and operations teams.</li>
+              <li>Hands‑on with design, build, migration, and steady‑state operations.</li>
+              <li>Focus on secure connectivity for users, branches, data centers, and cloud.</li>
+            </ul>
+          </div>
+          <div class="panel-footer">
+            <span class="tag">Architecture + Implementation</span>
+            <span class="tag">Security‑by‑Design</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Status</h3>
+          <div class="status-grid">
+            <div class="status-item">
+              <div class="label">ROLE</div>
+              <div class="value">Principal Security Architect</div>
+            </div>
+            <div class="status-item">
+              <div class="label">EXPERIENCE</div>
+              <div class="value">14+ yrs · Global Programs</div>
+            </div>
+            <div class="status-item">
+              <div class="label">FOCUS</div>
+              <div class="value">SASE · Zero Trust · SD‑WAN · Cloud Security</div>
+            </div>
+            <div class="status-item">
+              <div class="label">CLOUD</div>
+              <div class="value">AWS · Azure · GCP</div>
+            </div>
+          </div>
+          <div class="panel-footer">
+            <a href="#" class="btn btn-primary">
+              <span class="icon">↗</span>
+              <span>Launch full portfolio</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ARCHITECTURE VIEW -->
+      <div class="view" id="view-architecture">
+        <div class="panel">
+          <h3>Architecture Domains</h3>
+          <div class="panel-body">
+            <h4>Secure connectivity for a distributed enterprise</h4>
+            <p>
+              I design end‑to‑end architectures that align security controls with
+              identity, context, and business-critical applications — not with
+              traditional network boundaries.
+            </p>
+            <ul class="clean">
+              <li>SASE blueprints covering remote users, branches, and private apps.</li>
+              <li>Zero Trust access patterns for workforce, partners, and workloads.</li>
+              <li>SD‑WAN and WAN core modernization for hybrid and multi‑cloud.</li>
+              <li>Cloud security guardrails across AWS, Azure, and GCP.</li>
+            </ul>
+          </div>
+          <div class="panel-footer">
+            <span class="tag">Reference Architectures</span>
+            <span class="tag">Design Reviews</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Patterns &amp; Blueprints</h3>
+          <div class="panel-body">
+            <div class="two-col">
+              <div>
+                <strong>SASE</strong>
+                <p>Prisma Access, Zscaler, or similar platforms for secure edge, with clear connectivity and policy models.</p>
+              </div>
+              <div>
+                <strong>Zero Trust</strong>
+                <p>Identity‑centric access, micro‑segmentation, and continuous validation of user, device, and app context.</p>
+              </div>
+            </div>
+            <div class="two-col">
+              <div>
+                <strong>SD‑WAN &amp; WAN Fabric</strong>
+                <p>Global overlay designs (Viptela, Meraki, EdgeConnect, Aviatrix) with resilient underlay strategy.</p>
+              </div>
+              <div>
+                <strong>Cloud &amp; Platform Security</strong>
+                <p>Landing zones, network segmentation, and security services integrated with CI/CD and IaC.</p>
+              </div>
+            </div>
+          </div>
+          <div class="panel-footer">
+            <a href="#" class="btn">
+              <span class="icon">↗</span>
+              <span>Open architecture playbooks</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- TOOLS VIEW -->
+		<div class="view" id="view-tools">
+		  <div class="panel">
+			<h3>Tooling Reality</h3>
+			<div class="panel-body">
+			  <h4>Interactive tools I’ve built for practitioners</h4>
+			  <p>
+				These tools are designed for day‑to‑day use by security, network, and
+				DevOps engineers — calculators, references, and guided workflows that
+				simplify real tasks.
+			  </p>
+			  <ul class="clean">
+				<li>Security, network, firewall, DevOps, SD‑WAN, and SASE toolsets.</li>
+				<li>Focus on practical workflows: design, troubleshooting, and automation.</li>
+				<li>Continuously evolving based on real‑world scenarios.</li>
+			  </ul>
 			</div>
-		</div>
-
-		<span class="text-sm font-medium hidden md:block">Theme</span>
-	</div>
-    
-    <!-- Navigation -->
-    <nav class="sticky top-0 z-40 glass py-4">
-        <div class="container mx-auto px-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-full gradient-bg flex items-center justify-center pulse-glow">
-                        <i class="fas fa-shield-alt text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-bold">Balamurugan S</h1>
-                        <p class="text-xs text-gray-600 dark:text-gray-300">Security Architect</p>
-                    </div>
-                </div>
-                
-                <div class="hidden md:flex items-center gap-8">
-                    <a href="#home" class="font-medium hover:text-primary transition">Home</a>
-                    <a href="#about" class="font-medium hover:text-primary transition">About</a>
-                    <a href="#expertise" class="font-medium hover:text-primary transition">Expertise</a>
-                    <a href="#tools" class="font-medium hover:text-primary transition">Tools</a>
-                    <a href="#projects" class="font-medium hover:text-primary transition">Projects</a>
-                    <a href="#contact" class="font-medium hover:text-primary transition">Contact</a>
-                </div>
-                
-                <button id="mobileMenuBtn" class="md:hidden text-2xl">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-            
-            <!-- Mobile Menu -->
-            <div id="mobileMenu" class="hidden md:hidden mt-4 py-4 border-t border-gray-200 dark:border-gray-700">
-                <div class="flex flex-col gap-4">
-                    <a href="#home" class="font-medium hover:text-primary transition">Home</a>
-                    <a href="#about" class="font-medium hover:text-primary transition">About</a>
-                    <a href="#expertise" class="font-medium hover:text-primary transition">Expertise</a>
-                    <a href="#tools" class="font-medium hover:text-primary transition">Tools</a>
-                    <a href="#projects" class="font-medium hover:text-primary transition">Projects</a>
-                    <a href="#contact" class="font-medium hover:text-primary transition">Contact</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-    
-    <!-- Hero Section -->
-    <section id="home" class="pt-20 pb-32 relative overflow-hidden">
-        <div class="container mx-auto px-4">
-            <div class="grid md:grid-cols-2 gap-12 items-center">
-                <div class="fade-in-up">
-                    <div class="inline-block px-4 py-2 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 font-medium mb-6">
-                        <i class="fas fa-bolt mr-2"></i>14+ Years of Security Excellence
-                    </div>
-                    
-                    <h1 class="hero-title text-5xl md:text-6xl font-bold mb-6">
-                        <span class="text-gradient">Cyber Security</span><br>
-                        <span class="dark:text-white">Architect &</span><br>
-                        <span class="dark:text-white">Cloud Specialist</span>
-                    </h1>
-                    
-                    <p class="text-xl text-gray-600 dark:text-gray-300 mb-8">
-                        Designing and implementing secure, scalable cloud infrastructures with a focus on SASE, Zero Trust, and DevSecOps automation.
-                    </p>
-                    
-                    <div class="flex flex-wrap gap-4">
-                        <a href="#contact" class="px-8 py-3 rounded-lg gradient-bg text-white font-bold hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                            <i class="fas fa-paper-plane mr-2"></i> Get In Touch
-                        </a>
-                        <a href="#projects" class="px-8 py-3 rounded-lg border-2 border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400 font-bold hover:bg-indigo-50 dark:hover:bg-indigo-900/30 transition">
-                            <i class="fas fa-code-branch mr-2"></i> View Projects
-                        </a>
-                    </div>
-                </div>
-                
-                <div class="relative float">
-                    <div class="w-full h-96 rounded-2xl gradient-bg-alt flex items-center justify-center">
-                        <div class="relative">
-                            <div class="absolute -top-6 -left-6 w-20 h-20 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center shadow-2xl">
-                                <i class="fas fa-cloud text-3xl text-blue-500"></i>
-                            </div>
-                            <div class="absolute -bottom-6 -right-6 w-20 h-20 rounded-full bg-white dark:bg-gray-800 flex items-center justify-center shadow-2xl">
-                                <i class="fas fa-shield-alt text-3xl text-green-500"></i>
-                            </div>
-                            <div class="w-64 h-64 rounded-full bg-white/20 dark:bg-gray-800/50 backdrop-blur-sm flex flex-col items-center justify-center p-8 border-gradient">
-                                <div class="text-2xl font-bold text-gray mb-2">Bridge between</div>
-                                <div class="text-2xl text-gray text-center">network security automation</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Floating elements -->
-                    <div class="absolute -top-4 -left-4 w-16 h-16 rounded-lg bg-purple-500 flex items-center justify-center text-white shadow-2xl">
-                        <i class="fas fa-lock text-2xl"></i>
-                    </div>
-                    <div class="absolute -bottom-4 -right-4 w-16 h-16 rounded-lg bg-cyan-500 flex items-center justify-center text-white shadow-2xl">
-                        <i class="fas fa-network-wired text-2xl"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Stats Section -->
-    <section class="py-12 bg-gray-100 dark:bg-gray-800">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-                <div class="text-center p-6 rounded-xl bg-white dark:bg-gray-900 hover-card">
-                    <div class="text-4xl font-bold text-gradient mb-2">14+</div>
-                    <div class="text-gray-600 dark:text-gray-300">Years Experience</div>
-                </div>
-                <div class="text-center p-6 rounded-xl bg-white dark:bg-gray-900 hover-card">
-                    <div class="text-4xl font-bold text-gradient mb-2">70+</div>
-                    <div class="text-gray-600 dark:text-gray-300">Sites Deployed</div>
-                </div>
-                <div class="text-center p-6 rounded-xl bg-white dark:bg-gray-900 hover-card">
-                    <div class="text-4xl font-bold text-gradient mb-2">60%</div>
-                    <div class="text-gray-600 dark:text-gray-300">Cost Reduction</div>
-                </div>
-                <div class="text-center p-6 rounded-xl bg-white dark:bg-gray-900 hover-card">
-                    <div class="text-4xl font-bold text-gradient mb-2">6+</div>
-                    <div class="text-gray-600 dark:text-gray-300">Certifications</div>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-	<!-- About Section -->
-	<section id="about" class="py-20">
-		<div class="container mx-auto px-4">
-			<div class="max-w-4xl mx-auto text-center mb-16">
-				<h2 class="text-4xl font-bold mb-6">About Me</h2>
-				<p class="text-xl text-gray-600 dark:text-gray-300">
-					I am a security and cloud professional with 14+ years of global experience designing, deploying, and securing enterprise-scale environments. My work spans cloud security, secure network modernization, and building resilient security architectures aligned with modern business needs.
-				</p>
+			<div class="panel-footer">
+			  <span class="tag">Launch from cards</span>
+			  <span class="tag">Runs on GitHub Pages</span>
 			</div>
-			
-			<div class="grid md:grid-cols-2 gap-12 items-center">
-				<div class="slide-in-left">
-					<div class="relative">
-						<div class="w-full h-80 rounded-2xl gradient-bg overflow-hidden">
-							<div class="absolute inset-0 flex items-center justify-center">
-								<i class="fas fa-user-secret text-white text-8xl opacity-30"></i>
-							</div>
-						</div>
-						<div class="absolute -bottom-6 -right-6 w-40 h-40 rounded-2xl bg-white dark:bg-gray-900 shadow-2xl p-6 border-gradient">
-							<div class="text-center">
-								<div class="text-3xl font-bold text-gradient">100%</div>
-								<div class="text-gray-600 dark:text-gray-300 mt-2">Security Mindset</div>
-							</div>
-						</div>
-					</div>
-				</div>
-				
-				<div class="fade-in-up">
-					<h3 class="text-3xl font-bold mb-6">My Philosophy</h3>
-					<p class="text-gray-600 dark:text-gray-300 mb-6">
-						Effective security is built into systems from the start, not added as an afterthought. I focus on aligning security with engineering and operations to create scalable, automated, and resilient defenses without slowing innovation.
-					</p>
-					
-					<div class="space-y-4">
-						<div class="flex items-start gap-4">
-							<div class="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center flex-shrink-0">
-								<i class="fas fa-check text-indigo-600 dark:text-indigo-400"></i>
-							</div>
-							<div>
-								<h4 class="font-bold text-lg mb-1">Threat-Driven Design</h4>
-								<p class="text-gray-600 dark:text-gray-300">
-									Design controls based on real-world attack patterns and risk
-								</p>
-							</div>
-						</div>
-						
-						<div class="flex items-start gap-4">
-							<div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
-								<i class="fas fa-cogs text-green-600 dark:text-green-400"></i>
-							</div>
-							<div>
-								<h4 class="font-bold text-lg mb-1">Automation & Scale</h4>
-								<p class="text-gray-600 dark:text-gray-300">
-									Build repeatable, automated security workflows that scale
-								</p>
-							</div>
-						</div>
-						
-						<div class="flex items-start gap-4">
-							<div class="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center flex-shrink-0">
-								<i class="fas fa-users text-purple-600 dark:text-purple-400"></i>
-							</div>
-							<div>
-								<h4 class="font-bold text-lg mb-1">Shared Responsibility</h4>
-								<p class="text-gray-600 dark:text-gray-300">
-									Partner with teams to embed security across people, process, and technology
-								</p>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</section>
+		  </div>
 
-    
-    <!-- Expertise Section -->
-    <section id="expertise" class="py-20 bg-gray-100 dark:bg-gray-800">
-        <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-16">Core Expertise</h2>
-            
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="bg-white dark:bg-gray-900 rounded-2xl p-8 hover-card">
-                    <div class="w-16 h-16 rounded-full gradient-bg flex items-center justify-center mb-6">
-                        <i class="fas fa-cloud text-white text-2xl"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-4">SASE & Zero Trust</h3>
-                    <p class="text-gray-600 dark:text-gray-300 mb-6">
-                        Architected enterprise SASE solutions with Prisma Access & Zscaler, reducing gateway reliance by 60%.
-                    </p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 rounded-full text-sm">Zscaler</span>
-                        <span class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 rounded-full text-sm">Prisma</span>
-                        <span class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 rounded-full text-sm">Zero Trust</span>
-                    </div>
-                </div>
-                
-                <div class="bg-white dark:bg-gray-900 rounded-2xl p-8 hover-card">
-                    <div class="w-16 h-16 rounded-full gradient-bg-alt flex items-center justify-center mb-6">
-                        <i class="fas fa-sitemap text-white text-2xl"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-4">SD-WAN Excellence</h3>
-                    <p class="text-gray-600 dark:text-gray-300 mb-6">
-                        Deployed Cisco Viptela & Meraki SD-WAN across 70+ sites, cutting MPLS costs by 50%.
-                    </p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300 rounded-full text-sm">Cisco</span>
-                        <span class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300 rounded-full text-sm">Viptela</span>
-                        <span class="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300 rounded-full text-sm">Meraki</span>
-                    </div>
-                </div>
-                
-                <div class="bg-white dark:bg-gray-900 rounded-2xl p-8 hover-card">
-                    <div class="w-16 h-16 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mb-6">
-                        <i class="fas fa-robot text-white text-2xl"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-4">DevSecOps & IaC</h3>
-                    <p class="text-gray-600 dark:text-gray-300 mb-6">
-                        Automated security provisioning with Terraform, Ansible & Python, reducing manual effort by 40%.
-                    </p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 rounded-full text-sm">Terraform</span>
-                        <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 rounded-full text-sm">Ansible</span>
-                        <span class="px-3 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 rounded-full text-sm">Python</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-    
-    <!-- Tools Section -->
-    <section id="tools" class="py-20">
-        <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-4">Interactive Tools & Resources</h2>
-            <p class="text-center text-gray-600 dark:text-gray-300 mb-12 text-lg">Practical tools built for security and network professionals</p>
-            
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+		  <div class="panel">
+			<h3>Launch Tools</h3>
+			<div class="panel-body">
+			  <div class="tools-grid">
+
 				<!-- Security Tools -->
-					<a href="/security-tools/" class="block">
-						<div class="bg-gradient-to-br from-red-500 to-pink-600 text-white rounded-2xl p-6 hover-card">
-							<div class="flex items-center justify-between mb-4">
-								<i class="fas fa-shield-alt text-3xl"></i>
-								<i class="fas fa-arrow-right text-xl"></i>
-							</div>
-							<h3 class="text-2xl font-bold mb-3">Security Tools</h3>
-							<p class="opacity-90 mb-6">Password analyzer, hash generator, OWASP Top 10 reference, and security best practices</p>
-							<div class="flex flex-wrap gap-2">
-								<span class="px-3 py-1 bg-white/20 rounded-full text-sm">OWASP</span>
-								<span class="px-3 py-1 bg-white/20 rounded-full text-sm">Crypto</span>
-								<span class="px-3 py-1 bg-white/20 rounded-full text-sm">Audit</span>
-							</div>
-						</div>
-					</a>
+				<a class="tool-card tool-security" href="security-tools/security-index.html">
+				  <div class="tool-card-header">
+					<span>🛡</span>
+					<span>➜</span>
+				  </div>
+				  <div class="tool-card-title">Security Tools</div>
+				  <div class="tool-card-desc">
+					Password analyzer, hash utilities, OWASP references, and security best‑practice helpers.
+				  </div>
+				  <div class="tool-card-tags">
+					<span class="tool-tag">OWASP</span>
+					<span class="tool-tag">Crypto</span>
+					<span class="tool-tag">Audit</span>
+				  </div>
+				</a>
 
-                
-                <!-- Network Tools -->
-				<a href="/network-tools/" class="block">
-					<div class="bg-gradient-to-br from-blue-500 to-cyan-600 text-white rounded-2xl p-6 hover-card">
-						<div class="flex items-center justify-between mb-4">
-							<i class="fas fa-network-wired text-3xl"></i>
-							<i class="fas fa-arrow-right text-xl"></i>
-						</div>
-						<h3 class="text-2xl font-bold mb-3">Network Tools</h3>
-						<p class="opacity-90 mb-6">Subnet calculator, CIDR calculator, port reference, and network planning utilities</p>
-						<div class="flex flex-wrap gap-2">
-							<span class="px-3 py-1 bg-white/20 rounded-full text-sm">CIDR</span>
-							<span class="px-3 py-1 bg-white/20 rounded-full text-sm">Subnet</span>
-							<span class="px-3 py-1 bg-white/20 rounded-full text-sm">Ports</span>
-						</div>
-					</div>
+				<!-- Network Tools -->
+				<a class="tool-card tool-network" href="network-tools/network-index.html">
+				  <div class="tool-card-header">
+					<span>🌐</span>
+					<span>➜</span>
+				  </div>
+				  <div class="tool-card-title">Network Tools</div>
+				  <div class="tool-card-desc">
+					Subnet &amp; CIDR calculators, port references, and planning helpers for network engineers.
+				  </div>
+				  <div class="tool-card-tags">
+					<span class="tool-tag">CIDR</span>
+					<span class="tool-tag">Subnet</span>
+					<span class="tool-tag">Ports</span>
+				  </div>
 				</a>
 
 				<!-- Firewall Tools -->
-				<a href="/firewall-tools/" class="block">
-					<div class="bg-gradient-to-br from-green-500 to-emerald-600 text-white rounded-2xl p-6 hover-card">
-						<div class="flex items-center justify-between mb-4">
-							<i class="fas fa-fire text-3xl"></i>
-							<i class="fas fa-arrow-right text-xl"></i>
-						</div>
-						<h3 class="text-2xl font-bold mb-3">Firewall Tools</h3>
-						<p class="opacity-90 mb-6">CLI commands, troubleshooting guides, VPN configurations for Palo Alto, Fortinet, Cisco</p>
-						<div class="flex flex-wrap gap-2">
-							<span class="px-3 py-1 bg-white/20 rounded-full text-sm">Palo Alto</span>
-							<span class="px-3 py-1 bg-white/20 rounded-full text-sm">Fortinet</span>
-							<span class="px-3 py-1 bg-white/20 rounded-full text-sm">Cisco</span>
-						</div>
-					</div>
+				<a class="tool-card tool-firewall" href="firewall-tools/firewall-index.html">
+				  <div class="tool-card-header">
+					<span>🔥</span>
+					<span>➜</span>
+				  </div>
+				  <div class="tool-card-title">Firewall Tools</div>
+				  <div class="tool-card-desc">
+					CLI references, troubleshooting flows, and VPN templates for Palo Alto, Fortinet, and Cisco.
+				  </div>
+				  <div class="tool-card-tags">
+					<span class="tool-tag">Palo Alto</span>
+					<span class="tool-tag">Fortinet</span>
+					<span class="tool-tag">Cisco</span>
+				  </div>
 				</a>
 
 				<!-- DevOps Tools -->
-				<a href="/devops-tools/" class="block">
-					<div class="bg-gradient-to-br from-orange-500 to-amber-600 text-white rounded-2xl p-6 hover-card">
-						<div class="flex items-center justify-between mb-4">
-							<i class="fas fa-code-branch text-3xl"></i>
-							<i class="fas fa-arrow-right text-xl"></i>
-						</div>
-						<h3 class="text-2xl font-bold mb-3">DevOps Tools</h3>
-						<p class="opacity-90 mb-6">Automation scripts, deployment workflows, and IaC for Terraform, Ansible, Kubernetes</p>
-						<div class="flex flex-wrap gap-2">
-							<span class="px-3 py-1 bg-white/20 rounded-full text-sm">Terraform</span>
-							<span class="px-3 py-1 bg-white/20 rounded-full text-sm">K8s</span>
-							<span class="px-3 py-1 bg-white/20 rounded-full text-sm">CI/CD</span>
-						</div>
-					</div>
+				<a class="tool-card tool-devops" href="devops-tools/index.html">
+				  <div class="tool-card-header">
+					<span>⚙️</span>
+					<span>➜</span>
+				  </div>
+				  <div class="tool-card-title">DevOps Tools</div>
+				  <div class="tool-card-desc">
+					Automation snippets, deployment workflows, and IaC helpers for Terraform, Ansible, and K8s.
+				  </div>
+				  <div class="tool-card-tags">
+					<span class="tool-tag">Terraform</span>
+					<span class="tool-tag">K8s</span>
+					<span class="tool-tag">CI/CD</span>
+				  </div>
 				</a>
 
-				<!-- SDWAN Tools -->
-				<a href="/sdwan-tools/" class="block">
-					<div class="bg-gradient-to-br from-purple-500 to-violet-600 text-white rounded-2xl p-6 hover-card">
-						<div class="flex items-center justify-between mb-4">
-							<i class="fas fa-wifi text-3xl"></i>
-							<i class="fas fa-arrow-right text-xl"></i>
-						</div>
-						<h3 class="text-2xl font-bold mb-3">SDWAN Tools</h3>
-						<p class="opacity-90 mb-6">Automation scripts, deployment workflows, and IaC, Troubleshooting, CLI reference</p>
-						<div class="flex flex-wrap gap-2">
-							<span class="px-3 py-1 bg-white/20 rounded-full text-sm">Viptela</span>
-							<span class="px-3 py-1 bg-white/20 rounded-full text-sm">Meraki</span>
-							<span class="px-3 py-1 bg-white/20 rounded-full text-sm">Automation</span>
-						</div>
-					</div>
+				<!-- SD-WAN Tools -->
+				<a class="tool-card tool-sdwan" href="sdwan-tools/index.html">
+				  <div class="tool-card-header">
+					<span>📡</span>
+					<span>➜</span>
+				  </div>
+				  <div class="tool-card-title">SD‑WAN Tools</div>
+				  <div class="tool-card-desc">
+					SD‑WAN automation, troubleshooting, and CLI reference for Viptela, Meraki, and others.
+				  </div>
+				  <div class="tool-card-tags">
+					<span class="tool-tag">Viptela</span>
+					<span class="tool-tag">Meraki</span>
+					<span class="tool-tag">Automation</span>
+				  </div>
 				</a>
 
 				<!-- SASE Tools -->
-				<a href="/sase-tools/" class="block">
-					<div class="bg-gradient-to-br from-cyan-500 to-sky-600 text-white rounded-2xl p-6 hover-card">
-						<div class="flex items-center justify-between mb-4">
-							<i class="fas fa-cloud-upload-alt text-3xl"></i>
-							<i class="fas fa-arrow-right text-xl"></i>
-						</div>
-						<h3 class="text-2xl font-bold mb-3">SASE Tools</h3>
-						<p class="opacity-90 mb-6">ZTNA, SWG, CASB, FWaaS policy generators, access modeling, and cloud security tools</p>
-						<div class="flex flex-wrap gap-2">
-							<span class="px-3 py-1 bg-white/20 rounded-full text-sm">ZTNA</span>
-							<span class="px-3 py-1 bg-white/20 rounded-full text-sm">CASB</span>
-							<span class="px-3 py-1 bg-white/20 rounded-full text-sm">SWG</span>
-						</div>
-					</div>
-				</a>
-				<!-- Developer Toolkit -->
-				<a href="/toolkit/" class="block">
-				    <div class="bg-gradient-to-br from-teal-500 to-blue-600 text-white rounded-2xl p-6 hover-card">
-				        <div class="flex items-center justify-between mb-4">
-				            <i class="fas fa-laptop-code text-3xl"></i>
-				            <i class="fas fa-arrow-right text-xl"></i>
-				        </div>
-				        <h3 class="text-2xl font-bold mb-3">Developer Toolkit</h3>
-				        <p class="opacity-90 mb-6">Code linters, formatters, version control utilities, and debugging tools</p>
-				        <div class="flex flex-wrap gap-2">
-				            <span class="px-3 py-1 bg-white/20 rounded-full text-sm">Linters</span>
-				            <span class="px-3 py-1 bg-white/20 rounded-full text-sm">Version Control</span>
-				            <span class="px-3 py-1 bg-white/20 rounded-full text-sm">Debugging</span>
-				            <span class="px-3 py-1 bg-white/20 rounded-full text-sm">CI/CD</span>
-				        </div>
-				    </div>
+				<a class="tool-card tool-sase" href="sase-tools/index.html">
+				  <div class="tool-card-header">
+					<span>☁️</span>
+					<span>➜</span>
+				  </div>
+				  <div class="tool-card-title">SASE Tools</div>
+				  <div class="tool-card-desc">
+					ZTNA, SWG, CASB policy helpers, access modeling, and cloud security utilities.
+				  </div>
+				  <div class="tool-card-tags">
+					<span class="tool-tag">ZTNA</span>
+					<span class="tool-tag">CASB</span>
+					<span class="tool-tag">SWG</span>
+				  </div>
 				</a>
 
-            </div>
-        </div>
-    </section>
-    
-    <!-- Projects Section -->
-    <section id="projects" class="py-20 bg-gray-100 dark:bg-gray-800">
-        <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center text-gray mb-16">Key Projects & Achievements</h2>
-            
-            <div class="grid md:grid-cols-2 gap-8">
-                <div class="bg-white dark:bg-gray-900 rounded-2xl p-8 hover-card">
-                    <div class="flex items-center justify-between mb-6">
-                        <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                            <i class="fas fa-user-shield text-blue-600 dark:text-blue-400 text-xl"></i>
-                        </div>
-                        <span class="px-4 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-full text-sm font-medium">Zero Trust</span>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-4">Zero Trust & SASE Automation</h3>
-                    <p class="text-gray-600 dark:text-gray-300 mb-6">Migrated enterprise to Prisma Access using Terraform + Ansible automation, implementing Zero Trust principles across all access points.</p>
-                    <div class="flex items-center">
-                        <div class="flex-1">
-                            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1">Cost Reduction</div>
-                            <div class="text-2xl font-bold text-gradient">60%</div>
-                        </div>
-                        <div class="flex-1">
-                            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1">Deployment Time</div>
-                            <div class="text-2xl font-bold text-gradient">70% Faster</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="bg-white dark:bg-gray-900 rounded-2xl p-8 hover-card">
-                    <div class="flex items-center justify-between mb-6">
-                        <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                            <i class="fas fa-sitemap text-green-600 dark:text-green-400 text-xl"></i>
-                        </div>
-                        <span class="px-4 py-1 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400 rounded-full text-sm font-medium">SD-WAN</span>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-4">Enterprise SD-WAN Deployment</h3>
-                    <p class="text-gray-600 dark:text-gray-300 mb-6">Global Cisco Viptela & Meraki SD-WAN rollout across 70+ sites, replacing legacy MPLS infrastructure with secure cloud-based networking.</p>
-                    <div class="flex items-center">
-                        <div class="flex-1">
-                            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1">Cost Savings</div>
-                            <div class="text-2xl font-bold text-gradient">50%</div>
-                        </div>
-                        <div class="flex-1">
-                            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1">Sites Deployed</div>
-                            <div class="text-2xl font-bold text-gradient">70+</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="bg-white dark:bg-gray-900 rounded-2xl p-8 hover-card">
-                    <div class="flex items-center justify-between mb-6">
-                        <div class="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
-                            <i class="fas fa-cloud text-purple-600 dark:text-purple-400 text-xl"></i>
-                        </div>
-                        <span class="px-4 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-full text-sm font-medium">Multi-Cloud</span>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-4">Multi-Cloud Security Architecture</h3>
-                    <p class="text-gray-600 dark:text-gray-300 mb-6">Built secure AWS/Azure landing zones with Aviatrix & Prisma Cloud, enabling consistent security policies across hybrid cloud environments.</p>
-                    <div class="flex items-center">
-                        <div class="flex-1">
-                            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1">Provisioning Time</div>
-                            <div class="text-2xl font-bold text-gradient">70% Faster</div>
-                        </div>
-                        <div class="flex-1">
-                            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1">Policy Consistency</div>
-                            <div class="text-2xl font-bold text-gradient">100%</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="bg-white dark:bg-gray-900 rounded-2xl p-8 hover-card">
-                    <div class="flex items-center justify-between mb-6">
-                        <div class="w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center">
-                            <i class="fas fa-robot text-orange-600 dark:text-orange-400 text-xl"></i>
-                        </div>
-                        <span class="px-4 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 rounded-full text-sm font-medium">Automation</span>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-4">SOC Automation & Response</h3>
-                    <p class="text-gray-600 dark:text-gray-300 mb-6">Automated incident response with Splunk ES & Cortex XSOAR, reducing manual triage and accelerating threat response times.</p>
-                    <div class="flex items-center">
-                        <div class="flex-1">
-                            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1">Manual Triage</div>
-                            <div class="text-2xl font-bold text-gradient">40% Less</div>
-                        </div>
-                        <div class="flex-1">
-                            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1">Response Time</div>
-                            <div class="text-2xl font-bold text-gradient">80% Faster</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+			  </div>
+			</div>
+			<div class="panel-footer">
+			  <!-- Optional: central tools page -->
+			  <!-- <a class="btn btn-primary" href="tools/index.html"><span class="icon">↗</span><span>Open tools hub</span></a> -->
+			</div>
+		  </div>
+		</div>
 
-	<!-- Timeline Section -->
-	
-    <!-- Skills Section -->
-    <section class="py-20">
-        <div class="container mx-auto px-4">
-            <h2 class="text-4xl font-bold text-center mb-16">Technical Competencies</h2>
-            
-            <div class="grid md:grid-cols-2 gap-12">
-                <div>
-                    <h3 class="text-2xl font-bold mb-8">Security Domains</h3>
-                    <div class="space-y-6">
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <span class="font-medium">SASE / Zero Trust</span>
-                                <span class="font-bold text-indigo-600 dark:text-indigo-400">65%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill w-7/12"></div>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <span class="font-medium">Cloud Security (AWS/Azure)</span>
-                                <span class="font-bold text-indigo-600 dark:text-indigo-400">75%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill w-9/12"></div>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <span class="font-medium">Network Security</span>
-                                <span class="font-bold text-indigo-600 dark:text-indigo-400">90%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill w-11/12"></div>
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <div class="flex justify-between mb-2">
-                                <span class="font-medium">DevSecOps & Automation</span>
-                                <span class="font-bold text-indigo-600 dark:text-indigo-400">60%</span>
-                            </div>
-                            <div class="progress-bar">
-                                <div class="progress-fill w-6/12"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div>
-                    <h3 class="text-2xl font-bold mb-8">Technologies & Tools</h3>
-                    <div class="flex flex-wrap gap-3">
-                        <span class="tech-badge px-4 py-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 rounded-full font-medium">Palo Alto Networks</span>
-                        <span class="tech-badge px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 rounded-full font-medium">Zscaler ZIA/ZPA</span>
-                        <span class="tech-badge px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300 rounded-full font-medium">Cisco Viptela</span>
-                        <span class="tech-badge px-4 py-2 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 rounded-full font-medium">Aviatrix</span>
-                        <span class="tech-badge px-4 py-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 rounded-full font-medium">Prisma Cloud</span>
-                        <span class="tech-badge px-4 py-2 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-300 rounded-full font-medium">AWS Security</span>
-                        <span class="tech-badge px-4 py-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 rounded-full font-medium">Azure Security</span>
-                        <span class="tech-badge px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 rounded-full font-medium">Terraform</span>
-                        <span class="tech-badge px-4 py-2 bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300 rounded-full font-medium">Ansible</span>
-                        <span class="tech-badge px-4 py-2 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 rounded-full font-medium">Python</span>
-                        <span class="tech-badge px-4 py-2 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 rounded-full font-medium">SD-WAN</span>
-                        <span class="tech-badge px-4 py-2 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-300 rounded-full font-medium">Zero Trust</span>
-                        <span class="tech-badge px-4 py-2 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 rounded-full font-medium">SASE</span>
-                        <span class="tech-badge px-4 py-2 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 rounded-full font-medium">Kubernetes</span>
-                    </div>
-                </div>
-            </div>
+      <!-- EXPERIENCE VIEW -->
+      <div class="view" id="view-experience">
+        <div class="panel">
+          <h3>Experience Signals</h3>
+          <div class="panel-body">
+            <h4>From strategy to stable operations</h4>
+            <ul class="clean">
+              <li>Led architecture and rollout of large‑scale SASE &amp; SD‑WAN programs.</li>
+              <li>Worked across security, network, cloud, and application teams to align designs.</li>
+              <li>Balanced high‑level roadmaps with detailed design and implementation documents.</li>
+              <li>Helped teams move from “ticket‑driven” to “automation‑driven” delivery.</li>
+            </ul>
+          </div>
+          <div class="panel-footer">
+            <span class="tag">Global Programs</span>
+            <span class="tag">Cross‑functional Delivery</span>
+          </div>
         </div>
-    </section>
-    
-    <!-- Contact Section -->
-    <section id="contact" class="py-20 gradient-bg text-white">
-        <div class="container mx-auto px-4 text-center">
-            <h2 class="text-4xl font-bold mb-6">Let's Connect</h2>
-            <p class="text-xl mb-12 opacity-90 max-w-2xl mx-auto">
-                Interested in collaborating or learning more about my work? Feel free to reach out through any of the channels below.
+
+        <div class="panel">
+          <h3>How I Typically Engage</h3>
+          <div class="panel-body">
+            <ul class="clean">
+              <li><strong>Advisor:</strong> Review existing designs, identify gaps, and propose practical roadmaps.</li>
+              <li><strong>Architect:</strong> Own LLD/HLD, patterns, standards, and guardrails.</li>
+              <li><strong>Builder:</strong> Support PoCs, pilots, migrations, and handover to operations.</li>
+              <li><strong>Partner:</strong> Work with product, security, and infra teams to land change safely.</li>
+            </ul>
+          </div>
+          <div class="panel-footer">
+            <a href="#" class="btn">
+              <span class="icon">↗</span>
+              <span>View detailed experience</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROJECTS VIEW -->
+      <div class="view" id="view-projects">
+        <div class="panel">
+          <h3>Selected Work</h3>
+          <div class="panel-body">
+            <h4>Examples of what I’ve delivered</h4>
+            <ul class="clean">
+              <li><strong>Global SASE Transformation:</strong> Designed and rolled out a multi‑region SASE platform for users, branches, and data centers with clearly defined migration waves.</li>
+              <li><strong>SD‑WAN Modernization:</strong> Replaced legacy MPLS with an Internet‑first, SD‑WAN‑based fabric integrated with cloud on‑ramps and security services.</li>
+              <li><strong>Cloud Security Baseline:</strong> Defined network &amp; security guardrails for AWS and Azure, including segmentation, inspection, and access models.</li>
+            </ul>
+          </div>
+          <div class="panel-footer">
+            <span class="tag">Names &amp; details anonymized</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Project Console</h3>
+          <div class="panel-body">
+            <p>
+              This console highlights the type of problems I solve. The detailed
+              project views (diagrams, decisions, and runbooks) live in separate
+              workspaces.
             </p>
-            
-            <div class="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-16">
-                <div class="bg-white/10 backdrop-blur rounded-2xl p-8 hover-card">
-                    <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center mx-auto mb-6">
-                        <i class="fas fa-envelope text-2xl text-indigo-600"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-4">Email</h3>
-                    <p class="opacity-90 mb-6">Direct contact for professional inquiries</p>
-                    <a href="mailto:s-balamurugan@zohomail.in" class="inline-block bg-white text-indigo-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition">
-                        Send Email
-                    </a>
-                </div>
-                
-                <div class="bg-white/10 backdrop-blur rounded-2xl p-8 hover-card">
-                    <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center mx-auto mb-6">
-                        <i class="fab fa-linkedin text-2xl text-indigo-600"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-4">LinkedIn</h3>
-                    <p class="opacity-90 mb-6">Connect professionally and view my experience</p>
-                    <a href="https://www.linkedin.com/in/bala-murugan-s" target="_blank" class="inline-block bg-white text-indigo-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition">
-                        Visit Profile
-                    </a>
-                </div>
-                
-                <div class="bg-white/10 backdrop-blur rounded-2xl p-8 hover-card">
-                    <div class="w-16 h-16 rounded-full bg-white flex items-center justify-center mx-auto mb-6">
-                        <i class="fab fa-github text-2xl text-indigo-600"></i>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-4">GitHub</h3>
-                    <p class="opacity-90 mb-6">Explore my projects and code repositories</p>
-                    <a href="https://github.com/bala-murugan-s" target="_blank" class="inline-block bg-white text-indigo-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition">
-                        View Repos
-                    </a>
-                </div>
-            </div>
-            
-            <div class="max-w-2xl mx-auto">
-                <h3 class="text-2xl font-bold mb-6">Get in Touch</h3>
-                <form id="contactForm" class="space-y-6">
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <input type="text" placeholder="Your Name" class="w-full px-6 py-4 rounded-lg bg-white/10 backdrop-blur border border-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white">
-                        <input type="email" placeholder="Your Email" class="w-full px-6 py-4 rounded-lg bg-white/10 backdrop-blur border border-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white">
-                    </div>
-                    <textarea placeholder="Your Message" rows="4" class="w-full px-6 py-4 rounded-lg bg-white/10 backdrop-blur border border-white/20 text-white placeholder-white/70 focus:outline-none focus:ring-2 focus:ring-white"></textarea>
-                    <button type="submit" class="w-full md:w-auto px-10 py-4 bg-white text-indigo-600 rounded-lg font-bold hover:bg-gray-100 transition">
-                        <i class="fas fa-paper-plane mr-2"></i> Send Message
-                    </button>
-                </form>
-            </div>
+            <ul class="clean">
+              <li>Architecture decision records and design documents.</li>
+              <li>Migrations plans and rollout playbooks.</li>
+              <li>Operational readiness and handover material.</li>
+            </ul>
+          </div>
+          <div class="panel-footer">
+            <a href="#" class="btn btn-primary">
+              <span class="icon">↗</span>
+              <span>Open project workspace</span>
+            </a>
+          </div>
         </div>
-    </section>
-    
-    <!-- Footer -->
-	<footer class="bg-gray-900 text-white py-12">
-		<div class="container mx-auto px-4">
-			<div class="footer-content grid grid-cols-1 md:grid-cols-3 gap-8">
-				
-				<!-- About -->
-				<div class="footer-section">
-					<h3 class="text-lg font-semibold mb-4">Home Page</h3>
-					<p class="text-gray-400">
-						A comprehensive collection of security, SASE, DevOps utilities for developers and security professionals.
-					</p>
-				</div>
+      </div>
 
-				<!-- Quick Links -->
-				<div class="footer-section">
-					<h3 class="text-lg font-semibold mb-4">Quick Links</h3>
-					<ul class="footer-links space-y-2">
-						<li><a href="#tools" class="hover:text-indigo-400"><i class="fas fa-chevron-right mr-2"></i>Tools</a></li>
-						<li><a href="#projects" class="hover:text-indigo-400"><i class="fas fa-chevron-right mr-2"></i>Projects</a></li>
-						<li><a href="#expertise" class="hover:text-indigo-400"><i class="fas fa-chevron-right mr-2"></i>Expertise</a></li>
-						<li><a href="#contact" class="hover:text-indigo-400"><i class="fas fa-chevron-right mr-2"></i>Contact</a></li>
-					</ul>
-				</div>
+      <!-- WRITING VIEW -->
+      <div class="view" id="view-writing">
+        <div class="panel">
+          <h3>Writing &amp; Notes</h3>
+          <div class="panel-body">
+            <h4>Translating complex setups into clear narratives</h4>
+            <p>
+              I like to document not only the “what” but also the “why” behind architecture
+              decisions — trade‑offs, constraints, and lessons learned from real deployments.
+            </p>
+            <ul class="clean">
+              <li>Practical views on SASE and Zero Trust (beyond marketing slides).</li>
+              <li>Patterns for designing resilient SD‑WAN and cloud connectivity.</li>
+              <li>Automation patterns for networking and security.</li>
+            </ul>
+          </div>
+          <div class="panel-footer">
+            <a href="#" class="btn">
+              <span class="icon">↗</span>
+              <span>View articles &amp; diagrams</span>
+            </a>
+          </div>
+        </div>
 
-				<!-- Resources -->
-				<div class="footer-section">
-					<h3 class="text-lg font-semibold mb-4">Resources</h3>
-					<ul class="footer-links space-y-2">
-						<li><a href="/" class="hover:text-indigo-400"><i class="fab fa-github mr-2"></i>GitHub Profile</a></li>
-						<li><a href="/" class="hover:text-indigo-400"><i class="fas fa-home mr-2"></i>Portfolio Home</a></li>
-						<li><a href="#" class="hover:text-indigo-400"><i class="fas fa-book mr-2"></i>Documentation</a></li>
-						<li><a href="#contact" class="hover:text-indigo-400"><i class="fas fa-envelope mr-2"></i>Contact Me</a></li>
-					</ul>
-				</div>
+        <div class="panel">
+          <h3>Upcoming Topics</h3>
+          <div class="panel-body">
+            <ul class="clean">
+              <li>“Zero Trust for network engineers: where to start.”</li>
+              <li>“SASE migration: patterns that actually work in production.”</li>
+              <li>“IaC for network and security: getting the first pipelines right.”</li>
+            </ul>
+          </div>
+          <div class="panel-footer">
+            <span class="tag">Content roadmap</span>
+          </div>
+        </div>
+      </div>
 
+      <!-- CONTACT VIEW -->
+      <div class="view" id="view-contact">
+        <div class="panel">
+          <h3>Contact</h3>
+          <div class="panel-body">
+            <h4>Let’s discuss your architecture</h4>
+            <p>
+              If you’re planning or already running SASE, Zero Trust, SD‑WAN, or
+              cloud security programs and need an architect who can go from diagram
+              to implementation detail, I’d be happy to connect.
+            </p>
+            <ul class="clean">
+              <li>Architecture reviews and second opinions.</li>
+              <li>Support for migrations and rollout waves.</li>
+              <li>Helping teams move toward automation‑first operations.</li>
+            </ul>
+          </div>
+          <div class="panel-footer">
+            <!-- TODO: replace # with your real links -->
+            <a href="mailto:s-balamurugan@zohomail.in" class="btn btn-primary">
+              <span class="icon">✉</span>
+              <span>Email</span>
+            </a>
+            <a href="https://www.linkedin.com/in/bala-murugan-s" class="btn">
+              <span class="icon">in</span>
+              <span>LinkedIn</span>
+            </a>
+            <a href="https://bala-murugan-s.github.io/" class="btn">
+              <span class="icon">↗</span>
+              <span>GitHub Pages</span>
+            </a>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Working Style</h3>
+          <div class="panel-body">
+            <ul class="clean">
+              <li>Clear documentation and repeatable patterns over one‑off fixes.</li>
+              <li>Collaborative workshops with infra, security, and app teams.</li>
+              <li>Honest about trade‑offs, risk, and complexity.</li>
+            </ul>
+          </div>
+          <div class="panel-footer">
+            <span class="tag">Remote‑friendly</span>
+            <span class="tag">Enterprise‑scale</span>
+          </div>
+        </div>
+      </div>
+		
+
+		<!-- RESUME VIEW -->
+		<div class="view" id="view-resume">
+
+		  <!-- OVERVIEW PANEL -->
+		  <div class="panel">
+			<h3>Resume Overview</h3>
+			<div class="panel-body">
+			  <h4>Your downloadable documents</h4>
+			  <p>
+				Access your Resume (PDF), Detailed Resume, and Cover Letter.
+				Files are stored inside the <code>/resume/</code> folder.
+			  </p>
 			</div>
-		</div>
+		  </div>
 
-	<!-- Footer Bottom -->
-		<div class="footer-bottom mt-12 border-t border-gray-800 pt-8">
-			<div class="container mx-auto px-4">
-				<div class="flex flex-col md:flex-row justify-between items-center">
-					
-					<!-- Brand -->
-					<div class="mb-8 md:mb-0">
-						<div class="flex items-center gap-3 mb-4">
-							<div class="w-10 h-10 rounded-full gradient-bg flex items-center justify-center">
-								<i class="fas fa-shield-alt text-white"></i>
-							</div>
-							<div>
-								<h2 class="text-xl font-bold">Balamurugan S</h2>
-								<p class="text-gray-400 text-sm">Cloud & Network Security Specialist</p>
-							</div>
-						</div>
-						<p class="text-gray-400">14+ Years Global Experience</p>
-					</div>
+		  <!-- DOWNLOADS PANEL -->
+		  <div class="panel">
+			<h3>Downloads</h3>
+			<div class="panel-body">
+			  <div class="tools-grid">
 
-					<!-- Social -->
-					<div class="flex gap-6 mb-8 md:mb-0">
-						<a href="https://www.linkedin.com/in/bala-murugan-s" target="_blank"
-						   class="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center hover:bg-indigo-600 transition">
-							<i class="fab fa-linkedin-in text-xl"></i>
-						</a>
-						<a href="https://github.com/bala-murugan-s" target="_blank"
-						   class="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center hover:bg-gray-700 transition">
-							<i class="fab fa-github text-xl"></i>
-						</a>
-						<a href="mailto:s-balamurugan@zohomail.in"
-						   class="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center hover:bg-red-600 transition">
-							<i class="fas fa-envelope text-xl"></i>
-						</a>
-					</div>
+				<!-- Resume PDF -->
+				<a href="resume/Bala-Murugan-Sivaraman-Resume.pdf" 
+				   class="tool-card" 
+				   download>
+				  <div class="tool-card-header" 
+					   style="background:linear-gradient(135deg,#38bdf8,#0ea5e9);">
+					<h3>Resume (PDF)</h3>
+					<p>Latest updated professional resume.</p>
+				  </div>
+				  <div class="tool-card-body">
+					<p>Your primary resume used for job applications.</p>
+				  </div>
+				  <div class="tool-card-footer" style="color:#38bdf8;">
+					Download <span class="icon">⬇</span>
+				  </div>
+				</a>
 
-					<!-- Copyright -->
-					<div class="text-center md:text-right">
-						<p class="text-gray-400 mb-2">© 2026 Balamurugan Sivaraman</p>
-						<p class="text-gray-500 text-sm">
-							SASE | SD-WAN | DevSecOps | Zero Trust Architecture
-						</p>
-					</div>
+				<!-- Detailed Resume -->
+				<a href="resume/Bala-Murugan-Detailed-Resume.pdf" 
+				   class="tool-card" 
+				   download>
+				  <div class="tool-card-header" 
+					   style="background:linear-gradient(135deg,#38bdf8,#0ea5e9);">
+					<h3>Detailed Resume</h3>
+					<p>Extended version including deeper technical breakdowns.</p>
+				  </div>
+				  <div class="tool-card-body">
+					<p>Full-length resume with expanded project details.</p>
+				  </div>
+				  <div class="tool-card-footer" style="color:#38bdf8;">
+					Download <span class="icon">⬇</span>
+				  </div>
+				</a>
 
-				</div>
+				<!-- Cover Letter -->
+				<a href="resume/Cover-Letter.pdf" 
+				   class="tool-card" 
+				   download>
+				  <div class="tool-card-header" 
+					   style="background:linear-gradient(135deg,#38bdf8,#0ea5e9);">
+					<h3>Cover Letter</h3>
+					<p>Professional cover letter for job submissions.</p>
+				  </div>
+				  <div class="tool-card-body">
+					<p>Click to download your cover letter.</p>
+				  </div>
+				  <div class="tool-card-footer" style="color:#38bdf8;">
+					Download <span class="icon">⬇</span>
+				  </div>
+				</a>
+
+			  </div>
 			</div>
-		</div>
-	</footer>
+		  </div>
 
-    
-    <!-- Back to Top Button -->
-    <button id="backToTop" class="fixed bottom-6 right-6 w-12 h-12 rounded-full gradient-bg text-white shadow-2xl flex items-center justify-center z-50">
-        <i class="fas fa-arrow-up"></i>
-    </button>
-	<!-- Back to Home Button -->
-    <a href="/" class="back-home" title="Back to Home">
-        <i class="fas fa-arrow-left"></i>
-    </a>
-    
-    <script>
-        // Theme toggle functionality
-        const themeToggle = document.getElementById('themeToggle');
-        const body = document.body;
-        
-        // Check for saved theme preference or default to light
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        if (savedTheme === 'dark') {
-            body.classList.add('dark-mode');
+		</div> <!-- Resume -->
+		
+    </div> <!-- /content -->
+  </section>
+</div>
+
+<script>
+  // Theme toggle
+  const toggle = document.getElementById("themeToggle");
+  toggle.onclick = () => {
+    document.body.dataset.theme =
+      document.body.dataset.theme === "dark" ? "light" : "dark";
+  };
+
+  // View switching
+  const navLinks = document.querySelectorAll(".nav a[data-view]");
+  const views = document.querySelectorAll(".view");
+
+  navLinks.forEach(link => {
+    link.addEventListener("click", (e) => {
+      e.preventDefault();
+      const targetView = link.getAttribute("data-view");
+      if (!targetView) return;
+
+      // update nav
+      navLinks.forEach(l => l.classList.remove("active"));
+      link.classList.add("active");
+
+      // update views
+      views.forEach(view => {
+        if (view.id === "view-" + targetView) {
+          view.classList.add("active");
+        } else {
+          view.classList.remove("active");
         }
-        
-        themeToggle.addEventListener('click', () => {
-            body.classList.toggle('dark-mode');
-            
-            // Save preference to localStorage
-            const currentTheme = body.classList.contains('dark-mode') ? 'dark' : 'light';
-            localStorage.setItem('theme', currentTheme);
-        });
-        
-        // Mobile menu toggle
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const mobileMenu = document.getElementById('mobileMenu');
-        
-        mobileMenuBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
-        
-        // Back to top button
-        const backToTopBtn = document.getElementById('backToTop');
-        
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 300) {
-                backToTopBtn.style.display = 'flex';
-            } else {
-                backToTopBtn.style.display = 'none';
-            }
-        });
-        
-        backToTopBtn.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-        
-        // Form submission
-        const contactForm = document.getElementById('contactForm');
-        
-        contactForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            
-            // In a real implementation, this would send the form data to a server
-            alert('Thank you for your message! I will get back to you soon.');
-            contactForm.reset();
-        });
-        
-        // Scroll animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-        
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('fade-in-up');
-                }
-            });
-        }, observerOptions);
-        
-        // Observe elements for animation
-        document.querySelectorAll('.hover-card, .tech-badge').forEach(el => {
-            observer.observe(el);
-        });
-        
-        // Particles.js background
-        // This is a simplified version - in a real implementation you'd include the particles.js library
-        // For now, we'll create a simple CSS-based particle effect
-        const particlesContainer = document.getElementById('particles-js');
-        
-        // Create simple particles
-        if (particlesContainer) {
-            for (let i = 0; i < 30; i++) {
-                const particle = document.createElement('div');
-                particle.style.position = 'absolute';
-                particle.style.width = Math.random() * 5 + 2 + 'px';
-                particle.style.height = particle.style.width;
-                particle.style.backgroundColor = body.classList.contains('dark-mode') ? 'rgba(99, 102, 241, 0.3)' : 'rgba(99, 102, 241, 0.1)';
-                particle.style.borderRadius = '50%';
-                particle.style.top = Math.random() * 100 + '%';
-                particle.style.left = Math.random() * 100 + '%';
-                particle.style.opacity = Math.random() * 0.5 + 0.2;
-                
-                // Add animation
-                particle.style.animation = `float ${Math.random() * 10 + 10}s ease-in-out infinite`;
-                particle.style.animationDelay = Math.random() * 5 + 's';
-                
-                particlesContainer.appendChild(particle);
-            }
-        }
-        
-        // Animate progress bars on scroll
-        const progressBars = document.querySelectorAll('.progress-fill');
-        
-        const progressObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const width = entry.target.style.width;
-                    entry.target.style.width = '0%';
-                    
-                    setTimeout(() => {
-                        entry.target.style.width = width;
-                    }, 300);
-                }
-            });
-        }, { threshold: 0.5 });
-        
-        progressBars.forEach(bar => {
-            progressObserver.observe(bar);
-        });
-    </script>
+      });
+    });
+  });
+</script>
+
 </body>
 </html>
