@@ -1,0 +1,108 @@
+{
+  "topic": "zia-traffic-flow",
+  "title": "ZIA Traffic Flow Architecture",
+  "category": "zia",
+  "difficulty": "intermediate",
+  "lastUpdated": "2025-01-19",
+  "sections": [
+    {
+      "id": "overview",
+      "title": "Traffic Flow Overview",
+      "content": "Zscaler Internet Access (ZIA) acts as a secure cloud proxy between users and the internet. All user traffic is forwarded to the nearest Zscaler data center, where it undergoes policy enforcement, threat inspection, and data protection before reaching its destination.",
+      "type": "text"
+    },
+    {
+      "id": "architecture-diagram",
+      "title": "End-to-End Traffic Flow",
+      "content": "┌──────────────┐\n│  User Device │\n│  (Endpoint)  │\n└──────┬───────┘\n       │\n       │ 1. Traffic Forwarding\n       │    - PAC file\n       │    - GRE tunnel\n       │    - IPsec VPN\n       │    - Client Connector\n       ▼\n┌─────────────────────────────────────┐\n│   Zscaler Cloud (Nearest PoP)       │\n│                                     │\n│  ┌─────────────────────────────┐  │\n│  │  Traffic Processing Pipeline │  │\n│  │                               │  │\n│  │  1. Authentication            │  │\n│  │  2. URL Categorization        │  │\n│  │  3. SSL Inspection (if req)   │  │\n│  │  4. Threat Detection          │  │\n│  │  5. DLP Scanning              │  │\n│  │  6. Policy Enforcement        │  │\n│  │  7. Logging                   │  │\n│  └─────────────────────────────┘  │\n│                                     │\n└──────────────┬──────────────────────┘\n               │\n               │ Allowed/Blocked\n               ▼\n        ┌──────────────┐\n        │   Internet   │\n        │   Destination│\n        └──────────────┘",
+      "type": "diagram"
+    },
+    {
+      "id": "forwarding-methods",
+      "title": "Traffic Forwarding Methods",
+      "content": "ZIA supports multiple methods to forward user traffic to the cloud:\n\n**1. PAC File (Proxy Auto-Configuration)**\n- Browser-based forwarding\n- Most common for roaming users\n- JavaScript file defines proxy rules\n- Limitation: Only forwards HTTP/HTTPS\n\n**2. Client Connector (Zscaler App)**\n- Full tunnel client\n- Forwards all IP traffic (not just web)\n- Enforces always-on connectivity\n- Ideal for remote workforce\n\n**3. GRE Tunnel**\n- Branch/data center connectivity\n- Stateless tunneling protocol\n- Requires router configuration\n- No encryption (typically over MPLS)\n\n**4. IPsec VPN**\n- Encrypted tunnel for branches\n- Alternative to GRE for public internet\n- Higher overhead than GRE\n- Built-in encryption",
+      "type": "text"
+    },
+    {
+      "id": "cli-diagnostics",
+      "title": "Traffic Flow Diagnostics",
+      "commands": [
+        {
+          "command": "curl -I https://example.com",
+          "description": "Verify traffic is proxied through ZIA",
+          "output": "HTTP/1.1 200 OK\nX-Zscaler-Proxy: zscaler-cloud-sanjose-1\nX-Authenticated-User: user@company.com\nContent-Type: text/html"
+        },
+        {
+          "command": "nslookup gateway.zscaler.net",
+          "description": "Resolve Zscaler cloud gateway IP addresses",
+          "output": "Server:  8.8.8.8\nAddress: 8.8.8.8#53\n\nNon-authoritative answer:\nName: gateway.zscaler.net\nAddresses: 165.225.100.100\n           165.225.100.101"
+        },
+        {
+          "command": "traceroute -n example.com",
+          "description": "Verify routing path includes Zscaler cloud",
+          "output": " 1  192.168.1.1  1.234 ms\n 2  10.0.0.1  5.678 ms\n 3  165.225.100.100  12.345 ms  (Zscaler Cloud)\n 4  93.184.216.34  18.901 ms  (example.com)"
+        }
+      ],
+      "type": "cli"
+    },
+    {
+      "id": "troubleshooting",
+      "title": "Common Traffic Flow Issues",
+      "scenarios": [
+        {
+          "symptom": "Users cannot access internet, 'ERR_PROXY_CONNECTION_FAILED'",
+          "possibleCauses": [
+            "PAC file not loading or misconfigured",
+            "Zscaler cloud unreachable (firewall blocking ports 80/443)",
+            "Client Connector service stopped",
+            "GRE tunnel down between router and Zscaler"
+          ],
+          "diagnosticSteps": [
+            "Verify PAC file URL is accessible: curl -I https://pac.company.com/proxy.pac",
+            "Check firewall allows outbound to *.zscaler.net on ports 80/443",
+            "Test connectivity: curl -I https://gateway.zscaler.net",
+            "For Client Connector: Check service status and logs",
+            "For GRE: Verify tunnel interface is up and routes exist"
+          ],
+          "resolution": "Most common fix: Ensure firewall allows *.zscaler.net on TCP 80/443 for cloud access. For GRE tunnels, verify tunnel endpoints and that keep-alive packets are not blocked."
+        },
+        {
+          "symptom": "Some applications work, others fail (selective connectivity issues)",
+          "possibleCauses": [
+            "Application bypasses proxy settings",
+            "Non-HTTP traffic not tunneled (PAC file limitation)",
+            "Application uses non-standard ports",
+            "Cloud App Control blocking specific apps"
+          ],
+          "diagnosticSteps": [
+            "Identify if failing apps are HTTP/HTTPS vs. other protocols",
+            "Check ZIA logs for BLOCKED transactions",
+            "Verify app uses ports 80/443 or requires tunneling policy",
+            "Test with Client Connector (full tunnel) vs PAC file"
+          ],
+          "resolution": "PAC files only forward HTTP/HTTPS. For non-web apps (SSH, RDP, custom ports), use Client Connector or create tunnel policies in ZIA. Check Cloud App Control rules for application-specific blocks."
+        }
+      ],
+      "type": "troubleshooting"
+    }
+  ],
+  "interviewQuestions": [
+    {
+      "question": "Explain the difference between PAC file and Client Connector forwarding methods.",
+      "answer": "PAC file is a browser-based proxy configuration that forwards only HTTP/HTTPS traffic. It's stateless and relies on browser settings. Client Connector (Zscaler App) is a full VPN-like tunnel that forwards all IP traffic (not just web protocols), enforces always-on security, and works at the OS level. PAC files are simpler but limited; Client Connector provides comprehensive coverage for all applications and protocols.",
+      "difficulty": "intermediate"
+    },
+    {
+      "question": "What are the key differences between GRE and IPsec tunnels for branch connectivity?",
+      "answer": "GRE is a stateless, lightweight tunneling protocol with no built-in encryption, typically used over MPLS circuits. It has lower overhead and is easier to troubleshoot. IPsec provides encrypted tunneling, ideal for public internet connections, but has higher overhead due to encryption/decryption. GRE is preferred for performance over private WANs; IPsec is required when security over public internet is needed.",
+      "difficulty": "advanced"
+    }
+  ],
+  "relatedTopics": ["tunnels", "ssl-inspection", "zia-policies"],
+  "references": [
+    {
+      "title": "Zscaler Help: Traffic Forwarding Methods",
+      "url": "https://help.zscaler.com/zia/about-traffic-forwarding"
+    }
+  ]
+}

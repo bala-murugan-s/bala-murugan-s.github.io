@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Zscaler Visual & CLI-Driven Handbook - A comprehensive troubleshooting guide for ZIA, ZPA, and ZTNA">
+    <meta name="keywords" content="Zscaler, ZIA, ZPA, ZTNA, Network Security, Cloud Security, Troubleshooting">
+    <meta name="author" content="Zscaler Visual Handbook Community">
+    <title>Zscaler Visual Handbook | Network & Cloud Security Reference</title>
+    
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/theme-dark.css" id="theme-stylesheet">
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="header-content">
+                <div class="brand">
+                    <span class="logo">⚡</span>
+                    <h1>Zscaler Visual Handbook</h1>
+                </div>
+                <nav class="header-nav">
+                    <button id="theme-toggle" class="icon-button" aria-label="Toggle theme">
+                        <span class="theme-icon">🌙</span>
+                    </button>
+                    <a href="https://github.com/bala-murugan-s/bala-murugan-s.github.io/sase-tools/zscaler-visual-handbook" target="_blank" class="icon-button" aria-label="GitHub repository">
+                        <span>⚙</span>
+                    </a>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Layout -->
+        <div class="main-layout">
+            <!-- Sidebar Navigation -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <h2>Topics</h2>
+                    <input type="text" id="search-topics" placeholder="Search..." class="search-input">
+                </div>
+                <nav class="nav-menu" id="nav-menu">
+                    <!-- Navigation will be dynamically loaded -->
+                    <div class="nav-loading">Loading menu...</div>
+                </nav>
+            </aside>
+
+            <!-- Main Content Area -->
+            <main class="main-content" id="main-content">
+                <!-- Hero Section -->
+                <section class="hero">
+                    <div class="hero-content">
+                        <h1 class="hero-title">Welcome to the Zscaler Visual Handbook</h1>
+                        <p class="hero-subtitle">
+                            A comprehensive, CLI-driven troubleshooting guide for Zscaler Internet Access (ZIA), 
+                            Zscaler Private Access (ZPA), and Zero Trust Network Architecture.
+                        </p>
+                        <p class="hero-description">
+                            Built by network engineers, for network engineers. This handbook bridges the gap between 
+                            official documentation and real-world operational expertise.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- Quick Links -->
+                <section class="quick-links">
+                    <h2>Get Started</h2>
+                    <div class="card-grid">
+                        <a href="sections/architecture.html" class="card">
+                            <div class="card-icon">🏗️</div>
+                            <h3>Architecture Overview</h3>
+                            <p>Understand ZIA and ZPA cloud architecture, traffic flows, and ZTNA principles</p>
+                        </a>
+                        <a href="sections/zia.html" class="card">
+                            <div class="card-icon">🌐</div>
+                            <h3>ZIA Deep Dive</h3>
+                            <p>Internet Access gateway, SSL inspection, URL filtering, and DLP integration</p>
+                        </a>
+                        <a href="sections/zpa.html" class="card">
+                            <div class="card-icon">🔐</div>
+                            <h3>ZPA Deep Dive</h3>
+                            <p>Private Access broker model, app segments, connectors, and access policies</p>
+                        </a>
+                        <a href="sections/tunnels.html" class="card">
+                            <div class="card-icon">🔌</div>
+                            <h3>Tunnel Technologies</h3>
+                            <p>GRE tunnels, IPsec VPN, branch connectivity, and SD-WAN integration</p>
+                        </a>
+                        <a href="sections/ssl.html" class="card">
+                            <div class="card-icon">🔒</div>
+                            <h3>SSL Inspection</h3>
+                            <p>Break-and-inspect, certificate handling, CRL/OCSP, and common issues</p>
+                        </a>
+                        <a href="sections/cli.html" class="card">
+                            <div class="card-icon">💻</div>
+                            <h3>CLI Simulator</h3>
+                            <p>Interactive command-line troubleshooting with real-world examples</p>
+                        </a>
+                        <a href="sections/incidents.html" class="card">
+                            <div class="card-icon">🚨</div>
+                            <h3>Incident Response</h3>
+                            <p>P1/P2 scenarios, root cause analysis, and resolution workflows</p>
+                        </a>
+                        <a href="sections/dlp.html" class="card">
+                            <div class="card-icon">🛡️</div>
+                            <h3>Data Loss Prevention</h3>
+                            <p>DLP policies, CASB integration, and data protection strategies</p>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Features -->
+                <section class="features">
+                    <h2>What Makes This Different</h2>
+                    <div class="feature-list">
+                        <div class="feature-item">
+                            <div class="feature-icon">📊</div>
+                            <div class="feature-text">
+                                <h3>Visual Learning</h3>
+                                <p>ASCII diagrams and flowcharts that illustrate complex architectures in monospace clarity</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">⚡</div>
+                            <div class="feature-text">
+                                <h3>CLI-Driven Troubleshooting</h3>
+                                <p>Real command-line examples, log outputs, and diagnostic workflows from production environments</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">🎯</div>
+                            <div class="feature-text">
+                                <h3>Incident Response Focus</h3>
+                                <p>P1/P2 scenarios with step-by-step resolution paths based on real-world troubleshooting</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">💼</div>
+                            <div class="feature-text">
+                                <h3>Interview Preparation</h3>
+                                <p>Technical deep-dives, architectural decision frameworks, and common interview questions</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">🔧</div>
+                            <div class="feature-text">
+                                <h3>Enterprise Context</h3>
+                                <p>Multi-cloud patterns, hybrid deployments, and large-scale operational considerations</p>
+                            </div>
+                        </div>
+                        <div class="feature-item">
+                            <div class="feature-icon">🚀</div>
+                            <div class="feature-text">
+                                <h3>Zero Dependencies</h3>
+                                <p>Pure HTML, CSS, and JavaScript. No frameworks, no build tools, works everywhere</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- CLI Preview -->
+                <section class="cli-preview">
+                    <h2>Interactive CLI Troubleshooting</h2>
+                    <div class="cli-window">
+                        <div class="cli-header">
+                            <span class="cli-title">Terminal - Zscaler Diagnostics</span>
+                        </div>
+                        <div class="cli-body">
+                            <div class="cli-line">
+                                <span class="cli-prompt">engineer@zscaler:~$</span>
+                                <span class="cli-command">curl -I https://example.com</span>
+                            </div>
+                            <div class="cli-output">
+HTTP/1.1 200 OK
+X-Zscaler-Proxy: zscaler-cloud-name
+X-Authenticated-User: user@company.com
+Content-Type: text/html
+                            </div>
+                            <div class="cli-line">
+                                <span class="cli-prompt">engineer@zscaler:~$</span>
+                                <span class="cli-command">dig +short gateway.zscaler.net</span>
+                            </div>
+                            <div class="cli-output">
+165.225.100.100
+165.225.100.101
+                            </div>
+                            <div class="cli-line">
+                                <span class="cli-prompt">engineer@zscaler:~$</span>
+                                <span class="cli-cursor">▊</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="cli-cta">
+                        <a href="sections/cli.html" class="button-primary">Try Interactive CLI →</a>
+                    </p>
+                </section>
+
+                <!-- Footer Info -->
+                <section class="footer-info">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <h3>Open Source</h3>
+                            <p>MIT Licensed. Community-driven content. Contributions welcome via GitHub.</p>
+                        </div>
+                        <div class="info-item">
+                            <h3>Always Current</h3>
+                            <p>Updated regularly with new scenarios, CLI examples, and architecture patterns.</p>
+                        </div>
+                        <div class="info-item">
+                            <h3>Engineer-Focused</h3>
+                            <p>Written for L2/L3 engineers, architects, and security operations teams.</p>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- Footer -->
+        <footer class="main-footer">
+            <div class="footer-content">
+                <p>
+                    Zscaler Visual Handbook | 
+                    <a href="https://github.com/bala-murugan-s/bala-murugan-s.github.io/sase-tools/zscaler-visual-handbook"" target="_blank">GitHub</a> | 
+                    <a href="https://github.com/bala-murugan-s/bala-murugan-s.github.io/sase-tools/zscaler-visual-handbook/CONTRIBUTING.md" target="_blank">Contribute</a> | 
+                    <a href="https://github.com/bala-murugan-s/bala-murugan-s.github.io/sase-tools/zscaler-visual-handbook/LICENSE" target="_blank">MIT License</a>
+                </p>
+                <p class="footer-disclaimer">
+                    Independent educational resource. Not affiliated with Zscaler, Inc. 
+                    Zscaler® is a registered trademark of Zscaler, Inc.
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/navigation.js"></script>
+</body>
+</html>

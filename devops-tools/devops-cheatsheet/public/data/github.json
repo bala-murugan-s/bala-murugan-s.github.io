@@ -1,0 +1,171 @@
+{
+  "tool": "GitHub CLI & Actions",
+  "icon": "🐙",
+  "categories": [
+    {
+      "name": "GitHub CLI Basics",
+      "icon": "💻",
+      "commands": [
+        {
+          "command": "gh repo clone OWNER/REPO",
+          "description": "Clone repository",
+          "usage": "Quick clone with GitHub CLI",
+          "example_output": "Cloning into 'repo'...\nremote: Enumerating objects: 1234\nreceiving objects: 100% (1234/1234), done.",
+          "flags": [],
+          "tags": ["beginner", "daily-driver"],
+          "danger": "safe"
+        },
+        {
+          "command": "gh pr list",
+          "description": "List pull requests",
+          "usage": "See open PRs in current repo",
+          "example_output": "#42  feat: Add new feature    feature-branch    user:patch-1\n#41  fix: Bug in login         bugfix           user:hotfix",
+          "flags": [
+            { "flag": "--state all", "desc": "Include closed PRs" },
+            { "flag": "--author USERNAME", "desc": "Filter by author" },
+            { "flag": "--label LABEL", "desc": "Filter by label" }
+          ],
+          "tags": ["beginner", "daily-driver"],
+          "danger": "safe"
+        },
+        {
+          "command": "gh pr create",
+          "description": "Create pull request interactively",
+          "usage": "Open PR from current branch",
+          "example_output": "Creating pull request for feature-branch into main\n\n? Title: Add authentication feature\n? Body: Implements OAuth2 login\n\nhttps://github.com/owner/repo/pull/43",
+          "flags": [
+            { "flag": "--title 'TITLE'", "desc": "Set PR title" },
+            { "flag": "--body 'TEXT'", "desc": "Set PR description" },
+            { "flag": "--draft", "desc": "Create as draft PR" }
+          ],
+          "tags": ["intermediate", "daily-driver"],
+          "danger": "safe"
+        },
+        {
+          "command": "gh pr checkout NUMBER",
+          "description": "Checkout PR branch locally",
+          "usage": "Test someone else's PR",
+          "example_output": "Switched to branch 'feature-branch'\nYour branch is up to date with 'origin/feature-branch'.",
+          "flags": [],
+          "tags": ["intermediate"],
+          "danger": "safe"
+        },
+        {
+          "command": "gh issue create",
+          "description": "Create new issue",
+          "usage": "Report bug or feature request",
+          "example_output": "Creating issue in owner/repo\n\n? Title: Fix broken link\n? Body: Link on homepage is 404\n\nhttps://github.com/owner/repo/issues/123",
+          "flags": [
+            { "flag": "--title 'TITLE'", "desc": "Set issue title" },
+            { "flag": "--label bug", "desc": "Add label" }
+          ],
+          "tags": ["beginner"],
+          "danger": "safe"
+        }
+      ]
+    },
+    {
+      "name": "GitHub Actions Workflows",
+      "icon": "⚡",
+      "commands": [
+        {
+          "command": "gh workflow list",
+          "description": "List all workflows",
+          "usage": "See available CI/CD workflows",
+          "example_output": "CI              active  123456\nDeploy to Prod  active  123457\nTest Suite      active  123458",
+          "flags": [
+            { "flag": "--all", "desc": "Include disabled workflows" }
+          ],
+          "tags": ["intermediate"],
+          "danger": "safe"
+        },
+        {
+          "command": "gh workflow run WORKFLOW",
+          "description": "Trigger workflow manually",
+          "usage": "Start workflow run on demand",
+          "example_output": "✓ Created workflow_dispatch event for deploy.yml at main\n\nTo see runs for this workflow, try: gh run list --workflow=deploy.yml",
+          "flags": [
+            { "flag": "--ref BRANCH", "desc": "Run on specific branch" }
+          ],
+          "tags": ["intermediate", "production"],
+          "danger": "warning"
+        },
+        {
+          "command": "gh run list",
+          "description": "List workflow runs",
+          "usage": "See recent CI/CD runs",
+          "example_output": "✓  feat: Add feature    CI  main  1234567  2m ago\n✗  fix: Broken test     CI  dev   1234566  5m ago\n○  Deploy to staging   Deploy  staging  1234565  10m ago",
+          "flags": [
+            { "flag": "--workflow WORKFLOW", "desc": "Filter by workflow" },
+            { "flag": "--status failure", "desc": "Show only failures" }
+          ],
+          "tags": ["intermediate", "daily-driver"],
+          "danger": "safe"
+        },
+        {
+          "command": "gh run view RUN_ID",
+          "description": "View workflow run details",
+          "usage": "Debug failed workflow",
+          "example_output": "✗ CI · 1234567\nTriggered via push 2 minutes ago\n\nJOBS\n✓ build (ubuntu-latest) in 1m 23s\n✗ test (ubuntu-latest) in 45s\n  └─ Run tests failed",
+          "flags": [
+            { "flag": "--log", "desc": "Show full logs" },
+            { "flag": "--log-failed", "desc": "Show logs for failed jobs only" }
+          ],
+          "tags": ["intermediate", "debug"],
+          "danger": "safe"
+        },
+        {
+          "command": "gh run watch",
+          "description": "Watch workflow run in real-time",
+          "usage": "Monitor ongoing workflow execution",
+          "example_output": "Refreshing run status every 3 seconds. Press Ctrl+C to quit.\n\n✓ build  (1m 23s)\n○ test   (running...)\n- deploy (pending)",
+          "flags": [],
+          "tags": ["intermediate"],
+          "danger": "safe"
+        }
+      ]
+    },
+    {
+      "name": "Repository Management",
+      "icon": "📚",
+      "commands": [
+        {
+          "command": "gh repo create NAME",
+          "description": "Create new repository",
+          "usage": "Initialize new GitHub repo",
+          "example_output": "? Visibility: Public\n? Initialize with README? Yes\n✓ Created repository owner/name\nhttps://github.com/owner/name",
+          "flags": [
+            { "flag": "--public", "desc": "Create public repo" },
+            { "flag": "--private", "desc": "Create private repo" },
+            { "flag": "--clone", "desc": "Clone after creation" }
+          ],
+          "tags": ["beginner"],
+          "danger": "safe"
+        },
+        {
+          "command": "gh repo view",
+          "description": "View repository details",
+          "usage": "Get repo info in terminal",
+          "example_output": "owner/repo\nA modern DevOps toolkit\n\n✓ 1,234 stars  🍴 567 forks  👁 89 watchers\n📝 MIT License  🔗 https://example.com",
+          "flags": [
+            { "flag": "--web", "desc": "Open in browser" }
+          ],
+          "tags": ["beginner"],
+          "danger": "safe"
+        },
+        {
+          "command": "gh release create TAG",
+          "description": "Create new release",
+          "usage": "Publish versioned release",
+          "example_output": "? Title: v1.0.0\n? Release notes: Initial stable release\n? Publish this release? Yes\n✓ https://github.com/owner/repo/releases/tag/v1.0.0",
+          "flags": [
+            { "flag": "--notes 'TEXT'", "desc": "Set release notes" },
+            { "flag": "--draft", "desc": "Create as draft" }
+          ],
+          "tags": ["intermediate", "production"],
+          "danger": "safe"
+        }
+      ]
+    }
+  ]
+}

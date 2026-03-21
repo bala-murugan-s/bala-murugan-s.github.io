@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Vendor Firewall CLI Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .vendor-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .vendor-checkbox {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 15px 25px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .vendor-checkbox:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .vendor-checkbox.selected {
+            background: white;
+            border-color: white;
+        }
+
+        .vendor-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .vendor-checkbox label {
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1.1em;
+        }
+
+        .vendor-checkbox.selected label {
+            color: #667eea;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-button {
+            flex: 1;
+            min-width: 250px;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .tab-button.active {
+            background: white;
+            color: #667eea;
+            border-color: white;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 120px;
+            font-family: monospace;
+            resize: vertical;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1em;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .button-secondary {
+            background: #6c757d;
+        }
+
+        .button-secondary:hover {
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+        }
+
+        .button-success {
+            background: #28a745;
+        }
+
+        .button-success:hover {
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+        }
+
+        .output-section {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .output-section.show {
+            display: block;
+        }
+
+        .vendor-output {
+            margin-bottom: 25px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .vendor-output-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+            font-size: 1.1em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .vendor-output-body {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .info-box h4 {
+            color: #2196F3;
+            margin-bottom: 8px;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+            color: #555;
+        }
+
+        .info-box ul li {
+            margin-bottom: 5px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .warning-box h4 {
+            color: #856404;
+            margin-bottom: 8px;
+        }
+
+        .error-box {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+
+        .error-box h4 {
+            color: #721c24;
+            margin-bottom: 8px;
+        }
+
+        .tag-input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .tag-input-container input {
+            flex: 1;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .tag-item {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+        }
+
+        .tag-remove {
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .naming-standard {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+
+        .validation-message {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        .validation-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .validation-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .validation-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .char-matrix {
+            margin-top: 15px;
+            overflow-x: auto;
+        }
+
+        .char-matrix table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85em;
+        }
+
+        .char-matrix th,
+        .char-matrix td {
+            padding: 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        .char-matrix th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        .char-matrix td.supported {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .char-matrix td.not-supported {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .char-matrix td.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2col {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .export-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔥 Multi-Vendor Firewall CLI Generator</h1>
+            <p>Generate CLI commands for Palo Alto, Fortinet, Checkpoint & Cisco ASA</p>
+        </div>
+
+        <div class="info-box">
+            <h4>📋 Select Vendors to Generate Commands For:</h4>
+        </div>
+
+        <div class="vendor-selector">
+            <div class="vendor-checkbox selected" onclick="toggleVendor('paloalto')">
+                <input type="checkbox" id="vendor-paloalto" checked>
+                <label for="vendor-paloalto">Palo Alto</label>
+            </div>
+            <div class="vendor-checkbox selected" onclick="toggleVendor('fortinet')">
+                <input type="checkbox" id="vendor-fortinet" checked>
+                <label for="vendor-fortinet">Fortinet</label>
+            </div>
+            <div class="vendor-checkbox selected" onclick="toggleVendor('checkpoint')">
+                <input type="checkbox" id="vendor-checkpoint" checked>
+                <label for="vendor-checkpoint">Checkpoint R80+</label>
+            </div>
+            <div class="vendor-checkbox selected" onclick="toggleVendor('cisco')">
+                <input type="checkbox" id="vendor-cisco" checked>
+                <label for="vendor-cisco">Cisco ASA</label>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab(0)">📝 Single Object</button>
+            <button class="tab-button" onclick="switchTab(1)">📦 Bulk Objects</button>
+            <button class="tab-button" onclick="switchTab(2)">🔍 Character Reference</button>
+        </div>
+
+        <!-- Tab 1: Single Object -->
+        <div class="tab-content active" id="tab0">
+            <div class="info-box">
+                <h4>Create Single Address Object</h4>
+                <ul>
+                    <li>Enter object name with your preferred naming convention</li>
+                    <li>System will validate name against each vendor's requirements</li>
+                    <li>Commands generated for all selected vendors</li>
+                    <li><strong>Spaces:</strong> Allowed in Palo Alto (quoted) and Checkpoint only</li>
+                </ul>
+            </div>
+
+            <div class="form-group">
+                <label>Object Name *</label>
+                <input type="text" id="singleName" placeholder="e.g., web-server-01 or EXT - Partner - Google">
+                <div id="singleNameValidation"></div>
+            </div>
+
+            <div class="form-group">
+                <label>IP Address/FQDN *</label>
+                <input type="text" id="singleIP" placeholder="e.g., 192.168.1.100 or 192.168.1.0/24 or server.example.com">
+            </div>
+
+            <div class="grid-2col">
+                <div class="form-group">
+                    <label>Address Type</label>
+                    <select id="singleType">
+                        <option value="host">Host / Single IP</option>
+                        <option value="subnet">Subnet / Network</option>
+                        <option value="range">IP Range</option>
+                        <option value="fqdn">FQDN</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Subnet Mask (for subnet type)</label>
+                    <input type="text" id="singleMask" placeholder="e.g., 255.255.255.0">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="singleShared">
+                    <label for="singleShared" style="margin: 0;">Create as Shared Object (Palo Alto Panorama / Fortinet Global)</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Device Group / VDOM (if not shared)</label>
+                <input type="text" id="singleDeviceGroup" placeholder="e.g., DG-Production or root (Fortinet VDOM)">
+            </div>
+
+            <div class="form-group">
+                <label>Tags (optional)</label>
+                <div class="tag-input-container">
+                    <input type="text" id="singleTagInput" placeholder="Enter tag and press Add">
+                    <button class="button" onclick="addTag('single')">Add Tag</button>
+                </div>
+                <div class="tag-list" id="singleTagList"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Description (optional)</label>
+                <input type="text" id="singleDescription" placeholder="Brief description of the object">
+            </div>
+
+            <button class="button" onclick="generateSingleCommand()">🚀 Generate Commands</button>
+            <button class="button button-secondary" onclick="clearForm('single')">🗑️ Clear</button>
+
+            <div class="output-section" id="singleOutput">
+                <div id="singleOutputContent"></div>
+                <div class="export-buttons">
+                    <button class="button button-success" onclick="exportToText('single')">📄 Export to TXT</button>
+                    <button class="button button-success" onclick="exportToCSV('single')">📊 Export to CSV</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Bulk Objects -->
+        <div class="tab-content" id="tab1">
+            <div class="info-box">
+                <h4>Create Bulk Address Objects</h4>
+                <ul>
+                    <li>Upload multiple hostname/IP pairs (one per line)</li>
+                    <li>Format: <code>hostname,ip_address</code> or <code>hostname ip_address</code></li>
+                    <li>Optional: Apply naming standard with prefix/suffix</li>
+                    <li>System validates all names before generating commands</li>
+                </ul>
+            </div>
+
+            <div class="form-group">
+                <label>Naming Convention (Optional)</label>
+                <div class="grid-2col">
+                    <input type="text" id="bulkPrefix" placeholder="Prefix (e.g., ADDR)">
+                    <input type="text" id="bulkSuffix" placeholder="Suffix (e.g., PROD)">
+                </div>
+                <div class="naming-standard" id="bulkNamingPreview">
+                    Preview: <strong>hostname</strong>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Separator (between prefix-hostname-suffix)</label>
+                <select id="bulkSeparator">
+                    <option value="-">Hyphen (-)</option>
+                    <option value="_">Underscore (_)</option>
+                    <option value=" ">Space (only for Palo Alto quoted & Checkpoint)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <div class="checkbox-group">
+                    <input type="checkbox" id="bulkShared">
+                    <label for="bulkShared" style="margin: 0;">Create as Shared Objects</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Device Group / VDOM (if not shared)</label>
+                <input type="text" id="bulkDeviceGroup" placeholder="e.g., DG-Production or root">
+            </div>
+
+            <div class="form-group">
+                <label>Tags (optional, applies to all objects)</label>
+                <div class="tag-input-container">
+                    <input type="text" id="bulkTagInput" placeholder="Enter tag and press Add">
+                    <button class="button" onclick="addTag('bulk')">Add Tag</button>
+                </div>
+                <div class="tag-list" id="bulkTagList"></div>
+            </div>
+
+            <div class="form-group">
+                <label>Hostname/IP List *</label>
+                <textarea id="bulkInput" placeholder="Enter one per line:
+web-server,192.168.1.10
+db-server,192.168.1.20
+app-server,10.0.0.5/32
+
+or with spaces:
+web-server 192.168.1.10
+db-server 192.168.1.20"></textarea>
+            </div>
+
+            <button class="button" onclick="generateBulkCommands()">🚀 Generate Commands</button>
+            <button class="button button-secondary" onclick="clearForm('bulk')">🗑️ Clear</button>
+
+            <div class="output-section" id="bulkOutput">
+                <div id="bulkOutputContent"></div>
+                <div class="export-buttons">
+                    <button class="button button-success" onclick="exportToText('bulk')">📄 Export to TXT</button>
+                    <button class="button button-success" onclick="exportToCSV('bulk')">📊 Export to CSV</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Character Reference -->
+        <div class="tab-content" id="tab2">
+            <div class="info-box">
+                <h4>📚 Character Support Reference</h4>
+                <p>This table shows which characters are supported in object names for each vendor.</p>
+            </div>
+
+            <div class="char-matrix">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Character Type</th>
+                            <th>Palo Alto</th>
+                            <th>Fortinet</th>
+                            <th>Checkpoint R80+</th>
+                            <th>Cisco ASA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Letters (a-z, A-Z)</strong></td>
+                            <td class="supported">✅ Allowed</td>
+                            <td class="supported">✅ Allowed</td>
+                            <td class="supported">✅ Allowed</td>
+                            <td class="supported">✅ Allowed</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Numbers (0-9)</strong></td>
+                            <td class="supported">✅ Allowed</td>
+                            <td class="supported">✅ Allowed</td>
+                            <td class="supported">✅ Allowed</td>
+                            <td class="supported">✅ Allowed</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Hyphen (-)</strong></td>
+                            <td class="supported">✅ Allowed</td>
+                            <td class="supported">✅ Allowed</td>
+                            <td class="supported">✅ Allowed</td>
+                            <td class="supported">✅ Allowed</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Underscore (_)</strong></td>
+                            <td class="supported">✅ Allowed</td>
+                            <td class="supported">✅ Allowed</td>
+                            <td class="supported">✅ Allowed</td>
+                            <td class="supported">✅ Allowed</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Space ( )</strong></td>
+                            <td class="warning">⚠️ Quotes Required</td>
+                            <td class="not-supported">❌ Rejected</td>
+                            <td class="supported">✅ Allowed</td>
+                            <td class="not-supported">❌ Rejected</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Period (.)</strong></td>
+                            <td class="supported">✅ Allowed</td>
+                            <td class="not-supported">❌ Not Allowed</td>
+                            <td class="supported">✅ Allowed</td>
+                            <td class="supported">✅ Allowed</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Forward Slash (/)</strong></td>
+                            <td class="not-supported">❌ Not Allowed</td>
+                            <td class="not-supported">❌ Not Allowed</td>
+                            <td class="supported">✅ Allowed</td>
+                            <td class="not-supported">❌ Not Allowed</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Special (!@#$%^&)</strong></td>
+                            <td class="not-supported">❌ Not Allowed</td>
+                            <td class="not-supported">❌ Not Allowed</td>
+                            <td class="supported">✅ Allowed</td>
+                            <td class="warning">⚠️ Some Allowed</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="warning-box" style="margin-top: 20px;">
+                <h4>⚠️ Important Notes:</h4>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Palo Alto:</strong> Spaces require double quotes around entire object name</li>
+                    <li><strong>Fortinet:</strong> Spaces technically work but cause serious operational issues - REJECTED by this tool</li>
+                    <li><strong>Checkpoint:</strong> R80+ has no naming restrictions; pre-R80 versions have strict limits</li>
+                    <li><strong>Cisco ASA:</strong> Period allowed but spaces not clearly documented - REJECTED for safety</li>
+                    <li><strong>Safe Universal Characters:</strong> a-z A-Z 0-9 - _ (works on all vendors)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const tags = {
+            single: [],
+            bulk: []
+        };
+
+        const selectedVendors = {
+            paloalto: true,
+            fortinet: true,
+            checkpoint: true,
+            cisco: true
+        };
+
+        const generatedCommands = {
+            single: {},
+            bulk: {}
+        };
+
+        function toggleVendor(vendor) {
+            selectedVendors[vendor] = !selectedVendors[vendor];
+            const checkbox = document.getElementById(`vendor-${vendor}`);
+            checkbox.checked = selectedVendors[vendor];
+            checkbox.parentElement.classList.toggle('selected', selectedVendors[vendor]);
+        }
+
+        function switchTab(index) {
+            const buttons = document.querySelectorAll('.tab-button');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            buttons.forEach((btn, i) => {
+                btn.classList.toggle('active', i === index);
+            });
+            
+            contents.forEach((content, i) => {
+                content.classList.toggle('active', i === index);
+            });
+        }
+
+        function addTag(type) {
+            const input = document.getElementById(`${type}TagInput`);
+            const tagValue = input.value.trim();
+            
+            if (tagValue && !tags[type].includes(tagValue)) {
+                tags[type].push(tagValue);
+                updateTagDisplay(type);
+                input.value = '';
+            }
+        }
+
+        function removeTag(type, tag) {
+            tags[type] = tags[type].filter(t => t !== tag);
+            updateTagDisplay(type);
+        }
+
+        function updateTagDisplay(type) {
+            const container = document.getElementById(`${type}TagList`);
+            container.innerHTML = tags[type].map(tag => 
+                `<div class="tag-item">
+                    ${tag}
+                    <span class="tag-remove" onclick="removeTag('${type}', '${tag}')">×</span>
+                </div>`
+            ).join('');
+        }
+
+        function validateObjectName(name, vendor) {
+            const results = {
+                valid: true,
+                messages: []
+            };
+
+            if (!name || name.trim() === '') {
+                results.valid = false;
+                results.messages.push('Object name cannot be empty');
+                return results;
+            }
+
+            const hasSpace = name.includes(' ');
+            
+            switch(vendor) {
+                case 'paloalto':
+                    // Only alphanumeric, hyphen, underscore, and spaces (with quotes)
+                    const paloPattern = /^[a-zA-Z0-9\.\-_ ]+$/;
+                    if (!paloPattern.test(name)) {
+                        results.valid = false;
+                        results.messages.push('Palo Alto: Only letters, numbers, period(.), hyphen (-), underscore (_), and spaces allowed');
+                    }
+                    if (hasSpace) {
+                        results.messages.push('Palo Alto: Spaces detected - will wrap in quotes');
+                    }
+                    break;
+
+                case 'fortinet':
+                    // No spaces allowed - reject
+                    if (hasSpace) {
+                        results.valid = false;
+                        results.messages.push('Fortinet: Spaces NOT allowed (causes operational issues)');
+                    }
+                    // No special chars except period, hyphen and underscore
+                    const fortiPattern = /^[a-zA-Z0-9\-_]+$/;
+                    if (!fortiPattern.test(name)) {
+                        results.valid = false;
+                        results.messages.push('Fortinet: Only letters, numbers, hyphen (-), underscore (_) allowed');
+                    }
+                    break;
+
+                case 'checkpoint':
+                    // R80+ - virtually no restrictions
+                    results.messages.push('Checkpoint R80+: All characters allowed');
+                    break;
+
+                case 'cisco':
+                    // No spaces allowed
+                    if (hasSpace) {
+                        results.valid = false;
+                        results.messages.push('Cisco ASA: Spaces NOT allowed');
+                    }
+                    // Letters, numbers, period, dash, underscore, comma
+                    const ciscoPattern = /^[a-zA-Z0-9\.\-_,]+$/;
+                    if (!ciscoPattern.test(name)) {
+                        results.valid = false;
+                        results.messages.push('Cisco ASA: Only letters, numbers, period (.), hyphen (-), underscore (_), comma (,) allowed');
+                    }
+                    break;
+            }
+
+            return results;
+        }
+
+        function validateAllVendors(name) {
+            const validationDiv = document.getElementById('singleNameValidation');
+            let html = '';
+            let allValid = true;
+
+            for (const vendor in selectedVendors) {
+                if (!selectedVendors[vendor]) continue;
+
+                const result = validateObjectName(name, vendor);
+                if (!result.valid) {
+                    allValid = false;
+                    html += `<div class="validation-message validation-error">
+                        <strong>${vendor.toUpperCase()}:</strong> ${result.messages.join(', ')}
+                    </div>`;
+                } else if (result.messages.length > 0) {
+                    html += `<div class="validation-message validation-warning">
+                        <strong>${vendor.toUpperCase()}:</strong> ${result.messages.join(', ')}
+                    </div>`;
+                }
+            }
+
+            if (allValid && html === '') {
+                html = '<div class="validation-message validation-success">✅ Object name is valid for all selected vendors</div>';
+            }
+
+            validationDiv.innerHTML = html;
+            return allValid;
+        }
+
+        document.getElementById('singleName').addEventListener('input', function() {
+            const name = this.value.trim();
+            if (name) {
+                validateAllVendors(name);
+            } else {
+                document.getElementById('singleNameValidation').innerHTML = '';
+            }
+        });
+
+        function generatePaloAltoCommand(name, ip, type, shared, deviceGroup, description, tagList, mask) {
+            const hasSpace = name.includes(' ');
+            const quotedName = hasSpace ? `"${name}"` : name;
+            
+            let command = 'configure\n';
+            const location = shared ? 'shared' : `device-group ${deviceGroup || 'device-group-name'}`;
+            
+            command += `set ${location} address ${quotedName}`;
+            
+            if (type === 'host') {
+                command += ` ip-netmask ${ip}/32`;
+            } else if (type === 'subnet') {
+                if (ip.includes('/')) {
+                    command += ` ip-netmask ${ip}`;
+                } else {
+                    command += ` ip-netmask ${ip}/${mask || '24'}`;
+                }
+            } else if (type === 'range') {
+                command += ` ip-range ${ip}`;
+            } else if (type === 'fqdn') {
+                command += ` fqdn ${ip}`;
+            }
+
+            if (description) {
+                command += `\nset ${location} address ${quotedName} description "${description}"`;
+            }
+
+            if (tagList && tagList.length > 0) {
+                tagList.forEach(tag => {
+                    command += `\nset ${location} address ${quotedName} tag ${tag}`;
+                });
+            }
+
+            command += '\ncommit';
+            return command;
+        }
+
+        function generateFortinetCommand(name, ip, type, shared, vdom, description, tagList, mask) {
+            let command = 'config firewall address\n';
+            command += `    edit "${name}"\n`;
+            
+            if (type === 'host') {
+                command += `        set type ipmask\n`;
+                command += `        set subnet ${ip} 255.255.255.255\n`;
+            } else if (type === 'subnet') {
+                command += `        set type ipmask\n`;
+                if (ip.includes('/')) {
+                    const [addr, cidr] = ip.split('/');
+                    const netmask = cidrToNetmask(parseInt(cidr));
+                    command += `        set subnet ${addr} ${netmask}\n`;
+                } else {
+                    command += `        set subnet ${ip} ${mask || '255.255.255.0'}\n`;
+                }
+            } else if (type === 'range') {
+                command += `        set type iprange\n`;
+                command += `        set start-ip ${ip.split('-')[0]}\n`;
+                command += `        set end-ip ${ip.split('-')[1] || ip.split('-')[0]}\n`;
+            } else if (type === 'fqdn') {
+                command += `        set type fqdn\n`;
+                command += `        set fqdn "${ip}"\n`;
+            }
+
+            if (description) {
+                command += `        set comment "${description}"\n`;
+            }
+
+            command += `    next\nend`;
+
+            if (!shared && vdom) {
+                command = `config vdom\nedit ${vdom}\n` + command + `\nend`;
+            }
+
+            return command;
+        }
+
+        function generateCheckpointCommand(name, ip, type, description, tagList) {
+            let command = '# Checkpoint R80+ Management API\n';
+            
+            if (type === 'host') {
+                command += `mgmt_cli add host name "${name}" ip-address "${ip}"`;
+            } else if (type === 'subnet') {
+                if (ip.includes('/')) {
+                    const [addr, cidr] = ip.split('/');
+                    command += `mgmt_cli add network name "${name}" subnet "${addr}" subnet-mask "${cidrToNetmask(parseInt(cidr))}"`;
+                } else {
+                    command += `mgmt_cli add network name "${name}" subnet "${ip}" subnet-mask "255.255.255.0"`;
+                }
+            } else if (type === 'range') {
+                const [start, end] = ip.split('-');
+                command += `mgmt_cli add address-range name "${name}" ip-address-first "${start.trim()}" ip-address-last "${end ? end.trim() : start.trim()}"`;
+            } else if (type === 'fqdn') {
+                command += `mgmt_cli add dns-domain name "${name}" domain "${ip}"`;
+            }
+
+            if (description) {
+                command += ` comments "${description}"`;
+            }
+
+            if (tagList && tagList.length > 0) {
+                command += ` tags "${tagList.join(',')}"`;
+            }
+
+            return command;
+        }
+
+        function generateCiscoCommand(name, ip, type, description, mask) {
+            let command = 'configure terminal\n';
+            command += `object network ${name}\n`;
+            
+            if (type === 'host') {
+                command += `  host ${ip}\n`;
+            } else if (type === 'subnet') {
+                if (ip.includes('/')) {
+                    const [addr, cidr] = ip.split('/');
+                    command += `  subnet ${addr} ${cidrToNetmask(parseInt(cidr))}\n`;
+                } else {
+                    command += `  subnet ${ip} ${mask || '255.255.255.0'}\n`;
+                }
+            } else if (type === 'range') {
+                const [start, end] = ip.split('-');
+                command += `  range ${start.trim()} ${end ? end.trim() : start.trim()}\n`;
+            } else if (type === 'fqdn') {
+                command += `  fqdn ${ip}\n`;
+            }
+
+            if (description) {
+                command += `  description ${description}\n`;
+            }
+
+            command += 'exit\nend\nwrite memory';
+            return command;
+        }
+
+        function cidrToNetmask(cidr) {
+            const mask = [];
+            for (let i = 0; i < 4; i++) {
+                const n = Math.min(cidr, 8);
+                mask.push(256 - Math.pow(2, 8 - n));
+                cidr -= n;
+            }
+            return mask.join('.');
+        }
+
+        function generateSingleCommand() {
+            const name = document.getElementById('singleName').value.trim();
+            const ip = document.getElementById('singleIP').value.trim();
+            const type = document.getElementById('singleType').value;
+            const mask = document.getElementById('singleMask').value.trim();
+            const shared = document.getElementById('singleShared').checked;
+            const deviceGroup = document.getElementById('singleDeviceGroup').value.trim();
+            const description = document.getElementById('singleDescription').value.trim();
+
+            if (!name || !ip) {
+                alert('Please enter both object name and IP address/FQDN');
+                return;
+            }
+
+            // Validate name for all selected vendors
+            if (!validateAllVendors(name)) {
+                alert('Object name contains invalid characters for one or more selected vendors. Please check the validation messages.');
+                return;
+            }
+
+            const outputDiv = document.getElementById('singleOutputContent');
+            outputDiv.innerHTML = '';
+            generatedCommands.single = {};
+
+            if (selectedVendors.paloalto) {
+                const cmd = generatePaloAltoCommand(name, ip, type, shared, deviceGroup, description, tags.single, mask);
+                generatedCommands.single.paloalto = cmd;
+                outputDiv.innerHTML += `
+                    <div class="vendor-output">
+                        <div class="vendor-output-header">
+                            <span>Palo Alto Networks</span>
+                            <button class="button" style="padding: 8px 15px; margin: 0;" onclick="copyVendorCommand('paloalto', 'single')">📋 Copy</button>
+                        </div>
+                        <div class="vendor-output-body">${cmd}</div>
+                    </div>
+                `;
+            }
+
+            if (selectedVendors.fortinet) {
+                const validation = validateObjectName(name, 'fortinet');
+                if (validation.valid) {
+                    const cmd = generateFortinetCommand(name, ip, type, shared, deviceGroup, description, tags.single, mask);
+                    generatedCommands.single.fortinet = cmd;
+                    outputDiv.innerHTML += `
+                        <div class="vendor-output">
+                            <div class="vendor-output-header">
+                                <span>Fortinet FortiGate</span>
+                                <button class="button" style="padding: 8px 15px; margin: 0;" onclick="copyVendorCommand('fortinet', 'single')">📋 Copy</button>
+                            </div>
+                            <div class="vendor-output-body">${cmd}</div>
+                        </div>
+                    `;
+                } else {
+                    outputDiv.innerHTML += `
+                        <div class="vendor-output">
+                            <div class="vendor-output-header">
+                                <span>Fortinet FortiGate</span>
+                            </div>
+                            <div class="vendor-output-body" style="background: #f8d7da; color: #721c24;">
+❌ ERROR: ${validation.messages.join(', ')}
+
+Object name contains invalid characters for Fortinet.
+Please modify the name to use only: a-z A-Z 0-9 - _</div>
+                        </div>
+                    `;
+                }
+            }
+
+            if (selectedVendors.checkpoint) {
+                const cmd = generateCheckpointCommand(name, ip, type, description, tags.single);
+                generatedCommands.single.checkpoint = cmd;
+                outputDiv.innerHTML += `
+                    <div class="vendor-output">
+                        <div class="vendor-output-header">
+                            <span>Checkpoint R80+</span>
+                            <button class="button" style="padding: 8px 15px; margin: 0;" onclick="copyVendorCommand('checkpoint', 'single')">📋 Copy</button>
+                        </div>
+                        <div class="vendor-output-body">${cmd}</div>
+                    </div>
+                `;
+            }
+
+            if (selectedVendors.cisco) {
+                const validation = validateObjectName(name, 'cisco');
+                if (validation.valid) {
+                    const cmd = generateCiscoCommand(name, ip, type, description, mask);
+                    generatedCommands.single.cisco = cmd;
+                    outputDiv.innerHTML += `
+                        <div class="vendor-output">
+                            <div class="vendor-output-header">
+                                <span>Cisco ASA</span>
+                                <button class="button" style="padding: 8px 15px; margin: 0;" onclick="copyVendorCommand('cisco', 'single')">📋 Copy</button>
+                            </div>
+                            <div class="vendor-output-body">${cmd}</div>
+                        </div>
+                    `;
+                } else {
+                    outputDiv.innerHTML += `
+                        <div class="vendor-output">
+                            <div class="vendor-output-header">
+                                <span>Cisco ASA</span>
+                            </div>
+                            <div class="vendor-output-body" style="background: #f8d7da; color: #721c24;">
+❌ ERROR: ${validation.messages.join(', ')}
+
+Object name contains invalid characters for Cisco ASA.
+Please modify the name to use only: a-z A-Z 0-9 . - _ ,</div>
+                        </div>
+                    `;
+                }
+            }
+
+            document.getElementById('singleOutput').classList.add('show');
+        }
+
+        function generateBulkCommands() {
+            const input = document.getElementById('bulkInput').value.trim();
+            const prefix = document.getElementById('bulkPrefix').value.trim();
+            const suffix = document.getElementById('bulkSuffix').value.trim();
+            const separator = document.getElementById('bulkSeparator').value;
+            const shared = document.getElementById('bulkShared').checked;
+            const deviceGroup = document.getElementById('bulkDeviceGroup').value.trim();
+
+            if (!input) {
+                alert('Please enter hostname/IP pairs');
+                return;
+            }
+
+            const lines = input.split('\n').filter(line => line.trim());
+            const objects = [];
+
+            // Parse input
+            lines.forEach(line => {
+                const parts = line.trim().split(/[,\s]+/);
+                if (parts.length >= 2) {
+                    const hostname = parts[0];
+                    const ip = parts[1];
+                    
+                    let objectName = hostname;
+                    if (prefix) objectName = `${prefix}${separator}${objectName}`;
+                    if (suffix) objectName = `${objectName}${separator}${suffix}`;
+
+                    objects.push({ name: objectName, ip: ip });
+                }
+            });
+
+            if (objects.length === 0) {
+                alert('No valid hostname/IP pairs found');
+                return;
+            }
+
+            // Validate all object names
+            let hasErrors = false;
+            const errors = [];
+
+            objects.forEach(obj => {
+                for (const vendor in selectedVendors) {
+                    if (!selectedVendors[vendor]) continue;
+                    const validation = validateObjectName(obj.name, vendor);
+                    if (!validation.valid) {
+                        hasErrors = true;
+                        errors.push(`${obj.name} - ${vendor}: ${validation.messages.join(', ')}`);
+                    }
+                }
+            });
+
+            if (hasErrors) {
+                alert('Some object names contain invalid characters:\n\n' + errors.join('\n'));
+                return;
+            }
+
+            const outputDiv = document.getElementById('bulkOutputContent');
+            outputDiv.innerHTML = '';
+            generatedCommands.bulk = {};
+
+            if (selectedVendors.paloalto) {
+                let cmd = 'configure\n';
+                const location = shared ? 'shared' : `device-group ${deviceGroup || 'device-group-name'}`;
+                
+                objects.forEach(obj => {
+                    const hasSpace = obj.name.includes(' ');
+                    const quotedName = hasSpace ? `"${obj.name}"` : obj.name;
+                    cmd += `set ${location} address ${quotedName} ip-netmask ${obj.ip}\n`;
+                    
+                    if (tags.bulk.length > 0) {
+                        tags.bulk.forEach(tag => {
+                            cmd += `set ${location} address ${quotedName} tag ${tag}\n`;
+                        });
+                    }
+                });
+                
+                cmd += 'commit';
+                generatedCommands.bulk.paloalto = cmd;
+                outputDiv.innerHTML += `
+                    <div class="vendor-output">
+                        <div class="vendor-output-header">
+                            <span>Palo Alto Networks (${objects.length} objects)</span>
+                            <button class="button" style="padding: 8px 15px; margin: 0;" onclick="copyVendorCommand('paloalto', 'bulk')">📋 Copy</button>
+                        </div>
+                        <div class="vendor-output-body">${cmd}</div>
+                    </div>
+                `;
+            }
+
+            if (selectedVendors.fortinet) {
+                let cmd = 'config firewall address\n';
+                objects.forEach(obj => {
+                    cmd += `    edit "${obj.name}"\n`;
+                    cmd += `        set type ipmask\n`;
+                    const ipAddr = obj.ip.includes('/') ? obj.ip.split('/')[0] : obj.ip;
+                    cmd += `        set subnet ${ipAddr} 255.255.255.255\n`;
+                    cmd += `    next\n`;
+                });
+                cmd += 'end';
+
+                if (!shared && deviceGroup) {
+                    cmd = `config vdom\nedit ${deviceGroup}\n` + cmd + `\nend`;
+                }
+
+                generatedCommands.bulk.fortinet = cmd;
+                outputDiv.innerHTML += `
+                    <div class="vendor-output">
+                        <div class="vendor-output-header">
+                            <span>Fortinet FortiGate (${objects.length} objects)</span>
+                            <button class="button" style="padding: 8px 15px; margin: 0;" onclick="copyVendorCommand('fortinet', 'bulk')">📋 Copy</button>
+                        </div>
+                        <div class="vendor-output-body">${cmd}</div>
+                    </div>
+                `;
+            }
+
+            if (selectedVendors.checkpoint) {
+                let cmd = '# Checkpoint R80+ Management API\n';
+                objects.forEach(obj => {
+                    cmd += `mgmt_cli add host name "${obj.name}" ip-address "${obj.ip}"\n`;
+                });
+                
+                generatedCommands.bulk.checkpoint = cmd;
+                outputDiv.innerHTML += `
+                    <div class="vendor-output">
+                        <div class="vendor-output-header">
+                            <span>Checkpoint R80+ (${objects.length} objects)</span>
+                            <button class="button" style="padding: 8px 15px; margin: 0;" onclick="copyVendorCommand('checkpoint', 'bulk')">📋 Copy</button>
+                        </div>
+                        <div class="vendor-output-body">${cmd}</div>
+                    </div>
+                `;
+            }
+
+            if (selectedVendors.cisco) {
+                let cmd = 'configure terminal\n';
+                objects.forEach(obj => {
+                    cmd += `object network ${obj.name}\n`;
+                    cmd += `  host ${obj.ip}\n`;
+                    cmd += `exit\n`;
+                });
+                cmd += 'end\nwrite memory';
+
+                generatedCommands.bulk.cisco = cmd;
+                outputDiv.innerHTML += `
+                    <div class="vendor-output">
+                        <div class="vendor-output-header">
+                            <span>Cisco ASA (${objects.length} objects)</span>
+                            <button class="button" style="padding: 8px 15px; margin: 0;" onclick="copyVendorCommand('cisco', 'bulk')">📋 Copy</button>
+                        </div>
+                        <div class="vendor-output-body">${cmd}</div>
+                    </div>
+                `;
+            }
+
+            document.getElementById('bulkOutput').classList.add('show');
+        }
+
+        function copyVendorCommand(vendor, type) {
+            const text = generatedCommands[type][vendor];
+            navigator.clipboard.writeText(text).then(() => {
+                alert(`${vendor.toUpperCase()} commands copied to clipboard!`);
+            });
+        }
+
+        function exportToText(type) {
+            let content = '';
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+            
+            for (const vendor in generatedCommands[type]) {
+                content += `\n${'='.repeat(60)}\n`;
+                content += `${vendor.toUpperCase()} CONFIGURATION\n`;
+                content += `${'='.repeat(60)}\n\n`;
+                content += generatedCommands[type][vendor];
+                content += '\n\n';
+            }
+
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `firewall-config-${type}-${timestamp}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function exportToCSV(type) {
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+            let csv = 'Vendor,Object Name,IP Address,Type,Tags,Description,Command\n';
+
+            if (type === 'single') {
+                const name = document.getElementById('singleName').value.trim();
+                const ip = document.getElementById('singleIP').value.trim();
+                const addrType = document.getElementById('singleType').value;
+                const desc = document.getElementById('singleDescription').value.trim();
+                const tagList = tags.single.join(';');
+
+                for (const vendor in generatedCommands.single) {
+                    const cmd = generatedCommands.single[vendor].replace(/"/g, '""').replace(/\n/g, ' ');
+                    csv += `"${vendor}","${name}","${ip}","${addrType}","${tagList}","${desc}","${cmd}"\n`;
+                }
+            } else if (type === 'bulk') {
+                const input = document.getElementById('bulkInput').value.trim();
+                const prefix = document.getElementById('bulkPrefix').value.trim();
+                const suffix = document.getElementById('bulkSuffix').value.trim();
+                const separator = document.getElementById('bulkSeparator').value;
+                const tagList = tags.bulk.join(';');
+
+                const lines = input.split('\n').filter(line => line.trim());
+                lines.forEach(line => {
+                    const parts = line.trim().split(/[,\s]+/);
+                    if (parts.length >= 2) {
+                        const hostname = parts[0];
+                        const ip = parts[1];
+                        
+                        let objectName = hostname;
+                        if (prefix) objectName = `${prefix}${separator}${objectName}`;
+                        if (suffix) objectName = `${objectName}${separator}${suffix}`;
+
+                        for (const vendor in selectedVendors) {
+                            if (selectedVendors[vendor] && generatedCommands.bulk[vendor]) {
+                                csv += `"${vendor}","${objectName}","${ip}","host","${tagList}","",""\n`;
+                            }
+                        }
+                    }
+                });
+            }
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `firewall-config-${type}-${timestamp}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function clearForm(type) {
+            if (type === 'single') {
+                document.getElementById('singleName').value = '';
+                document.getElementById('singleIP').value = '';
+                document.getElementById('singleType').value = 'host';
+                document.getElementById('singleMask').value = '';
+                document.getElementById('singleShared').checked = false;
+                document.getElementById('singleDeviceGroup').value = '';
+                document.getElementById('singleTagInput').value = '';
+                document.getElementById('singleDescription').value = '';
+                document.getElementById('singleNameValidation').innerHTML = '';
+                tags.single = [];
+                updateTagDisplay('single');
+                document.getElementById('singleOutput').classList.remove('show');
+            } else if (type === 'bulk') {
+                document.getElementById('bulkInput').value = '';
+                document.getElementById('bulkPrefix').value = '';
+                document.getElementById('bulkSuffix').value = '';
+                document.getElementById('bulkSeparator').value = '-';
+                document.getElementById('bulkShared').checked = false;
+                document.getElementById('bulkDeviceGroup').value = '';
+                document.getElementById('bulkTagInput').value = '';
+                tags.bulk = [];
+                updateTagDisplay('bulk');
+                document.getElementById('bulkOutput').classList.remove('show');
+                updateNamingPreview();
+            }
+        }
+
+        // Update naming preview
+        document.getElementById('bulkPrefix').addEventListener('input', updateNamingPreview);
+        document.getElementById('bulkSuffix').addEventListener('input', updateNamingPreview);
+        document.getElementById('bulkSeparator').addEventListener('change', updateNamingPreview);
+
+        function updateNamingPreview() {
+            const prefix = document.getElementById('bulkPrefix').value.trim();
+            const suffix = document.getElementById('bulkSuffix').value.trim();
+            const separator = document.getElementById('bulkSeparator').value;
+            let preview = 'hostname';
+            if (prefix) preview = `${prefix}${separator}${preview}`;
+            if (suffix) preview = `${preview}${separator}${suffix}`;
+            document.getElementById('bulkNamingPreview').innerHTML = `Preview: <strong>${preview}</strong>`;
+        }
+
+        // Allow Enter key to add tags
+        ['single', 'bulk'].forEach(type => {
+            document.getElementById(`${type}TagInput`).addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    addTag(type);
+                }
+            });
+        });
+    </script>
+</body>
+</html>

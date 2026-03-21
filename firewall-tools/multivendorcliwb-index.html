@@ -1,0 +1,2120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Multi‑Vendor Firewall CLI Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    /* ------------------------------
+       BASE / THEME VARIABLES
+    -------------------------------- */
+    :root {
+      --bg-color: #020617;
+      --bg-elevated: #020617;
+      --bg-card: rgba(15, 23, 42, 0.96);
+      --bg-card-soft: rgba(15, 23, 42, 0.9);
+      --border-subtle: rgba(148, 163, 184, 0.25);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.12);
+      --accent-strong: #0ea5e9;
+      --accent-alt: #6366f1;
+      --text-main: #e5e7eb;
+      --text-muted: #9ca3af;
+      --text-soft: #6b7280;
+      --chip-bg: rgba(15, 23, 42, 0.85);
+      --output-bg: #020617;
+      --btn-primary: linear-gradient(135deg, #38bdf8, #6366f1);
+      --btn-primary-hover: linear-gradient(135deg, #0ea5e9, #4f46e5);
+      --btn-ghost-bg: rgba(15, 23, 42, 0.8);
+      --shadow-soft: 0 22px 45px rgba(15, 23, 42, 0.7);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --radius-pill: 999px;
+      --transition-fast: 0.15s ease-out;
+      --transition-med: 0.25s ease-out;
+
+      --grid-gap: 1.4rem;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top left, #0f172a, #020617);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ------------------------------
+       LAYOUT
+    -------------------------------- */
+    .app-shell {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      backdrop-filter: blur(18px);
+      background: linear-gradient(
+        to right,
+        rgba(15, 23, 42, 0.88),
+        rgba(15, 23, 42, 0.7),
+        rgba(15, 23, 42, 0.94)
+      );
+      border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.8rem 1.25rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 14px;
+      background: conic-gradient(
+        from 120deg,
+        #38bdf8,
+        #6366f1,
+        #22c55e,
+        #38bdf8
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0f172a;
+      font-size: 18px;
+      font-weight: 800;
+      box-shadow: 0 15px 35px rgba(59, 130, 246, 0.5);
+    }
+
+    .brand-text-main {
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      color: #e5e7eb;
+    }
+
+    .brand-sub {
+      font-size: 0.75rem;
+      color: var(--text-soft);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      padding: 0.25rem 0.7rem;
+      border-radius: var(--radius-pill);
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: #e5e7eb;
+    }
+
+    .btn-ghost {
+      border-radius: var(--radius-pill);
+      background: var(--btn-ghost-bg);
+      color: var(--text-main);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      padding: 0.35rem 0.9rem;
+      font-size: 0.76rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      cursor: pointer;
+      transition: background var(--transition-fast),
+        transform var(--transition-fast), border-color var(--transition-fast),
+        box-shadow var(--transition-fast);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(15, 23, 42, 0.98);
+      transform: translateY(-1px);
+      border-color: rgba(129, 140, 248, 0.7);
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.85);
+    }
+
+    .main {
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 1.75rem auto 2.5rem;
+      padding: 0 1.25rem;
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      gap: 1.75rem;
+      align-items: flex-start;
+    }
+
+    @media (max-width: 960px) {
+      .main {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ------------------------------
+       LEFT COLUMN: TOOL STACK
+    -------------------------------- */
+    .tool-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-title-main {
+      font-size: 1.15rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    .section-title-main span.icon {
+      font-size: 1.1rem;
+    }
+
+    .section-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      max-width: 360px;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+
+    .chip {
+      padding: 0.18rem 0.7rem;
+      border-radius: var(--radius-pill);
+      background: var(--chip-bg);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      font-size: 0.7rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      color: #cbd5f5;
+    }
+
+    .chip span.dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.25);
+    }
+
+    /* ------------------------------
+       CARD SHELL
+    -------------------------------- */
+    .card {
+      border-radius: var(--radius-lg);
+      background: radial-gradient(circle at top left, #0b1120, #020617);
+      box-shadow: var(--shadow-soft);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+      padding: 1.25rem 1.2rem 1.4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      background: radial-gradient(
+        circle at top left,
+        rgba(56, 189, 248, 0.14),
+        transparent 55%
+      );
+      opacity: 0.9;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .card-title {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: #e5e7eb;
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.4rem;
+    }
+
+    .card-title .badge {
+      font-size: 0.68rem;
+      padding: 0.14rem 0.54rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: var(--accent);
+      background: rgba(15, 23, 42, 0.9);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .card-meta {
+      font-size: 0.78rem;
+      color: var(--text-soft);
+    }
+
+    .card-body {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    /* ------------------------------
+       VENDOR TABS (Primary Area)
+    -------------------------------- */
+    .vendor-tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.25rem;
+    }
+
+    .tab {
+      padding: 0.45rem 0.8rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid transparent;
+      font-size: 0.75rem;
+      cursor: pointer;
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: border-color var(--transition-fast),
+        color var(--transition-fast), background var(--transition-fast),
+        transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .tab::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.6);
+    }
+
+    .tab.active {
+      color: #e5e7eb;
+      border-color: rgba(56, 189, 248, 0.65);
+      background: linear-gradient(
+        120deg,
+        rgba(37, 99, 235, 0.45),
+        rgba(56, 189, 248, 0.3)
+      );
+      box-shadow: 0 16px 35px rgba(37, 99, 235, 0.55);
+      transform: translateY(-1px);
+    }
+
+    .tab.active::before {
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.45);
+    }
+
+    .tab-content {
+      display: none;
+      margin-top: 0.4rem;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* ------------------------------
+       FORM GRID
+    -------------------------------- */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--grid-gap);
+      margin-top: 0.5rem;
+    }
+
+    @media (max-width: 720px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .form-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-soft);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .form-label span.key {
+      padding: 0.02rem 0.45rem;
+      border-radius: 4px;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      background: rgba(15, 23, 42, 0.8);
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.55rem 0.7rem;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      background: rgba(15, 23, 42, 0.85);
+      color: var(--text-main);
+      font-size: 0.86rem;
+      outline: none;
+      transition: border-color var(--transition-fast),
+        box-shadow var(--transition-fast), background var(--transition-fast),
+        transform var(--transition-fast);
+      resize: vertical;
+      min-height: 2.2rem;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: var(--text-soft);
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: rgba(56, 189, 248, 0.8);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.7);
+      background: rgba(15, 23, 42, 0.96);
+      transform: translateY(-0.5px);
+    }
+
+    select {
+      cursor: pointer;
+    }
+
+    textarea {
+      line-height: 1.4;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+      font-size: 0.82rem;
+    }
+
+    .inline-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .inline-row input[type="checkbox"] {
+      width: auto;
+      transform: scale(1.1);
+      accent-color: #38bdf8;
+    }
+
+    .hint {
+      font-size: 0.78rem;
+      color: var(--text-soft);
+    }
+
+    .validation {
+      font-size: 0.78rem;
+      margin-top: 0.35rem;
+    }
+
+    .error {
+      color: #f97373;
+    }
+
+    .warning {
+      color: #fbbf24;
+    }
+
+    .success {
+      color: #4ade80;
+    }
+
+    /* ------------------------------
+       BUTTONS
+    -------------------------------- */
+    .btn-primary {
+      margin-top: 0.5rem;
+      padding: 0.6rem 1.1rem;
+      border-radius: var(--radius-pill);
+      border: none;
+      color: #f9fafb;
+      font-weight: 600;
+      font-size: 0.86rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      background-image: var(--btn-primary);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      box-shadow: 0 16px 35px rgba(37, 99, 235, 0.75);
+      transition: transform var(--transition-med),
+        box-shadow var(--transition-med), filter var(--transition-med),
+        background-image var(--transition-med);
+    }
+
+    .btn-primary span.icon {
+      font-size: 1rem;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1.5px) translateZ(0);
+      box-shadow: 0 22px 55px rgba(37, 99, 235, 0.95);
+      background-image: var(--btn-primary-hover);
+      filter: saturate(1.2);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow: 0 12px 20px rgba(37, 99, 235, 0.75);
+    }
+
+    .btn-secondary {
+      margin-top: 0.5rem;
+      padding: 0.5rem 0.9rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: var(--text-main);
+      background: rgba(15, 23, 42, 0.85);
+      font-size: 0.78rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      cursor: pointer;
+      transition: background var(--transition-fast),
+        border-color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(15, 23, 42, 0.98);
+      border-color: rgba(129, 140, 248, 0.9);
+      transform: translateY(-1px);
+    }
+	
+	/* Back to Home Button */
+        .back-home {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: var(--shadow-lg);
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .back-home:hover {
+            transform: translateY(-5px) scale(1.1);
+            background-color: var(--secondary-color);
+        }
+
+    /* ------------------------------
+       OUTPUT PANELS
+    -------------------------------- */
+    .output-shell {
+      margin-top: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .output-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      font-size: 0.76rem;
+      color: var(--text-soft);
+    }
+
+    .output-label-row .code-pill {
+      padding: 0.08rem 0.55rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      background: rgba(15, 23, 42, 0.95);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .copy-btn {
+      border-radius: var(--radius-pill);
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      padding: 0.2rem 0.55rem;
+      background: rgba(15, 23, 42, 0.85);
+      color: #e5e7eb;
+      font-size: 0.72rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      cursor: pointer;
+      transition: background var(--transition-fast),
+        border-color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .copy-btn:hover {
+      background: rgba(15, 23, 42, 1);
+      border-color: rgba(56, 189, 248, 0.9);
+      transform: translateY(-1px);
+    }
+
+    .copy-btn.copied {
+      border-color: rgba(34, 197, 94, 0.9);
+      color: #bbf7d0;
+    }
+
+    .output {
+      background: var(--output-bg);
+      padding: 0.7rem 0.7rem;
+      border-radius: 0.9rem;
+      border: 1px solid rgba(15, 23, 42, 0.95);
+      box-shadow: inset 0 0 0 1px rgba(30, 64, 175, 0.5);
+      white-space: pre-wrap;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        "Liberation Mono", "Courier New", monospace;
+      font-size: 0.8rem;
+      max-height: 260px;
+      overflow: auto;
+      color: #e5e7eb;
+    }
+
+    /* ------------------------------
+       RIGHT COLUMN: SUMMARY / QUICK ACCESS
+    -------------------------------- */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .summary-card {
+      border-radius: var(--radius-lg);
+      background: linear-gradient(
+        135deg,
+        rgba(15, 23, 42, 0.98),
+        rgba(15, 23, 42, 0.92)
+      );
+      border: 1px solid rgba(99, 102, 241, 0.6);
+      padding: 1.1rem 1.1rem 1.2rem;
+      box-shadow: 0 22px 45px rgba(17, 24, 39, 0.95);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .summary-card::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      background: radial-gradient(
+        circle at top right,
+        rgba(99, 102, 241, 0.32),
+        transparent 60%
+      );
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .summary-body {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 0.7rem;
+      font-size: 0.83rem;
+    }
+
+    .summary-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #e5e7eb;
+      margin-bottom: 0.25rem;
+    }
+
+    .summary-list {
+      list-style: none;
+      padding: 0;
+      margin: 0.35rem 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+    }
+
+    .summary-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .summary-list span.label {
+      color: var(--text-soft);
+    }
+
+    .summary-list span.value {
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+
+    .quick-nav {
+      border-radius: var(--radius-lg);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px dashed rgba(148, 163, 184, 0.5);
+      padding: 0.9rem 0.95rem 1rem;
+    }
+
+    .quick-nav-title {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      color: var(--text-soft);
+      letter-spacing: 0.08em;
+      margin-bottom: 0.4rem;
+    }
+
+    .quick-nav-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.4rem;
+    }
+
+    .quick-nav-btn {
+      font-size: 0.78rem;
+      border-radius: 0.75rem;
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: rgba(15, 23, 42, 0.9);
+      padding: 0.45rem 0.55rem;
+      cursor: pointer;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      transition: background var(--transition-fast),
+        transform var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .quick-nav-btn:hover {
+      background: rgba(15, 23, 42, 1);
+      transform: translateY(-1px);
+      border-color: rgba(56, 189, 248, 0.9);
+    }
+
+    @media (max-width: 960px) {
+      .summary-card {
+        order: -1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+<!-- Back to Home Button -->
+    <a href="https://bala-murugan-s.github.io/" class="back-home" title="Back to Home">
+        <i class="fas fa-arrow-left"></i>
+    </a>
+  <div class="app-shell">
+    <!-- ====================== HEADER ======================= -->
+    <header class="app-header">
+      <div class="header-inner">
+        <div class="brand">
+          <div class="brand-logo">FW</div>
+          <div>
+            <div class="brand-text-main">Multi-Vendor Firewall CLI Studio</div>
+            <div class="brand-sub">
+              Generate address objects, groups & policies across Palo Alto, Fortinet, Cisco ASA & Check Point.
+            </div>
+          </div>
+        </div>
+        <div class="header-actions">
+          <div class="pill">
+            <span style="width: 8px;height: 8px;border-radius:999px;background:#22c55e;box-shadow:0 0 0 4px rgba(34,197,94,0.35);"></span>
+            <span>All engines ready</span>
+          </div>
+          <button id="themeToggle" class="btn-ghost">
+            <span>🌓</span>
+            <span>Theme</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ====================== MAIN ======================= -->
+    <main class="main">
+      <!-- LEFT: MAIN TOOL STACK -->
+      <section class="tool-stack">
+        <!-- Section header -->
+        <div class="section-heading">
+          <div>
+            <div class="section-title-main">
+              <span class="icon">⚙️</span>
+              <span>Address Objects & Rules</span>
+            </div>
+            <div class="section-subtitle">
+              Work in a single workspace and switch vendors without losing context. Bulk input is supported for rapid
+              rule onboarding.
+            </div>
+          </div>
+          <div class="chip-row">
+            <div class="chip">
+              <span class="dot"></span>
+              <span>Address Objects</span>
+            </div>
+            <div class="chip">
+              <span class="dot" style="background:#38bdf8;box-shadow:0 0 0 4px rgba(56,189,248,0.35);"></span>
+              <span>Address Groups</span>
+            </div>
+            <div class="chip">
+              <span class="dot" style="background:#f97316;box-shadow:0 0 0 4px rgba(249,115,22,0.35);"></span>
+              <span>Security Policies</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========== ADDRESS OBJECT GENERATOR ========== -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">
+                <span>🔥 Multi‑Vendor Address Object Generator</span>
+                <span class="badge">Step 1</span>
+              </div>
+              <div class="card-meta">
+                Define host / subnet / range / FQDN objects and instantly get vendor-specific CLI.
+              </div>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <!-- Primary vendor tab row -->
+            <div class="vendor-tabs">
+              <div class="tab active" data-tab="pa">Palo Alto</div>
+              <div class="tab" data-tab="forti">Fortinet</div>
+              <div class="tab" data-tab="asa">Cisco ASA</div>
+              <div class="tab" data-tab="cp">Check Point</div>
+            </div>
+
+            <!-- ===== Palo Alto Tab ===== -->
+            <div id="pa" class="tab-content active card-variant">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Object Name</label>
+                  <input id="paName" />
+                  <div id="paValidation" class="validation"></div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Type</label>
+                  <select id="paType">
+                    <option value="host">Host</option>
+                    <option value="subnet">Subnet</option>
+                    <option value="range">Range</option>
+                    <option value="fqdn">FQDN</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">IP / Value</label>
+                  <input id="paIp" />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Subnet Mask (if needed)</label>
+                  <input id="paMask" placeholder="255.255.255.0" />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Description</label>
+                  <input id="paDesc" />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Tags (comma‑separated)</label>
+                  <input id="paTags" placeholder="web, db, prod" />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Mode</label>
+                  <select id="paMode">
+                    <option value="firewall">Standalone Firewall</option>
+                    <option value="shared">Panorama Shared</option>
+                    <option value="dg">Panorama Device Group</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Panorama Settings</label>
+                  <div class="inline-row">
+                    <input type="checkbox" id="paShared" />
+                    <span>Create as Shared Object (Panorama / Central Manager)</span>
+                  </div>
+                  <div class="hint">Device Group (if applicable)</div>
+                  <input id="paDG" />
+                </div>
+              </div>
+
+              <button class="btn-primary" onclick="generateVendor('pa')">
+                <span class="icon">⚡</span>
+                <span>Generate Commands</span>
+              </button>
+
+              <div class="output-shell">
+                <div class="output-label-row">
+                  <span class="code-pill">PA CLI Output</span>
+                  <button class="copy-btn" data-copy-target="paOutput">
+                    <span>📋</span><span>Copy</span>
+                  </button>
+                </div>
+                <div id="paOutput" class="output"></div>
+              </div>
+
+              <hr style="border:none;border-top:1px dashed rgba(148,163,184,0.4);margin:0.9rem 0;" />
+
+              <div class="form-group">
+                <label class="form-label">Bulk Address Objects</label>
+                <div class="hint">
+                  One entry per line: <code>name value tags</code> (tags optional).
+                </div>
+                <textarea id="paBulk" rows="6" placeholder="
+web01 10.0.0.10 ext, blue
+db01 10.0.0.20 ext, blue
+net01 10.0.1.0/24 int, green
+range01 10.0.2.10-10.0.2.20 int, green
+fqdn01 google.com ext, purple
+"></textarea>
+              </div>
+
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">
+                <button class="btn-secondary" onclick="generateVendorBulk('pa')">
+                  <span>📦</span>
+                  <span>Generate Bulk Commands</span>
+                </button>
+                <button class="copy-btn" data-copy-target="paBulkOutput">
+                  <span>📋</span><span>Copy Bulk</span>
+                </button>
+              </div>
+
+              <div class="output" id="paBulkOutput"></div>
+            </div>
+
+            <!-- ===== Fortinet Tab ===== -->
+            <div id="forti" class="tab-content card-variant">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Object Name</label>
+                  <input id="fortiName" />
+                  <div id="fortiValidation" class="validation"></div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Type</label>
+                  <select id="fortiType">
+                    <option value="host">Host</option>
+                    <option value="subnet">Subnet</option>
+                    <option value="fqdn">FQDN</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">IP / Value</label>
+                  <input id="fortiIp" />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Subnet Mask (if needed)</label>
+                  <input id="fortiMask" placeholder="255.255.255.0" />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Description</label>
+                  <input id="fortiDesc" />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Tags (comma‑separated)</label>
+                  <input id="fortiTags" placeholder="web, db, prod" />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Scope</label>
+                  <div class="inline-row">
+                    <input type="checkbox" id="fortiShared" />
+                    <span>Create as Shared Object (config global)</span>
+                  </div>
+                </div>
+              </div>
+
+              <button class="btn-primary" onclick="generateVendor('forti')">
+                <span class="icon">⚡</span>
+                <span>Generate Commands</span>
+              </button>
+
+              <div class="output-shell">
+                <div class="output-label-row">
+                  <span class="code-pill">Fortinet CLI Output</span>
+                  <button class="copy-btn" data-copy-target="fortiOutput">
+                    <span>📋</span><span>Copy</span>
+                  </button>
+                </div>
+                <div id="fortiOutput" class="output"></div>
+              </div>
+
+              <hr style="border:none;border-top:1px dashed rgba(148,163,184,0.4);margin:0.9rem 0;" />
+
+              <div class="form-group">
+                <label class="form-label">Bulk Address Objects</label>
+                <textarea id="fortiBulk" rows="6" placeholder="
+web01 10.0.0.10 ext, blue
+db01 10.0.0.20 ext, blue
+net01 10.0.1.0/24 int, green
+range01 10.0.2.10-10.0.2.20 int, green
+fqdn01 google.com ext, purple
+"></textarea>
+              </div>
+
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">
+                <button class="btn-secondary" onclick="generateVendorBulk('forti')">
+                  <span>📦</span>
+                  <span>Generate Bulk Commands</span>
+                </button>
+                <button class="copy-btn" data-copy-target="fortiBulkOutput">
+                  <span>📋</span><span>Copy Bulk</span>
+                </button>
+              </div>
+
+              <div class="output" id="fortiBulkOutput"></div>
+            </div>
+
+            <!-- ===== Cisco ASA Tab ===== -->
+            <div id="asa" class="tab-content card-variant">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Object Name</label>
+                  <input id="asaName" />
+                  <div id="asaValidation" class="validation"></div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Type</label>
+                  <select id="asaType">
+                    <option value="host">Host</option>
+                    <option value="subnet">Subnet</option>
+                    <option value="range">Range</option>
+                    <option value="fqdn">FQDN</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">IP / Value</label>
+                  <input id="asaIp" />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Subnet Mask (if needed)</label>
+                  <input id="asaMask" placeholder="255.255.255.0" />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Description</label>
+                  <input id="asaDesc" />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Tags (comma‑separated)</label>
+                  <input id="asaTags" placeholder="web, db, prod" />
+                </div>
+              </div>
+
+              <button class="btn-primary" onclick="generateVendor('asa')">
+                <span class="icon">⚡</span>
+                <span>Generate Commands</span>
+              </button>
+
+              <div class="output-shell">
+                <div class="output-label-row">
+                  <span class="code-pill">ASA CLI Output</span>
+                  <button class="copy-btn" data-copy-target="asaOutput">
+                    <span>📋</span><span>Copy</span>
+                  </button>
+                </div>
+                <div id="asaOutput" class="output"></div>
+              </div>
+
+              <hr style="border:none;border-top:1px dashed rgba(148,163,184,0.4);margin:0.9rem 0;" />
+
+              <div class="form-group">
+                <label class="form-label">Bulk Address Objects</label>
+                <textarea id="asaBulk" rows="6" placeholder="
+web01 10.0.0.10 ext, blue
+db01 10.0.0.20 ext, blue
+net01 10.0.1.0/24 int, green
+range01 10.0.2.10-10.0.2.20 int, green
+fqdn01 google.com ext, purple
+"></textarea>
+              </div>
+
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">
+                <button class="btn-secondary" onclick="generateVendorBulk('asa')">
+                  <span>📦</span>
+                  <span>Generate Bulk Commands</span>
+                </button>
+                <button class="copy-btn" data-copy-target="asaBulkOutput">
+                  <span>📋</span><span>Copy Bulk</span>
+                </button>
+              </div>
+
+              <div class="output" id="asaBulkOutput"></div>
+            </div>
+
+            <!-- ===== Check Point Tab ===== -->
+            <div id="cp" class="tab-content card-variant">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Object Name</label>
+                  <input id="cpName" />
+                  <div id="cpValidation" class="validation"></div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Type</label>
+                  <select id="cpType">
+                    <option value="host">Host</option>
+                    <option value="subnet">Subnet</option>
+                    <option value="range">Range</option>
+                    <option value="fqdn">FQDN</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">IP / Value</label>
+                  <input id="cpIp" />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Description</label>
+                  <input id="cpDesc" />
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Tags (comma‑separated)</label>
+                  <input id="cpTags" placeholder="web, db, prod" />
+                </div>
+              </div>
+
+              <button class="btn-primary" onclick="generateVendor('cp')">
+                <span class="icon">⚡</span>
+                <span>Generate Commands</span>
+              </button>
+
+              <div class="output-shell">
+                <div class="output-label-row">
+                  <span class="code-pill">Check Point CLI Output</span>
+                  <button class="copy-btn" data-copy-target="cpOutput">
+                    <span>📋</span><span>Copy</span>
+                  </button>
+                </div>
+                <div id="cpOutput" class="output"></div>
+              </div>
+
+              <hr style="border:none;border-top:1px dashed rgba(148,163,184,0.4);margin:0.9rem 0;" />
+
+              <div class="form-group">
+                <label class="form-label">Bulk Address Objects</label>
+                <textarea id="cpBulk" rows="6" placeholder="
+web01 10.0.0.10 ext, blue
+db01 10.0.0.20 ext, blue
+net01 10.0.1.0/24 int, green
+range01 10.0.2.10-10.0.2.20 int, green
+fqdn01 google.com ext, purple
+"></textarea>
+              </div>
+
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;flex-wrap:wrap;">
+                <button class="btn-secondary" onclick="generateVendorBulk('cp')">
+                  <span>📦</span>
+                  <span>Generate Bulk Commands</span>
+                </button>
+                <button class="copy-btn" data-copy-target="cpBulkOutput">
+                  <span>📋</span><span>Copy Bulk</span>
+                </button>
+              </div>
+
+              <div class="output" id="cpBulkOutput"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========== ADDRESS GROUP GENERATOR ========== -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">
+                <span>📦 Address Group Generator</span>
+                <span class="badge">Step 2</span>
+              </div>
+              <div class="card-meta">
+                Build reusable groups for your address objects and reuse them in your security policies.
+              </div>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="vendor-tabs">
+              <div class="tab active" data-tab="pa-ag">Palo Alto</div>
+              <div class="tab" data-tab="forti-ag">Fortinet</div>
+              <div class="tab" data-tab="asa-ag">Cisco ASA</div>
+              <div class="tab" data-tab="cp-ag">Check Point</div>
+            </div>
+
+            <!-- Palo Alto AG -->
+            <div id="pa-ag" class="tab-content active">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Group Name</label>
+                  <input id="paAgName" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Description</label>
+                  <input id="paAgDesc" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Tags (comma‑separated)</label>
+                  <input id="paAgTags" placeholder="prod, web" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Panorama Mode</label>
+                  <select id="paAgMode">
+                    <option value="firewall">Standalone</option>
+                    <option value="dg">Device Group</option>
+                  </select>
+                  <div class="hint">Device Group</div>
+                  <input id="paAgDG" />
+                  <div class="inline-row" style="margin-top:0.3rem;">
+                    <input type="checkbox" id="paAgShared" />
+                    <span>Create as Shared Object</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-top:0.3rem;">
+                <label class="form-label">Members (one per line)</label>
+                <textarea id="paAgMembers" rows="4" placeholder="web01
+db01
+net01"></textarea>
+              </div>
+
+              <button class="btn-primary" onclick="generateAddressGroup('pa')">
+                <span class="icon">⚡</span>
+                <span>Generate</span>
+              </button>
+
+              <div class="output-shell">
+                <div class="output-label-row">
+                  <span class="code-pill">PA Address Group CLI</span>
+                  <button class="copy-btn" data-copy-target="paAgOutput">
+                    <span>📋</span><span>Copy</span>
+                  </button>
+                </div>
+                <div id="paAgOutput" class="output"></div>
+              </div>
+            </div>
+
+            <!-- Fortinet AG -->
+            <div id="forti-ag" class="tab-content">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Group Name</label>
+                  <input id="fortiAgName" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Description</label>
+                  <input id="fortiAgDesc" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Members (one per line)</label>
+                <textarea id="fortiAgMembers" rows="4"></textarea>
+              </div>
+
+              <button class="btn-primary" onclick="generateAddressGroup('forti')">
+                <span class="icon">⚡</span>
+                <span>Generate</span>
+              </button>
+
+              <div class="output-shell">
+                <div class="output-label-row">
+                  <span class="code-pill">Fortinet Address Group CLI</span>
+                  <button class="copy-btn" data-copy-target="fortiAgOutput">
+                    <span>📋</span><span>Copy</span>
+                  </button>
+                </div>
+                <div id="fortiAgOutput" class="output"></div>
+              </div>
+            </div>
+
+            <!-- ASA AG -->
+            <div id="asa-ag" class="tab-content">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Group Name</label>
+                  <input id="asaAgName" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Members (one per line)</label>
+                <textarea id="asaAgMembers" rows="4"></textarea>
+              </div>
+
+              <button class="btn-primary" onclick="generateAddressGroup('asa')">
+                <span class="icon">⚡</span>
+                <span>Generate</span>
+              </button>
+
+              <div class="output-shell">
+                <div class="output-label-row">
+                  <span class="code-pill">ASA Address Group CLI</span>
+                  <button class="copy-btn" data-copy-target="asaAgOutput">
+                    <span>📋</span><span>Copy</span>
+                  </button>
+                </div>
+                <div id="asaAgOutput" class="output"></div>
+              </div>
+            </div>
+
+            <!-- CP AG -->
+            <div id="cp-ag" class="tab-content">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Group Name</label>
+                  <input id="cpAgName" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Tags</label>
+                  <input id="cpAgTags" />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label">Members (one per line)</label>
+                <textarea id="cpAgMembers" rows="4"></textarea>
+              </div>
+
+              <button class="btn-primary" onclick="generateAddressGroup('cp')">
+                <span class="icon">⚡</span>
+                <span>Generate</span>
+              </button>
+
+              <div class="output-shell">
+                <div class="output-label-row">
+                  <span class="code-pill">Check Point Group CLI</span>
+                  <button class="copy-btn" data-copy-target="cpAgOutput">
+                    <span>📋</span><span>Copy</span>
+                  </button>
+                </div>
+                <div id="cpAgOutput" class="output"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========== SECURITY POLICY GENERATOR ========== -->
+         <!-- ========== POLICY TYPE SELECTION ========== -->
+  <div class="form-group">
+    <label class="form-label">Select Policy Type</label>
+    <select id="policyType" onchange="changePolicyType()">
+      <option value="security">Security Policy</option>
+      <option value="nat">NAT Policy</option>
+    </select>
+  </div>
+
+  <!-- ========== SECURITY POLICY GENERATOR ========== -->
+	  <section class="card" id="security-policy-form">
+		<div class="card-header">
+		  <div>
+			<div class="card-title">
+			  <span>🔐 Security Policy Generator</span>
+			  <span class="badge">Step 3</span>
+			</div>
+			<div class="card-meta">
+			  Map zones, sources, destinations, and services into deployable security rules per vendor.
+			</div>
+		  </div>
+		</div>
+
+		<div class="card-body">
+		  <div class="vendor-tabs">
+			<div class="tab active" data-tab="pa-pol">Palo Alto</div>
+			<div class="tab" data-tab="forti-pol">Fortinet</div>
+			<div class="tab" data-tab="asa-pol">Cisco ASA</div>
+			<div class="tab" data-tab="cp-pol">Check Point</div>
+		  </div>
+
+		  <!-- PA policy -->
+		  <div id="pa-pol" class="tab-content active">
+			<div class="form-grid">
+			  <div class="form-group">
+				<label class="form-label">Rule Name</label>
+				<input id="paPolName" />
+			  </div>
+			  <div class="form-group">
+				<label class="form-label">Source Zone</label>
+				<input id="paPolSrcZone" />
+			  </div>
+			  <div class="form-group">
+				<label class="form-label">Destination Zone</label>
+				<input id="paPolDstZone" />
+			  </div>
+			  <div class="form-group">
+				<label class="form-label">Source Address / Group</label>
+				<input id="paPolSrcAddr" placeholder="any or addr-group" />
+			  </div>
+			  <div class="form-group">
+				<label class="form-label">Destination Address / Group</label>
+				<input id="paPolDstAddr" placeholder="any or addr-group" />
+			  </div>
+			  <div class="form-group">
+				<label class="form-label">Application (e.g. ftp, ssh, ssl)</label>
+				<input id="paPolApp" placeholder="ftp, ssh, ssl" />
+			  </div>
+			  <div class="form-group">
+				<label class="form-label">Service (e.g. 443, 445, 1521)</label>
+				<input id="paPolService" placeholder="443, 445, 1521" />
+			  </div>
+			  <div class="form-group">
+				<label class="form-label">Action</label>
+				<select id="paPolAction">
+				  <option value="allow">Allow</option>
+				  <option value="deny">Deny</option>
+				</select>
+			  </div>
+			  <div class="form-group">
+				<label class="form-label">Log Profile</label>
+				<input id="paPolLog" placeholder="Log_Profile_Name" />
+			  </div>
+			  <div class="form-group">
+				<label class="form-label">Log at Session End</label>
+				<input type="checkbox" id="paPolLogSessionEnd" />
+			  </div>
+			  <div class="form-group">
+				<label class="form-label">Log Forwarding</label>
+				<input id="paPolLogForwarding" placeholder="Log Forwarding Profile" />
+			  </div>
+			</div>
+
+			<button class="btn-primary" onclick="generatePolicy('pa', 'security')">
+			  <span class="icon">⚡</span>
+			  <span>Generate Security Policy</span>
+			</button>
+
+			<div class="output-shell">
+			  <div class="output-label-row">
+				<span class="code-pill">PA Security Policy CLI</span>
+				<button class="copy-btn" data-copy-target="paPolOutput">
+				  <span>📋</span><span>Copy</span>
+				</button>
+			  </div>
+			  <div id="paPolOutput" class="output"></div>
+			</div>
+		  </div>
+		</div>
+	  </section>
+
+	  <!-- ========== NAT POLICY GENERATOR ========== -->
+	  <section class="card" id="nat-policy-form" style="display:none;">
+		<div class="card-header">
+		  <div>
+			<div class="card-title">
+			  <span>🌐 NAT Policy Generator</span>
+			  <span class="badge">Step 3</span>
+			</div>
+			<div class="card-meta">
+			  Configure NAT rules for the selected vendor.
+			</div>
+		  </div>
+		</div>
+
+		<div class="card-body">
+		  <div class="vendor-tabs">
+			<div class="tab active" data-tab="pa-nat">Palo Alto</div>
+			<div class="tab" data-tab="forti-nat">Fortinet</div>
+			<div class="tab" data-tab="asa-nat">Cisco ASA</div>
+			<div class="tab" data-tab="cp-nat">Check Point</div>
+		  </div>
+
+		  <!-- PA NAT policy -->
+		  <div id="pa-nat" class="tab-content active">
+			<div class="form-grid">
+			  <div class="form-group">
+				<label class="form-label">Rule Name</label>
+				<input id="paNatName" />
+			  </div>
+			  <div class="form-group">
+				<label class="form-label">Source Zone</label>
+				<input id="paNatSrcZone" />
+			  </div>
+			  <div class="form-group">
+				<label class="form-label">Destination Zone</label>
+				<input id="paNatDstZone" />
+			  </div>
+			  <div class="form-group">
+				<label class="form-label">Source Address</label>
+				<input id="paNatSrcAddr" />
+			  </div>
+			  <div class="form-group">
+				<label class="form-label">Destination Address</label>
+				<input id="paNatDstAddr" />
+			  </div>
+			  <div class="form-group">
+				<label class="form-label">Service</label>
+				<input id="paNatService" />
+			  </div>
+			  <div class="form-group">
+				<label class="form-label">NAT Type</label>
+				<select id="paNatType">
+				  <option value="dynamic-ip">Dynamic IP</option>
+				  <option value="static-ip">Static IP</option>
+				</select>
+			  </div>
+			  <div class="form-group">
+				<label class="form-label">Translated Address</label>
+				<input id="paNatTranslatedAddr" />
+			  </div>
+			</div>
+
+			<button class="btn-primary" onclick="generatePolicy('pa', 'nat')">
+			  <span class="icon">⚡</span>
+			  <span>Generate NAT Policy</span>
+			</button>
+
+			<div class="output-shell">
+			  <div class="output-label-row">
+				<span class="code-pill">PA NAT Policy CLI</span>
+				<button class="copy-btn" data-copy-target="paNatOutput">
+				  <span>📋</span><span>Copy</span>
+				</button>
+			  </div>
+			  <div id="paNatOutput" class="output"></div>
+			</div>
+		  </div>
+		</div>
+	  </section>
+      </section>
+
+      <!-- RIGHT: SIDEBAR / SUMMARY / QUICK NAV -->
+      <aside class="sidebar">
+        <section class="summary-card">
+          <div class="summary-body">
+            <div class="summary-title">Workspace Overview</div>
+            <p>
+              This panel is just informative.
+            </p>
+            <ul class="summary-list">
+              <li>
+                <span class="label">Vendors</span>
+                <span class="value">Palo Alto, Fortinet, Cisco ASA, Check Point</span>
+              </li>
+              <li>
+                <span class="label">Capabilities</span>
+                <span class="value">Objects • Groups • Policies</span>
+              </li>
+              <li>
+                <span class="label">Bulk Mode</span>
+                <span class="value">Supported for all vendors</span>
+              </li>
+            </ul>
+            <p style="margin-top:0.35rem;font-size:0.8rem;color:var(--text-soft);">
+              Tip: Our design is “card + vendors + output” 
+            </p>
+          </div>
+        </section>
+
+        <section class="quick-nav">
+          <div class="quick-nav-title">Quick jump</div>
+          <div class="quick-nav-grid">
+            <button class="quick-nav-btn" onclick="document.querySelector('.card').scrollIntoView({behavior:'smooth'})">
+              <span>🎯</span><span>Objects</span>
+            </button>
+            <button class="quick-nav-btn"
+              onclick="document.querySelectorAll('.card')[1].scrollIntoView({behavior:'smooth'})">
+              <span>📦</span><span>Groups</span>
+            </button>
+            <button class="quick-nav-btn"
+              onclick="document.querySelectorAll('.card')[2].scrollIntoView({behavior:'smooth'})">
+              <span>🔐</span><span>Policies</span>
+            </button>
+            <button class="quick-nav-btn" style="opacity:0.6;cursor:not-allowed;">
+              <span>➕</span><span>Future Tool</span>
+            </button>
+          </div>
+        </section>
+      </aside>
+    </main>
+	<!-- Footer -->
+	<footer class="footer" id="contact">
+		<div class="container">
+			<div class="footer-content">
+				<!-- Multivendor CLI Command Generator Section -->
+				<div class="footer-section">
+					<h3>CLI Command Generator</h3>
+					<p>A comprehensive collection of CLI command generators for network security vendors.</p>
+					<div style="margin-top: 1rem; display: flex; gap: 1rem;">
+						<a href="#" style="color: var(--accent-color); font-size: 1.5rem;" target="_blank">
+							<i class="fab fa-github"></i>
+						</a>
+						<a href="#" style="color: var(--accent-color); font-size: 1.5rem;" target="_blank">
+							<i class="fab fa-twitter"></i>
+						</a>
+						<a href="#" style="color: var(--accent-color); font-size: 1.5rem;" target="_blank">
+							<i class="fab fa-linkedin"></i>
+						</a>
+					</div>
+				</div>
+			
+			<!-- Footer Bottom Section -->
+			<div class="footer-bottom">
+				<p>&copy; 2023 CLI Command Generator. All rights reserved. | Designed with <i class="fas fa-heart" style="color: #ef4444;"></i> for the network community</p>
+				<p style="margin-top: 0.5rem; font-size: 0.8rem;">This page is part of <a href="https://bala-murugan-s.github.io/" style="color: var(--accent-color);" target="_blank">bala-murugan-s.github.io</a></p>
+			</div>
+		</div>
+	</footer>
+  </div>
+
+  <!-- =========================================================
+       ORIGINAL SCRIPT BLOCK – UNCHANGED LOGIC / FUNCTIONS
+       (Copied from your existing file and left intact)
+  ========================================================== -->
+  <script>
+    // ========== Tabs ==========
+    const tabs = document.querySelectorAll('.tab');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+        document.getElementById(tab.dataset.tab).classList.add('active');
+      });
+    });
+    // ========== Shared Functions ==========
+    function validateName(name, vendor) {
+      if (!name) return "Name is required";
+      const hasSpace = name.includes(" ");
+      if (vendor === "pa") {
+        if (!/^[a-zA-Z0-9._\- ]+$/.test(name))
+          return "Palo Alto allows only a-z A-Z 0-9 . - _ (spaces allowed with quotes)";
+      }
+      if (vendor === "forti") {
+        if (hasSpace) return "Fortinet does not allow spaces";
+        if (!/^[a-zA-Z0-9-_]+$/.test(name))
+          return "Fortinet allows only a-z A-Z 0-9 - _";
+      }
+      if (vendor === "asa") {
+        if (hasSpace) return "Cisco ASA does not allow spaces";
+        if (!/^[a-zA-Z0-9._-]+$/.test(name))
+          return "Cisco ASA allows a-z A-Z 0-9 . - _";
+      }
+      return null;
+    }
+    function parseBulk(vendor) {
+      const bulkInput = document.getElementById(vendor + "Bulk").value
+        .split("\n")
+        .map(l => l.trim())
+        .filter(Boolean);
+      const objects = [];
+      bulkInput.forEach(line => {
+        const parts = line.includes(",") ? line.split(",") : line.split(/\s+/);
+        if (parts.length >= 2) {
+          objects.push({
+            name: parts[0],
+            value: parts[1],
+            tags: parts[2] || ""
+          });
+        }
+      });
+      return objects;
+    }
+    function detectType(value) {
+      if (value.includes("-")) return "range";
+      if (value.includes("/")) return "subnet";
+      if (/^[a-zA-Z]/.test(value)) return "fqdn";
+      return "host";
+    }
+    // Example generation functions (simplified)
+    function generateVendorBulk(vendor) {
+      const objs = parseBulk(vendor);
+      if (objs.length === 0) {
+        alert("No valid bulk entries found for " + vendor);
+        return;
+      }
+      let bulkOutput = "";
+      objs.forEach(o => {
+        const type = detectType(o.value);
+        if (vendor === "pa") {
+          const mode = document.getElementById("paMode").value;
+          const dg = document.getElementById("paDG").value.trim();
+          const isShared = document.getElementById("paShared").checked;
+          bulkOutput += generatePaloAlto(o.name, type, o.value, "", "", mode, dg, isShared, o.tags) + "\n";
+        }
+        else if (vendor === "forti") {
+          const isShared = document.getElementById("fortiShared").checked;
+          bulkOutput += generateFortinet(o.name, type, o.value, "", "", isShared, o.tags) + "\n";
+        }
+        else if (vendor === "asa") {
+          bulkOutput += generateASA(o.name, type, o.value, "", "", o.tags) + "\n";
+        }
+        else if (vendor === "cp") {
+          bulkOutput += generateCP(o.name, type, o.value, "", o.tags) + "\n";
+        }
+      });
+      document.getElementById(vendor + "BulkOutput").innerText = bulkOutput.trim();
+    }
+    function generatePaloAlto(name, type, ip, mask, desc, mode, dg, isShared, tags = "") {
+      const qName = name.includes(" ") ? `"${name}"` : name;
+      let base;
+      if (isShared) base = "set shared address";
+      else if (mode === "dg") base = `set device-group ${dg || "DG-NAME"} address`;
+      else base = "set address";
+      let cmd = `${base} ${qName} `;
+      if (type === "host" || type === "subnet") {
+        const normalized = normalizePANetmask(ip, type);
+        cmd += `ip-netmask ${normalized}`;
+      } else if (type === "range") {
+        cmd += `ip-range ${ip}`;
+      } else if (type === "fqdn") {
+        cmd += `fqdn ${ip}`;
+      }
+      if (desc) cmd += `\n${base} ${qName} description "${desc}"`;
+      // Handle multiple tags correctly
+      if (tags) {
+        const tagList = tags.split(",").map(t => t.trim()).filter(Boolean);
+        if (tagList.length) cmd += `\n${base} ${qName} tag ${tagList.join(",")}`;
+      }
+      return cmd;
+    }
+    function generateFortinet(name, type, ip, mask, desc, isShared, tags = "") {
+      let cmd = `config firewall address\n edit "${name}"\n`;
+      if (type === "host") cmd += ` set subnet ${ip} 255.255.255.255\n`;
+      if (type === "subnet") cmd += ` set subnet ${ip} ${mask || "255.255.255.0"}\n`;
+      if (type === "fqdn") cmd += ` set type fqdn\n set fqdn "${ip}"\n`;
+      if (desc) cmd += ` set comment "${desc}"\n`;
+      if (tags) {
+        const tagList = tags.split(",").map(t => t.trim()).filter(Boolean);
+        tagList.forEach(tag => {
+          cmd += ` set tag ${tag}\n`;
+        });
+      }
+      cmd += " next\nend";
+      if (isShared) cmd = "config global\n" + cmd + "\nend";
+      return cmd;
+    }
+    function generateASA(name, type, ip, mask, desc, tags = "") {
+      let cmd = `object network ${name}\n`;
+      if (type === "host") cmd += ` host ${ip}\n`;
+      if (type === "subnet") cmd += ` subnet ${ip} ${mask || "255.255.255.0"}\n`;
+      if (type === "range") cmd += ` range ${ip}\n`;
+      if (desc) cmd += ` description ${desc}\n`;
+      if (tags) {
+        const tagList = tags.split(",").map(t => t.trim()).filter(Boolean);
+        cmd += ` description "tags: ${tagList.join(", ")}"\n`;
+      }
+      return cmd;
+    }
+    function generateCP(name, type, ip, desc, tags = "") {
+      if (type === "host") return `mgmt_cli add host name "${name}" ip-address "${ip}" comments "${desc || ""}"`;
+      if (type === "fqdn") return `mgmt_cli add dns-domain name "${name}" domain "${ip}"`;
+      if (tags) {
+        const tagList = tags.split(",").map(t => t.trim()).filter(Boolean);
+        tagList.forEach(tag => {
+          cmd += `\nmgmt_cli set ${type} name "${name}" tags "${tag}"`;
+        });
+      }
+      return "# Unsupported object type";
+    }
+    // ========== To Normalize for PA Object =========
+    function normalizePANetmask(value, type) {
+      if (type === "host") {
+        // If no CIDR, force /32
+        return value.includes("/") ? value : `${value}/32`;
+      }
+      if (type === "subnet") {
+        // Preserve provided CIDR
+        return value;
+      }
+      return value;
+    }
+    // ========== Generate Vendor ==========
+    function generateVendor(vendor) {
+      let name = document.getElementById(vendor + "Name").value.trim();
+      let type = document.getElementById(vendor + "Type").value;
+      let ip = document.getElementById(vendor + "Ip")?.value.trim();
+      let mask = document.getElementById(vendor + "Mask")?.value.trim();
+      let desc = document.getElementById(vendor + "Desc")?.value.trim();
+      let tags = document.getElementById(vendor + "Tags")?.value.trim();
+      let validationDiv = document.getElementById(vendor + "Validation");
+      let outputDiv = document.getElementById(vendor + "Output");
+      validationDiv.innerHTML = "";
+      outputDiv.innerHTML = "";
+      let err = validateName(name, vendor);
+      if (err) {
+        validationDiv.innerHTML = `<div class="error">${err}</div>`;
+        return;
+      }
+      let cmd = "";
+      if (vendor === "pa") {
+        const mode = document.getElementById("paMode").value;
+        const dg = document.getElementById("paDG").value.trim();
+        const isShared = document.getElementById("paShared").checked;
+        cmd = generatePaloAlto(name, type, ip, mask, desc, mode, dg, isShared, tags);
+      }
+      if (vendor === "forti") {
+        const isShared = document.getElementById("fortiShared").checked;
+        cmd = generateFortinet(name, type, ip, mask, desc, isShared, tags);
+      }
+      if (vendor === "asa") cmd = generateASA(name, type, ip, mask, desc, tags);
+      if (vendor === "cp") cmd = generateCP(name, type, ip, desc, tags);
+      outputDiv.innerHTML = cmd;
+    }
+    // ============= Address Group ===========
+    function getMembers(text) {
+      return text
+        .split("\n")
+        .map(m => m.trim())
+        .filter(Boolean);
+    }
+    function generatePAAddressGroup(name, members, desc, tags, mode, dg, isShared) {
+      const qName = name.includes(" ") ? `"${name}"` : name;
+      let base;
+      if (isShared) base = "set shared address-group";
+      else if (mode === "dg") base = `set device-group ${dg || "DG-NAME"} address-group`;
+      else base = "set address-group";
+      let cmd = `${base} ${qName} static [ ${members.join(" ")} ]`;
+      if (desc) cmd += `\n${base} ${qName} description "${desc}"`;
+      if (tags) {
+        const tagList = tags.split(",").map(t => t.trim()).filter(Boolean);
+        if (tagList.length)
+          cmd += `\n${base} ${qName} tag ${tagList.join(",")}`;
+      }
+      return cmd;
+    }
+    function generateFortiAddressGroup(name, members, desc) {
+      let cmd = `config firewall addrgrp 
+ edit "${name}" 
+`;
+      members.forEach(m => {
+        cmd += ` append member "${m}"\n`;
+      });
+      if (desc) cmd += ` set comment "${desc}"\n`;
+      cmd += ` next 
+end`;
+      return cmd;
+    }
+    function generateASAAddressGroup(name, members) {
+      let cmd = `object-group network ${name}\n`;
+      members.forEach(m => {
+        cmd += ` network-object object ${m}\n`;
+      });
+      return cmd;
+    }
+    function generateASAAddressGroup(name, members) {
+      let cmd = `object-group network ${name}\n`;
+      members.forEach(m => {
+        cmd += ` network-object object ${m}\n`;
+      });
+      return cmd;
+    }
+    // =============Address Group module ======
+    function generateAddressGroup(vendor) {
+      let name = document.getElementById(vendor + "AgName").value.trim();
+      let members = getMembers(document.getElementById(vendor + "AgMembers").value);
+      let desc = document.getElementById(vendor + "AgDesc")?.value.trim();
+      let tags = document.getElementById(vendor + "AgTags")?.value.trim();
+      let output = document.getElementById(vendor + "AgOutput");
+      output.innerHTML = "";
+      if (!name || members.length === 0) {
+        output.innerHTML = "Group name and members are required";
+        return;
+      }
+      let cmd = "";
+      if (vendor === "pa") {
+        const mode = document.getElementById("paAgMode").value;
+        const dg = document.getElementById("paAgDG").value.trim();
+        const isShared = document.getElementById("paAgShared").checked;
+        cmd = generatePAAddressGroup(name, members, desc, tags, mode, dg, isShared);
+      }
+      else if (vendor === "forti") cmd = generateFortiAddressGroup(name, members, desc);
+      else if (vendor === "asa") cmd = generateASAAddressGroup(name, members);
+      else if (vendor === "cp") cmd = generateCPAddressGroup(name, members, tags);
+      output.innerText = cmd;
+    }
+    function generatePolicy(vendor, policyType) {
+	  let d = {}; // Define an empty object for policy parameters
+
+	  // ==================== SECURITY POLICY =====================
+	  if (policyType === "security") {
+		if (vendor === "pa") {
+		  d = {
+			name: paPolName.value,
+			srcZone: paPolSrcZone.value,
+			dstZone: paPolDstZone.value,
+			srcAddr: paPolSrcAddr.value,
+			dstAddr: paPolDstAddr.value,
+			app: paPolApp.value,
+			service: paPolService.value,
+			action: paPolAction.value,
+			log: paPolLog.value,
+			logSessionEnd: paPolLogSessionEnd.checked ? "yes" : "no",
+			logForwarding: paPolLogForwarding.value,
+			securityProfile: paPolSecurityProfile.value,
+			mode: paPolMode.value,
+			dg: paPolDG.value
+		  };
+		  paPolOutput.innerText = generatePAPolicy(d); // Call security policy generation
+		}
+		if (vendor === "forti") {
+		  d = {
+			name: fortiPolName.value,
+			srcZone: fortiPolSrcZone.value,
+			dstZone: fortiPolDstZone.value,
+			srcAddr: fortiPolSrcAddr.value,
+			dstAddr: fortiPolDstAddr.value,
+			service: fortiPolService.value,
+			action: fortiPolAction.value
+		  };
+		  fortiPolOutput.innerText = generateFortiPolicy(d); // Call Forti policy generation
+		}
+		if (vendor === "asa") {
+		  d = {
+			name: asaPolName.value,
+			srcZone: asaPolSrcZone.value,
+			srcAddr: asaPolSrcAddr.value,
+			dstAddr: asaPolDstAddr.value,
+			service: asaPolService.value,
+			action: asaPolAction.value
+		  };
+		  asaPolOutput.innerText = generateASAPolicy(d); // Call ASA policy generation
+		}
+		if (vendor === "cp") {
+		  d = {
+			name: cpPolName.value,
+			srcAddr: cpPolSrcAddr.value,
+			dstAddr: cpPolDstAddr.value,
+			service: cpPolService.value,
+			action: cpPolAction.value,
+			tags: cpPolTags.value
+		  };
+		  cpPolOutput.innerText = generateCPPolicy(d); // Call Checkpoint policy generation
+		}
+	  }
+
+	  // ==================== NAT POLICY =====================
+	  else if (policyType === "nat") {
+		if (vendor === "pa") {
+		  d = {
+			name: paNatName.value,
+			srcZone: paNatSrcZone.value,
+			dstZone: paNatDstZone.value,
+			srcAddr: paNatSrcAddr.value,
+			dstAddr: paNatDstAddr.value,
+			service: paNatService.value,
+			action: paNatAction.value,
+			natType: paNatType.value, // Dynamic IP or Static IP
+			translatedAddr: paNatTranslatedAddr.value,
+			log: paNatLog.value,
+			mode: paPolMode.value,
+			dg: paPolDG.value
+		  };
+		  paNatOutput.innerText = generatePANATPolicy(d); // Call PANAT policy generation
+		}
+		if (vendor === "forti") {
+		  d = {
+			name: fortiNatName.value,
+			srcZone: fortiNatSrcZone.value,
+			dstZone: fortiNatDstZone.value,
+			srcAddr: fortiNatSrcAddr.value,
+			dstAddr: fortiNatDstAddr.value,
+			service: fortiNatService.value,
+			action: fortiNatAction.value,
+			translatedAddr: fortiNatTranslatedAddr.value
+		  };
+		  fortiNatOutput.innerText = generateFortiNATPolicy(d); // Call Forti NAT policy generation
+		}
+		if (vendor === "asa") {
+		  d = {
+			name: asaNatName.value,
+			srcAddr: asaNatSrcAddr.value,
+			dstAddr: asaNatDstAddr.value,
+			service: asaNatService.value,
+			action: asaNatAction.value,
+			translatedAddr: asaNatTranslatedAddr.value
+		  };
+		  asaNatOutput.innerText = generateASANATPolicy(d); // Call ASA NAT policy generation
+		}
+		if (vendor === "cp") {
+		  d = {
+			name: cpNatName.value,
+			srcAddr: cpNatSrcAddr.value,
+			dstAddr: cpNatDstAddr.value,
+			service: cpNatService.value,
+			action: cpNatAction.value,
+			translatedAddr: cpNatTranslatedAddr.value,
+			log: cpNatLog.value
+		  };
+		  cpNatOutput.innerText = generateCPNATPolicy(d); // Call Checkpoint NAT policy generation
+		}
+	  }
+	}
+	// Handle policy type switch (Security vs NAT)
+		function changePolicyType() {
+		  const policyType = document.getElementById("policyType").value;
+		  const securityForm = document.getElementById("security-policy-form");
+		  const natForm = document.getElementById("nat-policy-form");
+
+		  if (policyType === "security") {
+			securityForm.style.display = "block"; // Show security form
+			natForm.style.display = "none"; // Hide NAT form
+		  } else if (policyType === "nat") {
+			securityForm.style.display = "none"; // Hide security form
+			natForm.style.display = "block"; // Show NAT form
+		  }
+		}
+
+		// Call this on page load to set the correct default visibility
+		window.onload = function() {
+		  changePolicyType();
+		};
+
+    // =============Dark-Light Theme ======
+    const darkTheme = {
+      '--bg-color': '#1f2937',
+      '--text-color': '#f9fafb',
+      '--card-bg': '#111827',
+      '--button-bg': '#2563eb',
+      '--button-hover': '#1d4ed8',
+      '--output-bg': '#020617'
+    };
+    const lightTheme = {
+      '--bg-color': '#f9fafb',
+      '--text-color': '#111827',
+      '--card-bg': '#e5e7eb',
+      '--button-bg': '#3b82f6',
+      '--button-hover': '#2563eb',
+      '--output-bg': '#f3f4f6'
+    };
+    let isDark = true;
+    document.getElementById("themeToggle").addEventListener("click", () => {
+      const theme = isDark ? lightTheme : darkTheme;
+      for (const key in theme) {
+        document.documentElement.style.setProperty(key, theme[key]);
+      }
+      isDark = !isDark;
+    });
+
+    // Copy-to-clipboard for any element referenced via data-copy-target
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const targetId = btn.getAttribute('data-copy-target');
+        if (!targetId) return;
+        const el = document.getElementById(targetId);
+        if (!el) return;
+        const text = el.innerText || el.textContent || '';
+        if (!text.trim()) return;
+        try {
+          await navigator.clipboard.writeText(text);
+          btn.classList.add('copied');
+          const original = btn.innerHTML;
+          btn.innerHTML = '<span>✅</span><span>Copied</span>';
+          setTimeout(() => {
+            btn.classList.remove('copied');
+            btn.innerHTML = original;
+          }, 1200);
+        } catch (_) {
+          alert('Unable to copy to clipboard in this browser.');
+        }
+      });
+    });
+  </script>
+</body>
+
+</html>

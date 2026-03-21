@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Developer Toolkit Pro</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛠️ Developer Toolkit Pro</h1>
+            <p class="subtitle">19 essential tools for developers</p>
+            <button id="themeToggle" class="theme-toggle">🌙</button>
+        </header>
+        <nav class="category-nav">
+            <button class="cat-btn active" data-category="converters">Data Converters</button>
+            <button class="cat-btn" data-category="beautifiers">Beautifiers</button>
+            <button class="cat-btn" data-category="encoders">Encode/Decode</button>
+            <button class="cat-btn" data-category="texttools">Text Tools</button>
+            <button class="cat-btn" data-category="utilities">Utilities</button>
+            <button class="cat-btn" data-category="generators">Generators</button>
+        </nav>
+        <div id="toolCards" class="tool-cards"></div>
+        <div id="toolInterface" class="tool-interface hidden">
+            <div class="tool-header">
+                <button id="backBtn" class="back-btn">← Back</button>
+                <h2 id="toolTitle"></h2>
+            </div>
+            <div class="tool-content">
+                <div class="input-section">
+                    <div class="section-header">
+                        <label>Input</label>
+                        <div class="actions">
+                            <button id="sampleBtn" class="btn-sm">Sample</button>
+                            <button id="clearInputBtn" class="btn-sm">Clear</button>
+                        </div>
+                    </div>
+                    <textarea id="inputArea" placeholder="Paste data here..."></textarea>
+                </div>
+                <div class="output-section">
+                    <div class="section-header">
+                        <label>Output</label>
+                        <div class="actions">
+                            <button id="copyBtn" class="btn-sm">Copy</button>
+                            <button id="downloadBtn" class="btn-sm">Download</button>
+                        </div>
+                    </div>
+                    <textarea id="outputArea" readonly placeholder="Output appears here..."></textarea>
+                    <canvas id="qrCanvas" class="qr-canvas hidden"></canvas>
+                    <div id="previewArea" class="preview-area hidden"></div>
+                </div>
+            </div>
+            <div id="errorMsg" class="error-msg hidden"></div>
+        </div>
+    </div>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

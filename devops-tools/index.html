@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevOps Tools</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .tool-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .tool-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-gradient-to-r from-orange-600 to-green-600 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-8">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h1 class="text-4xl font-bold mb-2">Security Tools</h1>
+                    <p class="text-lg opacity-90">Essential devops utilities and references</p>
+                </div>
+                <a href="/" class="bg-white text-orange-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+                    ← Back to Home
+                </a>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div class="bg-white/10 backdrop-blur rounded-lg p-4">
+                    <p class="text-2xl font-bold">Useful</p>
+                    <p class="text-sm opacity-90">DevOps Tools</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur rounded-lg p-4">
+                    <p class="text-2xl font-bold">Ansible</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur rounded-lg p-4">
+                    <p class="text-2xl font-bold">Terraform</p>
+                </div>
+				<div class="bg-white/10 backdrop-blur rounded-lg p-4">
+                    <p class="text-2xl font-bold">Kubernetes</p>
+                </div>
+                <div class="bg-white/10 backdrop-blur rounded-lg p-4">
+                    <p class="text-2xl font-bold">Free</p>
+                    <p class="text-sm opacity-90">Open Source</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Tools Grid -->
+    <!-- DevOps Tools Grid -->
+<main class="container mx-auto px-4 py-12">
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+			        <!-- Terraform VPC-VNET Builder -->
+			<a href="terraform/cloud-vpc-vnet/" class="tool-card block bg-white rounded-xl shadow-lg overflow-hidden">
+			    <div class="bg-gradient-to-br from-orange-500 to-orange-600 p-6 text-white">
+			        <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+			                  d="M12 8c-1.1 0-2 .9-2 2v6h4v-6c0-1.1-.9-2-2-2zm6 2v6h2v-6c0-2.2-1.8-4-4-4h-1V4h-2v2H9C6.8 6 5 7.8 5 10v6h2v-6c0-1.1.9-2 2-2h6c1.1 0 2 .9 2 2z" />
+			        </svg>
+			        <h3 class="text-2xl font-bold mb-2">Terraform VPC/VNet Builder</h3>
+			        <p class="text-orange-100">Generate cloud-ready VPC or VNet infrastructure templates.</p>
+			    </div>
+			    <div class="p-6">
+			        <div class="flex flex-wrap gap-2 mb-4">
+			            <span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-semibold">Multi-Cloud</span>
+			            <span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-semibold">IaC</span>
+			            <span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-semibold">Networking</span>
+			        </div>
+			        <p class="text-gray-600 text-sm">Automatically build modular VPC/VNet Terraform configurations for AWS, Azure, and GCP.</p>
+			    </div>
+			    <div class="px-6 pb-6">
+			        <span class="inline-flex items-center text-orange-600 font-semibold">
+			            Launch Tool
+			            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+			            </svg>
+			        </span>
+			    </div>
+			</a>
+			
+			<!-- Terraform SASE Configuration Generator -->
+			<a href="terraform/sase-config/" class="tool-card block bg-white rounded-xl shadow-lg overflow-hidden">
+			    <div class="bg-gradient-to-br from-amber-500 to-amber-600 p-6 text-white">
+			        <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+			                  d="M15 7a2 2 0 012 2v6H7V9a2 2 0 012-2h6zm4 2v6h2V9a6 6 0 00-6-6h-1V1H10v2H9a6 6 0 00-6 6v6h2V9a4 4 0 014-4h6a4 4 0 014 4z" />
+			        </svg>
+			        <h3 class="text-2xl font-bold mb-2">Terraform SASE Config Generator</h3>
+			        <p class="text-amber-100">Automated SASE policy & tunnel configuration templates.</p>
+			    </div>
+			    <div class="p-6">
+			        <div class="flex flex-wrap gap-2 mb-4">
+			            <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold">Automation</span>
+			            <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold">Config</span>
+			            <span class="px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-semibold">SASE</span>
+			        </div>
+			        <p class="text-gray-600 text-sm">Create Terraform-ready templates for SASE integrations, tunnels, and security policies across major vendors.</p>
+			    </div>
+			    <div class="px-6 pb-6">
+			        <span class="inline-flex items-center text-amber-600 font-semibold">
+			            Launch Tool
+			            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+			            </svg>
+			        </span>
+			    </div>
+			</a>
+			
+			<!-- Terraform Network Security Group Generator -->
+			<a href="terraform/cloud-nsg-gen/" class="tool-card block bg-white rounded-xl shadow-lg overflow-hidden">
+			    <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 p-6 text-white">
+			        <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+			                  d="M12 12l2 2-2 2m0-4l-2 2 2 2m7-6a9 9 0 11-18 0 9 9 0 0118 0z" />
+			        </svg>
+			        <h3 class="text-2xl font-bold mb-2">Terraform NSG Generator</h3>
+			        <p class="text-yellow-100">Quickly generate NSG rules for cloud platforms.</p>
+			    </div>
+			    <div class="p-6">
+			        <div class="flex flex-wrap gap-2 mb-4">
+			            <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-semibold">Security</span>
+			            <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-semibold">IaC</span>
+			            <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-semibold">Config</span>
+			        </div>
+			        <p class="text-gray-600 text-sm">Auto-build rule sets and Terraform modules for Azure NSG, AWS SG, and GCP firewall policies.</p>
+			    </div>
+			    <div class="px-6 pb-6">
+			        <span class="inline-flex items-center text-yellow-600 font-semibold">
+			            Launch Tool
+			            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+			            </svg>
+			        </span>
+			    </div>
+			</a>
+			
+			<!-- Ansible SDWAN Configuration Generator -->
+			<a href="ansible/sdwan-config/" class="tool-card block bg-white rounded-xl shadow-lg overflow-hidden">
+			    <div class="bg-gradient-to-br from-red-500 to-red-600 p-6 text-white">
+			        <svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+			                  d="M3 12h3m3 0h12m-9-6v3m0 3v3m6-6h3m-3 0a6 6 0 11-12 0 6 6 0 0112 0z" />
+			        </svg>
+			        <h3 class="text-2xl font-bold mb-2">Ansible SD-WAN Config Generator</h3>
+			        <p class="text-red-100">Generate ready-to-use Ansible playbooks for SD-WAN devices.</p>
+			    </div>
+			    <div class="p-6">
+			        <div class="flex flex-wrap gap-2 mb-4">
+			            <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold">Automation</span>
+			            <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold">SD-WAN</span>
+			            <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold">Config</span>
+			        </div>
+			        <p class="text-gray-600 text-sm">Build automated configuration templates and Ansible playbooks for major SD-WAN vendors.</p>
+			    </div>
+			    <div class="px-6 pb-6">
+			        <span class="inline-flex items-center text-red-600 font-semibold">
+			            Launch Tool
+			            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+			            </svg>
+			        </span>
+			    </div>
+			</a>
+			
+			<!-- DevOps Cheatsheet -->
+			<a href="devops-cheatsheet/" class="tool-card block bg-white rounded-xl shadow-lg overflow-hidden">
+				<div class="bg-gradient-to-br from-blue-500 to-blue-600 p-6 text-white">
+					<svg class="w-12 h-12 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+							d="M3 7h18M3 12h18M3 17h18" />
+					</svg>
+					<h3 class="text-2xl font-bold mb-2">DevOps Cheatsheet</h3>
+					<p class="text-blue-100">Quick access to essential DevOps commands, tools, and workflows.</p>
+				</div>
+
+				<div class="p-6">
+					<div class="flex flex-wrap gap-2 mb-4">
+						<span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">DevOps</span>
+						<span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">CI/CD</span>
+						<span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">Automation</span>
+					</div>
+					<p class="text-gray-600 text-sm">
+						A compact reference for Git, Docker, Kubernetes, Ansible, Terraform, Linux, pipelines, and more.
+					</p>
+				</div>
+
+				<div class="px-6 pb-6">
+					<span class="inline-flex items-center text-blue-600 font-semibold">
+						Open Cheatsheet
+						<svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+								d="M13 7l5 5m0 0l-5 5m5-5H6" />
+						</svg>
+					</span>
+				</div>
+			</a>
+
+    </div>
+
+        <!-- Add New Tool Info -->
+        <div class="mt-16 bg-gradient-to-r from-orange-600 to-green-600 text-white rounded-xl p-8 text-center">
+            <h2 class="text-2xl font-bold mb-4">More Devops Tools Coming Soon!</h2>
+            <p class="text-lg mb-6">I'm constantly adding new tools and utilities. Check back regularly for updates.</p>
+            <div class="flex justify-center gap-4">
+                <a href="https://github.com/bala-murugan-s" target="_blank" class="bg-white text-orange-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+                    View on GitHub
+                </a>
+                <a href="mailto:s-balamurugan@zohomail.in" class="bg-orange-800 text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-900 transition">
+                    Suggest a Tool
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-16">
+        <div class="container mx-auto px-4 text-center">
+            <p class="mb-2">© 2025 Balamurugan Sivaraman - Security Tools</p>
+            <p class="text-gray-400 text-sm">Cloud & Network Security Specialist | 14+ Years Experience</p>
+        </div>
+    </footer>
+</body>
+</html>
