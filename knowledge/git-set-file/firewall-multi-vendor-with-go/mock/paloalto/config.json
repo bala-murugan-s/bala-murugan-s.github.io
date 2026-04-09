@@ -1,0 +1,70 @@
+{
+    "policies": [
+        {
+            "name": "Allow-Outbound-HTTP",
+            "from": "trust",
+            "to": "untrust",
+            "source": "10.0.0.0/8",
+            "destination": "any",
+            "service": "http",
+            "action": "allow",
+            "disabled": false,
+            "unused": false
+        },
+        {
+            "name": "Allow-Outbound-HTTPS",
+            "from": "trust",
+            "to": "untrust",
+            "source": "10.0.0.0/8",
+            "destination": "any",
+            "service": "https",
+            "action": "allow",
+            "disabled": false,
+            "unused": false
+        },
+        {
+            "name": "Block-Malicious-IPs",
+            "from": "any",
+            "to": "any",
+            "source": "any",
+            "destination": "185.130.5.0/24",
+            "service": "any",
+            "action": "deny",
+            "disabled": false,
+            "unused": false
+        },
+        {
+            "name": "Allow-DNS",
+            "from": "trust",
+            "to": "untrust",
+            "source": "10.0.0.0/8",
+            "destination": "any",
+            "service": "dns",
+            "action": "allow",
+            "disabled": false,
+            "unused": true
+        }
+    ],
+    "natRules": [
+        {
+            "name": "Source-NAT-Outbound",
+            "from": "trust",
+            "to": "untrust",
+            "source": "10.0.0.0/8",
+            "destination": "any",
+            "service": "any",
+            "translatedAddress": "interface-address"
+        }
+    ],
+    "objects": [
+        {
+            "name": "Web-Servers",
+            "type": "address-group",
+            "members": [
+                "10.0.1.10",
+                "10.0.1.11",
+                "10.0.1.12"
+            ]
+        }
+    ]
+}

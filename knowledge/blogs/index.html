@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Blogs</title>
+    <link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body>
+
+    <div class="panel">
+        <h3>Blogs</h3>
+        <div id="blog-list" class="panel-body"></div>
+    </div>
+
+    <div class="panel">
+        <div id="blog-content" class="panel-body"></div>
+    </div>
+
+    <script src="../shared/markdown.js"></script>
+    <script>
+        const blogs = [
+            { title: "SASE Migration Strategy", file: "sase-migration.md" },
+            { title: "Zero Trust Basics", file: "zero-trust-basics.md" }
+        ];
+
+        const list = document.getElementById("blog-list");
+        const content = document.getElementById("blog-content");
+
+        blogs.forEach(blog => {
+            const btn = document.createElement("button");
+            btn.className = "btn";
+            btn.textContent = blog.title;
+            btn.onclick = () => loadBlog(blog.file);
+            list.appendChild(btn);
+        });
+
+        async function loadBlog(file) {
+            const res = await fetch(file);
+            const text = await res.text();
+            content.innerHTML = markdownToHTML(text);
+        }
+    </script>
+
+</body>
+
+</html>

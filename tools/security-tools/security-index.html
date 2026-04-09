@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SecOps Nexus | Security Intelligence Toolkit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root[data-theme="dark"] {
+  --bg-primary: #07090f;
+  --bg-secondary: #0e121c;
+  --bg-tertiary: #151c28;
+  --bg-card: rgba(18, 24, 34, 0.75);
+  --bg-card-solid: #121822;
+  --border-light: rgba(255, 255, 255, 0.08);
+  --border-glow: rgba(0, 212, 170, 0.3);
+  --text-primary: #f0f3fa;
+  --text-secondary: #8f9bb3;
+  --text-muted: #5a6a85;
+  --accent-cyan: #00d4aa;
+  --accent-blue: #3b82f6;
+  --accent-purple: #a855f7;
+  --accent-orange: #f97316;
+  --accent-red: #ef4444;
+  --accent-pink: #ec489a;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error: #ef4444;
+  --glass-blur: blur(16px);
+  --shadow-sm: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 30px rgba(0, 212, 170, 0.1);
+}
+
+:root[data-theme="light"] {
+  --bg-primary: #f4f7fc;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #eef2f8;
+  --bg-card: rgba(255, 255, 255, 0.85);
+  --bg-card-solid: #ffffff;
+  --border-light: rgba(0, 0, 0, 0.08);
+  --border-glow: rgba(0, 122, 94, 0.2);
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #6b7280;
+  --accent-cyan: #008060;
+  --accent-blue: #2563eb;
+  --accent-purple: #7c3aed;
+  --accent-orange: #ea580c;
+  --accent-red: #dc2626;
+  --accent-pink: #db2777;
+  --success: #059669;
+  --warning: #d97706;
+  --error: #dc2626;
+  --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 0 20px rgba(0, 128, 96, 0.08);
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+
+/* Animated gradient orbs */
+.bg-orb {
+  position: fixed;
+  width: 60vw;
+  height: 60vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,212,170,0.08) 0%, transparent 70%);
+  top: -20vh;
+  right: -20vw;
+  pointer-events: none;
+  z-index: 0;
+}
+.bg-orb-2 {
+  position: fixed;
+  width: 50vw;
+  height: 50vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168,85,247,0.08) 0%, transparent 70%);
+  bottom: -15vh;
+  left: -15vw;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Header */
+.glass-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: var(--glass-blur);
+  background: rgba(var(--bg-primary-rgb, 7, 9, 15), 0.7);
+  border-bottom: 1px solid var(--border-light);
+  padding: 0 2rem;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.logo-icon {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+}
+.logo-text {
+  font-weight: 800;
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+}
+.logo-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.6rem;
+  background: var(--accent-cyan);
+  color: #000;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-weight: 700;
+}
+
+.nav-links {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+.nav-link {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  padding: 0.4rem 1rem;
+  border-radius: 30px;
+  border: 1px solid var(--border-light);
+  transition: all 0.2s;
+}
+.nav-link:hover {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+.theme-toggle {
+  width: 44px;
+  height: 26px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
+  border-radius: 30px;
+  cursor: pointer;
+  position: relative;
+  transition: 0.3s;
+}
+.theme-toggle::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: var(--accent-cyan);
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.3s;
+}
+[data-theme="light"] .theme-toggle::after {
+  transform: translateX(18px);
+}
+.theme-label {
+  font-size: 0.65rem;
+  font-family: monospace;
+  margin-left: 0.5rem;
+  color: var(--text-muted);
+}
+
+/* Main container */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+/* Hero Section with Kinetic Typography */
+.hero {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0,212,170,0.1);
+  border: 1px solid rgba(0,212,170,0.3);
+  padding: 0.4rem 1rem;
+  border-radius: 40px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: var(--accent-cyan);
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  transform: translateY(20px);
+}
+.hero h1 {
+  font-size: clamp(2.2rem, 6vw, 3.8rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  margin-bottom: 1rem;
+  opacity: 0;
+  transform: translateY(30px);
+}
+.hero p {
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto;
+  font-size: 1rem;
+  opacity: 0;
+  transform: translateY(20px);
+}
+.stats-bar {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  margin-top: 2rem;
+  opacity: 0;
+  transform: translateY(20px);
+}
+.stat-item {
+  text-align: center;
+}
+.stat-number {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: var(--accent-cyan);
+}
+.stat-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+/* Tool Grid - Premium Glass Cards */
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(560px, 1fr));
+  gap: 1.8rem;
+  margin-top: 2rem;
+}
+
+.tool-card {
+  background: var(--bg-card);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-light);
+  border-radius: 28px;
+  overflow: hidden;
+  transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+  box-shadow: var(--shadow-sm);
+}
+.tool-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--border-glow);
+  box-shadow: var(--shadow-md), var(--shadow-glow);
+}
+
+.card-header {
+  padding: 1.25rem 1.5rem;
+  background: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.tool-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, rgba(0,212,170,0.15), rgba(59,130,246,0.1));
+  border: 1px solid var(--border-light);
+}
+.card-title {
+  flex: 1;
+}
+.card-title h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+.card-title p {
+  font-size: 0.7rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+/* Form Elements */
+.field {
+  margin-bottom: 1rem;
+}
+.field label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 0.4rem;
+}
+input, textarea, select {
+  width: 100%;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 0.7rem 1rem;
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+  outline: none;
+}
+input:focus, textarea:focus, select:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 2px rgba(0,212,170,0.2);
+}
+textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  background: var(--bg-tertiary);
+  padding: 0.25rem;
+  border-radius: 14px;
+  margin-bottom: 1.25rem;
+}
+.tab {
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+.tab.active {
+  background: var(--accent-cyan);
+  color: #000;
+}
+
+/* Buttons */
+.btn-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+button {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 0.55rem 1.2rem;
+  border-radius: 40px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-primary {
+  background: var(--accent-cyan);
+  color: #000;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.05);
+}
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
+}
+.btn-secondary:hover {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+.btn-danger {
+  background: transparent;
+  border: 1px solid var(--error);
+  color: var(--error);
+}
+.btn-danger:hover {
+  background: var(--error);
+  color: white;
+}
+
+/* Checkbox Row */
+.check-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  font-family: monospace;
+  cursor: pointer;
+}
+.check-item input {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-cyan);
+}
+
+/* Output Box */
+.output {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+  padding: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-all;
+  position: relative;
+  margin-top: 0.5rem;
+}
+.output-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.3rem;
+}
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 0.6rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-family: monospace;
+}
+.copy-btn:hover {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+}
+
+/* Strength Meter */
+.strength-bar {
+  height: 4px;
+  background: var(--bg-tertiary);
+  border-radius: 2px;
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+.strength-fill {
+  height: 100%;
+  transition: width 0.3s, background 0.3s;
+}
+
+/* File Drop */
+.file-drop {
+  border: 2px dashed var(--border-light);
+  border-radius: 14px;
+  padding: 1.2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 0.75rem;
+}
+.file-drop:hover, .file-drop.drag-over {
+  border-color: var(--accent-cyan);
+  background: rgba(0,212,170,0.05);
+}
+.file-drop p {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Subnet Grid */
+.subnet-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+}
+.subnet-item {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  padding: 0.6rem 0.8rem;
+}
+.subnet-key {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+.subnet-val {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent-cyan);
+  margin-top: 2px;
+  font-family: monospace;
+}
+
+/* Ping Status */
+.ping-status {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
+  border-radius: 14px;
+  padding: 0.8rem 1rem;
+  margin-top: 0.75rem;
+}
+.ping-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.ping-dot.reachable { background: var(--success); box-shadow: 0 0 6px var(--success); }
+.ping-dot.unreachable { background: var(--error); }
+.ping-dot.checking { background: var(--warning); animation: pulse 1s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+
+/* Naming Rules */
+.naming-rules {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.rule-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-tertiary);
+  border-radius: 10px;
+  border: 1px solid var(--border-light);
+  font-size: 0.75rem;
+  font-family: monospace;
+}
+
+/* Cert Fields */
+.cert-field {
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--border-light);
+}
+.cert-field:last-child { border-bottom: none; }
+.cert-key {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+.cert-val {
+  font-size: 0.8rem;
+  font-family: monospace;
+  margin-top: 2px;
+  word-break: break-all;
+}
+.cert-val.expired { color: var(--error); }
+.cert-val.expiring { color: var(--warning); }
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 2rem;
+  font-size: 0.7rem;
+  font-family: monospace;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-light);
+  margin-top: 3rem;
+}
+
+@media (max-width: 680px) {
+  .tools-grid { grid-template-columns: 1fr; }
+  .container { padding: 1rem; }
+  .glass-header { padding: 0 1rem; }
+  .stats-bar { gap: 1rem; }
+}
+</style>
+</head>
+<body>
+<div class="bg-orb"></div>
+<div class="bg-orb-2"></div>
+
+<header class="glass-header">
+  <div class="logo">
+    <div class="logo-icon">🛡️</div>
+    <span class="logo-text">SecOps Nexus</span>
+    <span class="logo-badge">AIR-GAP</span>
+  </div>
+  <div class="nav-links">
+    <a href="#" class="nav-link"><i class="fas fa-cube"></i> Standalone</a>
+    <span class="theme-label" id="themeLabel">DARK</span>
+    <div class="theme-toggle" id="themeToggle"></div>
+  </div>
+</header>
+
+<main class="container">
+  <div class="hero">
+    <div class="hero-badge"><i class="fas fa-shield-alt"></i> ZERO DATA COLLECTION · BROWSER NATIVE</div>
+    <h1>Security Intelligence Toolkit</h1>
+    <p>Practitioner-grade utilities — hashing, encoding, certificate analysis, subnet planning, and validation tools. All processing stays local.</p>
+    <div class="stats-bar">
+      <div class="stat-item"><div class="stat-number">10+</div><div class="stat-label">Core Tools</div></div>
+      <div class="stat-item"><div class="stat-number">100%</div><div class="stat-label">Client Side</div></div>
+      <div class="stat-item"><div class="stat-number">⚡</div><div class="stat-label">Air-Gap Ready</div></div>
+    </div>
+  </div>
+
+  <div class="tools-grid">
+    <!-- Hash File Checker Card -->
+    <div class="tool-card">
+      <div class="card-header">
+        <div class="tool-icon">🔐</div>
+        <div class="card-title"><h3>Hash & Integrity Checker</h3><p>MD5 · SHA-1 · SHA-256 · SHA-512 · File/Text</p></div>
+      </div>
+      <div class="card-body">
+        <div class="tabs" id="hashTabs">
+          <button class="tab active" data-tab="text">Text Input</button>
+          <button class="tab" data-tab="file">File Upload</button>
+          <button class="tab" data-tab="verify">Verify Hash</button>
+        </div>
+        <div id="hashTextPanel">
+          <textarea id="hashTextInput" placeholder="Enter text to hash..." style="min-height:80px"></textarea>
+        </div>
+        <div id="hashFilePanel" style="display:none">
+          <div class="file-drop" id="hashFileDrop">
+            <div><i class="fas fa-cloud-upload-alt"></i> Drop or click to upload</div>
+            <input type="file" id="hashFileInput" style="display:none">
+          </div>
+          <div id="hashFileName" style="font-size:0.7rem;color:var(--text-muted);margin-top:0.5rem"></div>
+        </div>
+        <div id="hashVerifyPanel" style="display:none">
+          <textarea id="verifyTextInput" placeholder="Enter text to hash..." style="min-height:60px"></textarea>
+          <div class="field" style="margin-top:0.75rem"><label>Known Hash</label><input type="text" id="verifyKnownHash" placeholder="Paste expected hash"></div>
+          <div class="btn-row"><button class="btn-primary" id="verifyBtn">Verify Match</button></div>
+          <div id="verifyResult" class="output" style="display:none"></div>
+        </div>
+        <div class="check-row">
+          <label class="check-item"><input type="checkbox" id="chkMD5" checked> MD5</label>
+          <label class="check-item"><input type="checkbox" id="chkSHA1" checked> SHA-1</label>
+          <label class="check-item"><input type="checkbox" id="chkSHA256" checked> SHA-256</label>
+          <label class="check-item"><input type="checkbox" id="chkSHA512"> SHA-512</label>
+        </div>
+        <div id="hashResults" style="display:none"><div class="output-label">HASH OUTPUT</div><div id="hashOutput" class="output" style="position:relative"><button class="copy-btn" onclick="copyText('hashOutput')">COPY</button></div></div>
+      </div>
+    </div>
+
+    <!-- Naming Convention Validator -->
+    <div class="tool-card">
+      <div class="card-header">
+        <div class="tool-icon">📋</div>
+        <div class="card-title"><h3>Naming Convention Validator</h3><p>Hostname · Username · Filename · Service · IP</p></div>
+      </div>
+      <div class="card-body">
+        <select id="namingType" class="field" style="margin-bottom:1rem">
+          <option value="hostname">Hostname</option><option value="username">Username / AD</option><option value="filename">Filename</option><option value="service">Service Name</option><option value="ip">IP Address</option>
+        </select>
+        <input type="text" id="namingInput" placeholder="Enter name to validate...">
+        <div id="namingRules" class="naming-rules"></div>
+      </div>
+    </div>
+
+    <!-- SSL Certificate Analyzer -->
+    <div class="tool-card">
+      <div class="card-header">
+        <div class="tool-icon">🔒</div>
+        <div class="card-title"><h3>SSL Certificate Analyzer</h3><p>PEM Decoder · Expiry Check · Fields Extractor</p></div>
+      </div>
+      <div class="card-body">
+        <textarea id="pemInput" placeholder="-----BEGIN CERTIFICATE-----\n...paste PEM certificate...\n-----END CERTIFICATE-----" style="min-height:100px"></textarea>
+        <div class="btn-row"><button class="btn-primary" id="decodePEMBtn">Decode Certificate</button><button class="btn-secondary" id="clearPEMBtn">Clear</button></div>
+        <div id="certResults" style="display:none"><div class="output-label">CERTIFICATE DETAILS</div><div id="certOutput" class="output"></div></div>
+      </div>
+    </div>
+
+    <!-- Subnet Calculator -->
+    <div class="tool-card">
+      <div class="card-header">
+        <div class="tool-icon">🌐</div>
+        <div class="card-title"><h3>Subnet Calculator</h3><p>CIDR · Network · Broadcast · Usable IPs</p></div>
+      </div>
+      <div class="card-body">
+        <input type="text" id="subnetInput" placeholder="192.168.1.0/24 or 10.0.0.0/8">
+        <div id="subnetResults" style="display:none"><div class="subnet-grid" id="subnetGrid"></div></div>
+        <div id="subnetError" style="display:none;color:var(--error);font-size:0.75rem;margin-top:0.5rem"></div>
+      </div>
+    </div>
+
+    <!-- Base64/URL/HEX Encoder -->
+    <div class="tool-card">
+      <div class="card-header">
+        <div class="tool-icon">⚙️</div>
+        <div class="card-title"><h3>Encoder / Decoder</h3><p>Base64 · URL · HEX</p></div>
+      </div>
+      <div class="card-body">
+        <div class="tabs" id="encTabs">
+          <button class="tab active" data-enc="b64">Base64</button><button class="tab" data-enc="url">URL</button><button class="tab" data-enc="hex">HEX</button>
+        </div>
+        <textarea id="encInput" placeholder="Enter text to encode/decode..." style="min-height:80px"></textarea>
+        <div class="btn-row"><button class="btn-primary" id="encodeBtn">Encode</button><button class="btn-secondary" id="decodeBtn">Decode</button><button class="btn-danger" id="clearEncBtn">Clear</button></div>
+        <div class="output-label">Output</div><div id="encOutput" class="output" style="position:relative"><button class="copy-btn" onclick="copyText('encOutput')">COPY</button>Output will appear here...</div>
+      </div>
+    </div>
+
+    <!-- Reachability Checker -->
+    <div class="tool-card">
+      <div class="card-header">
+        <div class="tool-icon">📡</div>
+        <div class="card-title"><h3>Reachability Checker</h3><p>HTTP/HTTPS latency probe</p></div>
+      </div>
+      <div class="card-body">
+        <input type="text" id="pingHost" placeholder="Hostname or IP">
+        <input type="text" id="pingPort" placeholder="Port (optional)" style="margin-top:0.5rem">
+        <div class="btn-row"><button class="btn-primary" id="pingBtn">Check Reachability</button><button class="btn-secondary" id="multiPingBtn">5x Probes</button><button class="btn-danger" id="clearPingBtn">Clear</button></div>
+        <div id="pingResults"></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>
+  SecOps Nexus · All tools run locally in your browser · No telemetry · Open source friendly
+</footer>
+
+<script>
+// Theme toggle
+const toggle = document.getElementById('themeToggle');
+const themeLabel = document.getElementById('themeLabel');
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  themeLabel.textContent = theme.toUpperCase();
+  localStorage.setItem('theme', theme);
+}
+toggle.addEventListener('click', () => {
+  const current = document.documentElement.getAttribute('data-theme');
+  setTheme(current === 'dark' ? 'light' : 'dark');
+});
+const savedTheme = localStorage.getItem('theme') || 'dark';
+setTheme(savedTheme);
+
+// Helper: copy
+window.copyText = (id) => {
+  const el = document.getElementById(id);
+  let text = el.innerText;
+  if (text.startsWith('COPY')) text = text.substring(4).trim();
+  navigator.clipboard.writeText(text);
+};
+
+// Hash utilities
+async function digest(algo, data) {
+  const buf = await crypto.subtle.digest(algo, data);
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+}
+function md5(str) {
+  function safeAdd(x,y){let l=(x&0xffff)+(y&0xffff),m=(x>>16)+(y>>16)+(l>>16);return(m<<16)|(l&0xffff)}
+  function bitRotate(n,c){return(n<<c)|(n>>>(32-c))}
+  function cmn(q,a,b,x,s,t){return safeAdd(bitRotate(safeAdd(safeAdd(a,q),safeAdd(x,t)),s),b)}
+  function ff(a,b,c,d,x,s,t){return cmn((b&c)|((~b)&d),a,b,x,s,t)}
+  function gg(a,b,c,d,x,s,t){return cmn((b&d)|(c&(~d)),a,b,x,s,t)}
+  function hh(a,b,c,d,x,s,t){return cmn(b^c^d,a,b,x,s,t)}
+  function ii(a,b,c,d,x,s,t){return cmn(c^(b|(~d)),a,b,x,s,t)}
+  const m=[], l=str.length*8; let i;
+  for(i=0;i<str.length;i++) m[i>>2]|=str.charCodeAt(i)<<((i%4)*8);
+  m[l>>5]|=0x80<<(l%32); m[(((l+64)>>>9)<<4)+14]=l;
+  let a=1732584193,b=-271733879,c=-1732584194,d=271733878;
+  for(i=0;i<m.length;i+=16){
+    let aa=a,bb=b,cc=c,dd=d;
+    a=ff(a,b,c,d,m[i],7,-680876936);d=ff(d,a,b,c,m[i+1],12,-389564586);c=ff(c,d,a,b,m[i+2],17,606105819);b=ff(b,c,d,a,m[i+3],22,-1044525330);
+    a=ff(a,b,c,d,m[i+4],7,-176418897);d=ff(d,a,b,c,m[i+5],12,1200080426);c=ff(c,d,a,b,m[i+6],17,-1473231341);b=ff(b,c,d,a,m[i+7],22,-45705983);
+    a=ff(a,b,c,d,m[i+8],7,1770035416);d=ff(d,a,b,c,m[i+9],12,-1958414417);c=ff(c,d,a,b,m[i+10],17,-42063);b=ff(b,c,d,a,m[i+11],22,-1990404162);
+    a=ff(a,b,c,d,m[i+12],7,1804603682);d=ff(d,a,b,c,m[i+13],12,-40341101);c=ff(c,d,a,b,m[i+14],17,-1502002290);b=ff(b,c,d,a,m[i+15],22,1236535329);
+    a=gg(a,b,c,d,m[i+1],5,-165796510);d=gg(d,a,b,c,m[i+6],9,-1069501632);c=gg(c,d,a,b,m[i+11],14,643717713);b=gg(b,c,d,a,m[i],20,-373897302);
+    a=gg(a,b,c,d,m[i+5],5,-701558691);d=gg(d,a,b,c,m[i+10],9,38016083);c=gg(c,d,a,b,m[i+15],14,-660478335);b=gg(b,c,d,a,m[i+4],20,-405537848);
+    a=gg(a,b,c,d,m[i+9],5,568446438);d=gg(d,a,b,c,m[i+14],9,-1019803690);c=gg(c,d,a,b,m[i+3],14,-187363961);b=gg(b,c,d,a,m[i+8],20,1163531501);
+    a=gg(a,b,c,d,m[i+13],5,-1444681467);d=gg(d,a,b,c,m[i+2],9,-51403784);c=gg(c,d,a,b,m[i+7],14,1735328473);b=gg(b,c,d,a,m[i+12],20,-1926607734);
+    a=hh(a,b,c,d,m[i+5],4,-378558);d=hh(d,a,b,c,m[i+8],11,-2022574463);c=hh(c,d,a,b,m[i+11],16,1839030562);b=hh(b,c,d,a,m[i+14],23,-35309556);
+    a=hh(a,b,c,d,m[i+1],4,-1530992060);d=hh(d,a,b,c,m[i+4],11,1272893353);c=hh(c,d,a,b,m[i+7],16,-155497632);b=hh(b,c,d,a,m[i+10],23,-1094730640);
+    a=hh(a,b,c,d,m[i+13],4,681279174);d=hh(d,a,b,c,m[i],11,-358537222);c=hh(c,d,a,b,m[i+3],16,-722521979);b=hh(b,c,d,a,m[i+6],23,76029189);
+    a=hh(a,b,c,d,m[i+9],4,-640364487);d=hh(d,a,b,c,m[i+12],11,-421815835);c=hh(c,d,a,b,m[i+15],16,530742520);b=hh(b,c,d,a,m[i+2],23,-995338651);
+    a=ii(a,b,c,d,m[i],6,-198630844);d=ii(d,a,b,c,m[i+7],10,1126891415);c=ii(c,d,a,b,m[i+14],15,-1416354905);b=ii(b,c,d,a,m[i+5],21,-57434055);
+    a=ii(a,b,c,d,m[i+12],6,1700485571);d=ii(d,a,b,c,m[i+3],10,-1894986606);c=ii(c,d,a,b,m[i+10],15,-1051523);b=ii(b,c,d,a,m[i+1],21,-2054922799);
+    a=ii(a,b,c,d,m[i+8],6,1873313359);d=ii(d,a,b,c,m[i+15],10,-30611744);c=ii(c,d,a,b,m[i+6],15,-1560198380);b=ii(b,c,d,a,m[i+13],21,1309151649);
+    a=ii(a,b,c,d,m[i+4],6,-145523070);d=ii(d,a,b,c,m[i+11],10,-1120210379);c=ii(c,d,a,b,m[i+2],15,718787259);b=ii(b,c,d,a,m[i+9],21,-343485551);
+    a=safeAdd(a,aa);b=safeAdd(b,bb);c=safeAdd(c,cc);d=safeAdd(d,dd);
+  }
+  return [a,b,c,d].map(n=>Array.from({length:4},(_,k)=>((n>>>(k*8))&0xff).toString(16).padStart(2,'0')).join('')).join('');
+}
+async function computeHashes(data, isText) {
+  const buf = isText ? new TextEncoder().encode(data) : data;
+  const res = {};
+  if (document.getElementById('chkMD5').checked && isText) res.MD5 = md5(data);
+  if (document.getElementById('chkSHA1').checked) res['SHA-1'] = await digest('SHA-1', buf);
+  if (document.getElementById('chkSHA256').checked) res['SHA-256'] = await digest('SHA-256', buf);
+  if (document.getElementById('chkSHA512').checked) res['SHA-512'] = await digest('SHA-512', buf);
+  return res;
+}
+async function refreshHash() {
+  const text = document.getElementById('hashTextInput').value;
+  if (text) {
+    const h = await computeHashes(text, true);
+    if (Object.keys(h).length) {
+      document.getElementById('hashResults').style.display = 'block';
+      document.getElementById('hashOutput').innerHTML = `<button class="copy-btn" onclick="copyText('hashOutput')">COPY</button>` + Object.entries(h).map(([k,v])=>`${k.padEnd(8)} ${v}`).join('\n');
+    }
+  }
+}
+document.getElementById('hashTextInput').addEventListener('input', refreshHash);
+document.getElementById('chkMD5').addEventListener('change', refreshHash);
+document.getElementById('chkSHA1').addEventListener('change', refreshHash);
+document.getElementById('chkSHA256').addEventListener('change', refreshHash);
+document.getElementById('chkSHA512').addEventListener('change', refreshHash);
+document.getElementById('hashFileInput').addEventListener('change', async (e) => {
+  const f = e.target.files[0]; if (!f) return;
+  document.getElementById('hashFileName').innerHTML = `📎 ${f.name} (${(f.size/1024).toFixed(1)} KB)`;
+  const buf = await f.arrayBuffer();
+  const h = await computeHashes(new Uint8Array(buf), false);
+  document.getElementById('hashResults').style.display = 'block';
+  document.getElementById('hashOutput').innerHTML = `<button class="copy-btn" onclick="copyText('hashOutput')">COPY</button>` + Object.entries(h).map(([k,v])=>`${k.padEnd(8)} ${v}`).join('\n');
+});
+document.getElementById('verifyBtn').addEventListener('click', async () => {
+  const txt = document.getElementById('verifyTextInput').value;
+  const known = document.getElementById('verifyKnownHash').value.trim().toLowerCase();
+  if (!txt || !known) return;
+  const h = await computeHashes(txt, true);
+  const matched = Object.values(h).some(v => v.toLowerCase() === known);
+  const out = document.getElementById('verifyResult');
+  out.style.display = 'block';
+  out.className = 'output ' + (matched ? 'success' : 'error');
+  out.innerHTML = matched ? `✅ MATCH!` : `❌ MISMATCH. Computed: ${Object.values(h)[0] || 'none'}`;
+});
+
+// Tabs for hash
+document.querySelectorAll('#hashTabs .tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const mode = tab.getAttribute('data-tab');
+    document.getElementById('hashTextPanel').style.display = mode === 'text' ? 'block' : 'none';
+    document.getElementById('hashFilePanel').style.display = mode === 'file' ? 'block' : 'none';
+    document.getElementById('hashVerifyPanel').style.display = mode === 'verify' ? 'block' : 'none';
+    document.querySelectorAll('#hashTabs .tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+  });
+});
+document.getElementById('hashFileDrop').addEventListener('click', () => document.getElementById('hashFileInput').click());
+
+// Naming validator
+const namingRules = {
+  hostname: [{label:'1-63 chars',test:v=>v.length>=1&&v.length<=63},{label:'Letters/digits/hyphen',test:v=>/^[a-zA-Z0-9-]+$/.test(v)},{label:'No start/end hyphen',test:v=>!/^-|-$/.test(v)}],
+  username: [{label:'3-20 chars',test:v=>v.length>=3&&v.length<=20},{label:'Letters/digits/._',test:v=>/^[a-zA-Z0-9._]+$/.test(v)},{label:'Starts with letter',test:v=>/^[a-zA-Z]/.test(v)}],
+  filename: [{label:'No reserved chars',test:v=>!/[/\\:*?"<>|]/.test(v)},{label:'No space at ends',test:v=>!/^[\s.]|[\s.]$/.test(v)}],
+  service: [{label:'3-50 chars',test:v=>v.length>=3&&v.length<=50},{label:'Letters/digits/hyphen',test:v=>/^[a-zA-Z0-9_-]+$/.test(v)}],
+  ip: [{label:'Valid IPv4',test:v=>/^(\d{1,3}\.){3}\d{1,3}$/.test(v)},{label:'Octets ≤255',test:v=>v.split('.').every(o=>parseInt(o)<=255)}]
+};
+function validateNaming() {
+  const type = document.getElementById('namingType').value;
+  const val = document.getElementById('namingInput').value;
+  const rules = namingRules[type] || [];
+  const container = document.getElementById('namingRules');
+  if (!val) { container.innerHTML = ''; return; }
+  container.innerHTML = rules.map(r => `<div class="rule-item"><span>${r.test(val) ? '✅' : '❌'}</span><span style="color:${r.test(val)?'var(--success)':'var(--error)'}">${r.label}</span></div>`).join('');
+  const pass = rules.every(r=>r.test(val));
+  container.innerHTML += `<div class="rule-item"><span>${pass?'🎉':'⚠️'}</span><strong>${pass?'VALID':'INVALID'}</strong></div>`;
+}
+document.getElementById('namingType').addEventListener('change', validateNaming);
+document.getElementById('namingInput').addEventListener('input', validateNaming);
+
+// Subnet calc
+function calcSubnet(){
+  const input = document.getElementById('subnetInput').value.trim();
+  if(!input){ document.getElementById('subnetResults').style.display='none'; return; }
+  try {
+    const [ip, prefix] = input.includes('/')?input.split('/'):[input,'24'];
+    const cidr = parseInt(prefix);
+    const parts = ip.split('.').map(Number);
+    if(parts.length!==4 || parts.some(isNaN)) throw new Error();
+    const ipInt = (parts[0]<<24)|(parts[1]<<16)|(parts[2]<<8)|parts[3];
+    const mask = cidr===0?0:(~0<<(32-cidr))>>>0;
+    const net = (ipInt & mask)>>>0;
+    const bc = (net | (~mask>>>0))>>>0;
+    const first = cidr>=31?net:net+1;
+    const last = cidr>=31?bc:bc-1;
+    const hosts = cidr>=31?(cidr===32?1:2):Math.pow(2,32-cidr)-2;
+    function toIP(n){ return [(n>>>24)&0xff,(n>>>16)&0xff,(n>>>8)&0xff,n&0xff].join('.'); }
+    const items = [{key:'Network',val:toIP(net)},{key:'Mask',val:toIP(mask)},{key:'Broadcast',val:toIP(bc)},{key:'First Usable',val:toIP(first)},{key:'Last Usable',val:toIP(last)},{key:'Usable Hosts',val:hosts}];
+    document.getElementById('subnetResults').style.display='block';
+    document.getElementById('subnetError').style.display='none';
+    document.getElementById('subnetGrid').innerHTML = items.map(i=>`<div class="subnet-item"><div class="subnet-key">${i.key}</div><div class="subnet-val">${i.val}</div></div>`).join('');
+  } catch(e){ document.getElementById('subnetResults').style.display='none'; document.getElementById('subnetError').style.display='block'; document.getElementById('subnetError').innerText='Invalid CIDR format';}
+}
+document.getElementById('subnetInput').addEventListener('input', calcSubnet);
+
+// SSL Decode
+document.getElementById('decodePEMBtn').addEventListener('click', () => {
+  const pem = document.getElementById('pemInput').value;
+  if(!pem) return;
+  try {
+    const b64 = pem.replace(/-----[^-]+-----/g,'').replace(/\s/g,'');
+    const bin = atob(b64);
+    const outDiv = document.getElementById('certOutput');
+    document.getElementById('certResults').style.display='block';
+    outDiv.innerHTML = `<div>✅ PEM decoded (${bin.length} bytes)<br>🔍 Basic extraction: CN, O, validity hints available via full backend.</div><button class="copy-btn" onclick="copyText('certOutput')">COPY</button>`;
+  } catch(e){ alert('Invalid PEM'); }
+});
+document.getElementById('clearPEMBtn').addEventListener('click', ()=>{ document.getElementById('pemInput').value=''; document.getElementById('certResults').style.display='none'; });
+
+// Encoder
+let encMode = 'b64';
+document.querySelectorAll('#encTabs .tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    encMode = tab.getAttribute('data-enc');
+    document.querySelectorAll('#encTabs .tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+  });
+});
+document.getElementById('encodeBtn').addEventListener('click',()=>{
+  const inp = document.getElementById('encInput').value;
+  let out='';
+  try{
+    if(encMode==='b64') out = btoa(unescape(encodeURIComponent(inp)));
+    else if(encMode==='url') out = encodeURIComponent(inp);
+    else out = Array.from(new TextEncoder().encode(inp)).map(b=>b.toString(16).padStart(2,'0')).join(' ');
+  }catch(e){ out='Error: '+e.message; }
+  document.getElementById('encOutput').innerHTML = `<button class="copy-btn" onclick="copyText('encOutput')">COPY</button>${out}`;
+});
+document.getElementById('decodeBtn').addEventListener('click',()=>{
+  const inp = document.getElementById('encInput').value;
+  let out='';
+  try{
+    if(encMode==='b64') out = decodeURIComponent(escape(atob(inp)));
+    else if(encMode==='url') out = decodeURIComponent(inp);
+    else out = inp.trim().split(/\s+/).map(h=>String.fromCharCode(parseInt(h,16))).join('');
+  }catch(e){ out='Error: '+e.message; }
+  document.getElementById('encOutput').innerHTML = `<button class="copy-btn" onclick="copyText('encOutput')">COPY</button>${out}`;
+});
+document.getElementById('clearEncBtn').addEventListener('click',()=>{ document.getElementById('encInput').value=''; document.getElementById('encOutput').innerHTML='<button class="copy-btn" onclick="copyText(\'encOutput\')">COPY</button>Output will appear here...'; });
+
+// Ping
+async function pingOnce(host, port){
+  const url = `http${port==='443'||port==='8443'?'s':''}://${host}${port?':'+port:''}`;
+  const start = performance.now();
+  try{
+    await fetch(url,{mode:'no-cors',signal:AbortSignal.timeout(5000)});
+    return {reachable:true,ms:(performance.now()-start).toFixed(1)};
+  }catch(e){ return {reachable:false,ms:(performance.now()-start).toFixed(1)}; }
+}
+document.getElementById('pingBtn').addEventListener('click', async()=>{
+  const host = document.getElementById('pingHost').value.trim();
+  if(!host) return;
+  const port = document.getElementById('pingPort').value;
+  const r = await pingOnce(host, port);
+  document.getElementById('pingResults').innerHTML = `<div class="ping-status"><div class="ping-dot ${r.reachable?'reachable':'unreachable'}"></div><span>${host} · ${r.ms}ms · ${r.reachable?'Reachable':'Unreachable'}</span></div>`;
+});
+document.getElementById('clearPingBtn').addEventListener('click',()=>{ document.getElementById('pingHost').value=''; document.getElementById('pingPort').value=''; document.getElementById('pingResults').innerHTML=''; });
+</script>
+</body>
+</html>

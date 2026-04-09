@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Experience | Balamurugan S</title>
+    <style>
+        /* Base Styles & Theme from our previous design */
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --accent: #8b5cf6;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gray-dark: #334155;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        body.dark-mode {
+            background-color: var(--dark);
+            color: var(--light);
+        }
+        
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+        }
+        
+        /* Layout matching the reference site */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        
+        .dark-mode header {
+            border-bottom: 2px solid #334155;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .subtitle {
+            color: var(--gray);
+            font-size: 1.2rem;
+        }
+        
+        .dark-mode .subtitle {
+            color: #94a3b8;
+        }
+        
+        /* Experience Sections - Matching reference layout */
+        .experience-section {
+            margin-bottom: 60px;
+            position: relative;
+        }
+        
+        .company-name {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .date-range {
+            color: var(--gray);
+            font-size: 1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .date-range span {
+            padding: 2px 8px;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .dark-mode .date-range span {
+            background-color: #334155;
+        }
+        
+        .work-function {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+        
+        .dark-mode .work-function {
+            color: var(--light);
+        }
+        
+        .responsibilities {
+            margin-bottom: 25px;
+            padding-left: 20px;
+        }
+        
+        .responsibilities li {
+            margin-bottom: 10px;
+            position: relative;
+        }
+        
+        .domain-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .work-details {
+            background-color: #f1f5f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .dark-mode .work-details {
+            background-color: #1e293b;
+        }
+        
+        .work-time {
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+        
+        .work-mode {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .mode-tag {
+            padding: 5px 12px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .mode-tag.remote {
+            background-color: var(--secondary);
+        }
+        
+        .mode-tag.hybrid {
+            background-color: var(--accent);
+        }
+        
+        .timeline-section {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 2px solid #e2e8f0;
+        }
+        
+        .dark-mode .timeline-section {
+            border-top: 2px solid #334155;
+        }
+        
+        .timeline-visual {
+            overflow-x: auto;
+            margin: 30px 0;
+            padding: 20px 0;
+        }
+        
+        .timeline-bar {
+            height: 30px;
+            background-color: #e2e8f0;
+            border-radius: 15px;
+            position: relative;
+            min-width: 800px;
+        }
+        
+        .dark-mode .timeline-bar {
+            background-color: #334155;
+        }
+        
+        .timeline-segment {
+            height: 100%;
+            border-radius: 15px;
+            position: absolute;
+            top: 0;
+            transition: transform 0.2s;
+            cursor: pointer;
+        }
+        
+        .timeline-segment:hover {
+            transform: scaleY(1.2);
+        }
+        
+        .timeline-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: var(--gray);
+            min-width: 800px;
+        }
+        
+        .summary {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #f1f5f9;
+            border-radius: 8px;
+        }
+        
+        .dark-mode .summary {
+            background-color: #1e293b;
+        }
+        
+        .client-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .client-tag {
+            padding: 4px 10px;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        
+        .dark-mode .client-tag {
+            background-color: #334155;
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 30px;
+            border-radius: 15px;
+            background-color: var(--gray);
+            cursor: pointer;
+            z-index: 100;
+        }
+        
+        .theme-toggle-slider {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: white;
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            transition: transform 0.3s;
+        }
+        
+        .dark-mode .theme-toggle-slider {
+            transform: translateX(30px);
+            background-color: #fbbf24;
+        }
+        
+        .note {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #fef3c7;
+            border-radius: 8px;
+            color: #92400e;
+        }
+        
+        .dark-mode .note {
+            background-color: #78350f;
+            color: #fde68a;
+        }
+        
+        .earlier-roles {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            border-left: 4px solid var(--gray);
+        }
+        
+        .dark-mode .earlier-roles {
+            background-color: #1e293b;
+            border-left: 4px solid #64748b;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .timeline-visual {
+                margin-left: -20px;
+                margin-right: -20px;
+            }
+            
+            .date-range {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap">
+</head>
+<body class="dark-mode">
+    <div class="theme-toggle" id="themeToggle">
+        <div class="theme-toggle-slider"></div>
+    </div>
+    
+    <div class="container">
+        <header>
+            <h1>Employee Experience | Balamurugan S</h1>
+            <div class="subtitle">Experience as a Cloud & Network Security Specialist</div>
+        </header>
+        
+        <main>
+            <!-- HCL Technologies -->
+            <section class="experience-section">
+                <h2 class="company-name">HCL Technologies Pvt. Ltd.</h2>
+                <div class="date-range">
+                    <span>01.08.2021</span>
+                    <span>Present</span>
+                </div>
+                <h3 class="work-function">Work Function: Associate Consultant</h3>
+                
+                <div class="domain-tag">Domain: Cloud Security | SASE | SD-WAN | DevSecOps</div>
+                
+                <ul class="responsibilities">
+                    <li>Lead architect for SASE and Zero Trust adoption, aligning enterprise cloud and edge security under unified frameworks</li>
+                    <li>Defined security reference architectures for AWS and Azure, integrating automation and compliance controls</li>
+                    <li>Directed global SD-WAN governance, ensuring alignment with business continuity, visibility, and SLA objectives</li>
+                    <li>Championed DevSecOps enablement, embedding security validation and IaC principles into CI/CD workflows</li>
+                    <li>Guided cross-functional teams on incident response, HA/DR, and security operations modernization</li>
+                </ul>
+                
+                <div class="work-details">
+                    <div class="work-time">Work Time: 4 Years, 6 Months (as of Feb 2026)</div>
+                    <div class="work-schedule">
+                        <strong>full-time 8h</strong><br>
+                        01.08.2021 - Present
+                    </div>
+                    <div class="work-mode">
+                        <span class="mode-tag hybrid">Hybrid</span>
+                        <span class="mode-tag remote">Remote</span>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Cognizant Technology Solutions -->
+            <section class="experience-section">
+                <h2 class="company-name">Cognizant Technology Solutions Pvt. Ltd.</h2>
+                <div class="date-range">
+                    <span>01.08.2018</span>
+                    <span>31.07.2021</span>
+                </div>
+                <h3 class="work-function">Work Function: Technical Lead</h3>
+                
+                <div class="domain-tag">Domain: Network Security Engineering | Cloud Enablement | Automation</div>
+                
+                <ul class="responsibilities">
+                    <li>Led security modernization initiatives, optimizing perimeter, WAF, and remote access solutions for large-scale clients</li>
+                    <li>Introduced automation frameworks (Terraform, Ansible, Python) to streamline security provisioning and reduce manual effort</li>
+                    <li>Partnered with SOC and governance teams to improve SIEM integrations, playbooks, and risk reporting</li>
+                    <li>Mentored L2/L3 teams, improving operational maturity and standardization across global security environments</li>
+                </ul>
+                
+                <div class="work-details">
+                    <div class="work-time">Work Time: 3 Years</div>
+                    <div class="work-schedule">
+                        <strong>full-time 8h</strong><br>
+                        01.08.2018 - 31.07.2021
+                    </div>
+                    <div class="work-mode">
+                        <span class="mode-tag">On-site</span>
+                        <span class="mode-tag hybrid">Hybrid</span>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Tata Consultancy Services -->
+            <section class="experience-section">
+                <h2 class="company-name">Tata Consultancy Services Pvt. Ltd.</h2>
+                <div class="date-range">
+                    <span>01.05.2015</span>
+                    <span>31.07.2018</span>
+                </div>
+                <h3 class="work-function">Work Function: IT Analyst</h3>
+                
+                <div class="domain-tag">Domain: Data Center & Cloud Security Operations</div>
+                
+                <ul class="responsibilities">
+                    <li>Oversaw network and firewall operations across regional data centers, ensuring availability and secure access</li>
+                    <li>Supported early-stage cloud transitions by aligning legacy controls with AWS and Azure frameworks</li>
+                    <li>Enhanced service delivery through process documentation, risk assessments, and configuration baselines</li>
+                </ul>
+                
+                <div class="work-details">
+                    <div class="work-time">Work Time: 3 Years, 3 Months</div>
+                    <div class="work-schedule">
+                        <strong>full-time 8h</strong><br>
+                        01.05.2015 - 31.07.2018
+                    </div>
+                    <div class="work-mode">
+                        <span class="mode-tag">On-site</span>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Quadsel Systems -->
+            <section class="experience-section">
+                <h2 class="company-name">Quadsel Systems Pvt. Ltd.</h2>
+                <div class="date-range">
+                    <span>01.10.2013</span>
+                    <span>31.03.2015</span>
+                </div>
+                <h3 class="work-function">Work Function: Network Engineer</h3>
+                
+                <div class="domain-tag">Domain: Enterprise Network & Security Support</div>
+                
+                <ul class="responsibilities">
+                    <li>Delivered network and firewall deployments for BFSI clients, ensuring reliability and regulatory compliance</li>
+                    <li>Supported secure WAN rollouts and failover validation for distributed branches</li>
+                </ul>
+                
+                <div class="work-details">
+                    <div class="work-time">Work Time: 1 Year, 6 Months</div>
+                    <div class="work-schedule">
+                        <strong>full-time 8h</strong><br>
+                        01.10.2013 - 31.03.2015
+                    </div>
+                    <div class="work-mode">
+                        <span class="mode-tag">On-site</span>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Earlier Roles Section -->
+            <section class="earlier-roles">
+                <h3>Earlier Roles (2011 – 2013)</h3>
+                <p><strong>System & Support Engineer</strong> – 3i Infotech / InfoServices / Care IT Solutions</p>
+                <ul class="responsibilities">
+                    <li>Provided network infrastructure support, troubleshooting, and early exposure to LAN/WAN, ACLs, and VPN technologies</li>
+                    <li>Developed strong fundamentals in network operations, change control, and customer engagement</li>
+                </ul>
+            </section>
+            
+            <!-- Key Client Environments -->
+            <section class="experience-section">
+                <h2 class="company-name">Key Client Environments</h2>
+                <div class="client-list">
+                    <span class="client-tag">Western Digital</span>
+                    <span class="client-tag">Sandisk Technologies</span>
+                    <span class="client-tag">Sainsbury's</span>
+                    <span class="client-tag">Pearson Global</span>
+                    <span class="client-tag">Hasbro</span>
+                    <span class="client-tag">John Lewis</span>
+                    <span class="client-tag">Sundaram Clayton</span>
+                    <span class="client-tag">MRF</span>
+                    <span class="client-tag">Zoho</span>
+                    <span class="client-tag">PwC</span>
+                    <span class="client-tag">Lakshmi Vilas Bank</span>
+                    <span class="client-tag">Standard Chartered Bank</span>
+                </div>
+            </section>
+            
+            <!-- Timeline Visualization -->
+            <section class="timeline-section">
+                <h2>Work Experience Timeline</h2>
+                <div class="timeline-visual">
+                    <div class="timeline-bar">
+                        <!-- Earlier Roles (2011-2013) -->
+                        <div class="timeline-segment" style="left: 0%; width: 10%; background-color: #94a3b8;" title="Earlier Roles: 2011-2013"></div>
+                        <!-- Quadsel Systems -->
+                        <div class="timeline-segment" style="left: 10%; width: 8%; background-color: #8b5cf6;" title="Quadsel Systems: 2013-2015"></div>
+                        <!-- Tata Consultancy Services -->
+                        <div class="timeline-segment" style="left: 18%; width: 15%; background-color: #10b981;" title="TCS: 2015-2018"></div>
+                        <!-- Cognizant -->
+                        <div class="timeline-segment" style="left: 33%; width: 15%; background-color: #3b82f6;" title="Cognizant: 2018-2021"></div>
+                        <!-- HCL Technologies -->
+                        <div class="timeline-segment" style="left: 48%; width: 27%; background-color: #6366f1;" title="HCL Technologies: 2021-Present"></div>
+                    </div>
+                    <div class="timeline-labels">
+                        <span>2011</span>
+                        <span>2013</span>
+                        <span>2015</span>
+                        <span>2017</span>
+                        <span>2019</span>
+                        <span>2021</span>
+                        <span>2023</span>
+                        <span>2025</span>
+                    </div>
+                </div>
+                
+                <div class="summary">
+                    <h3>Experience Summary</h3>
+                    <p><strong>Total Work Experience:</strong> 14+ years (2011 - Present)</p>
+                    <p><strong>Areas of Expertise:</strong> SASE Architecture, Zero Trust Implementation, Cloud Security (AWS/Azure), SD-WAN Deployment, Network Security Automation, DevSecOps Integration</p>
+                    <p><strong>Key Technologies:</strong> Terraform, Ansible, Python, Palo Alto Networks, Zscaler, Cisco SD-WAN, AWS Security, Azure Security, SIEM, CI/CD Security</p>
+                    <p><strong>Industries Served:</strong> Technology, Banking & Finance, Retail, Manufacturing, Education, Consulting</p>
+                </div>
+            </section>
+            
+            <!-- Note Section -->
+            <section class="note">
+                <p><strong>Note:</strong> Please be aware that this is not a completed list, and there may be additional professional experiences not mentioned here. If you have specific inquiries about my work history or would like more details, feel free to reach out.</p>
+            </section>
+        </main>
+    </div>
+    
+    <script>
+        // Theme Toggle Functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        if (savedTheme === 'light') {
+            body.classList.remove('dark-mode');
+        }
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            
+            // Save preference to localStorage
+            const currentTheme = body.classList.contains('dark-mode') ? 'dark' : 'light';
+            localStorage.setItem('theme', currentTheme);
+        });
+        
+        // Calculate work durations
+        function calculateWorkDurations() {
+            const experiences = [
+                { start: new Date(2021, 7, 1), end: new Date(), id: 'hcl' },
+                { start: new Date(2018, 7, 1), end: new Date(2021, 6, 31), id: 'cognizant' },
+                { start: new Date(2015, 4, 1), end: new Date(2018, 6, 31), id: 'tcs' },
+                { start: new Date(2013, 9, 1), end: new Date(2015, 2, 31), id: 'quadsel' }
+            ];
+            
+            experiences.forEach(exp => {
+                const diffTime = Math.abs(exp.end - exp.start);
+                const diffYears = Math.floor(diffTime / (1000 * 60 * 60 * 24 * 365));
+                const diffMonths = Math.floor((diffTime % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24 * 30));
+                
+                // Update the work time display
+                const workTimeElement = document.querySelector(`#${exp.id} .work-time`);
+                if (workTimeElement) {
+                    workTimeElement.textContent = `Work Time: ${diffYears} Years, ${diffMonths} Months`;
+                }
+            });
+            
+            // Calculate total experience
+            const careerStart = new Date(2011, 0, 1);
+            const currentDate = new Date();
+            const totalDiffTime = Math.abs(currentDate - careerStart);
+            const totalYears = Math.floor(totalDiffTime / (1000 * 60 * 60 * 24 * 365));
+            
+            // Update total experience in summary
+            const totalExpElement = document.querySelector('.summary p:first-child');
+            if (totalExpElement) {
+                totalExpElement.innerHTML = `<strong>Total Work Experience:</strong> ${totalYears}+ years (2011 - Present)`;
+            }
+        }
+        
+        // Add interactive timeline hover effects
+        function setupTimelineInteractions() {
+            const timelineSegments = document.querySelectorAll('.timeline-segment');
+            const experienceSections = document.querySelectorAll('.experience-section, .earlier-roles');
+            
+            timelineSegments.forEach((segment, index) => {
+                segment.addEventListener('mouseover', function() {
+                    this.style.transform = 'scaleY(1.3)';
+                    
+                    // Highlight corresponding experience section
+                    if (experienceSections[index]) {
+                        experienceSections[index].style.backgroundColor = 'rgba(99, 102, 241, 0.1)';
+                        experienceSections[index].style.transition = 'background-color 0.3s';
+                    }
+                });
+                
+                segment.addEventListener('mouseout', function() {
+                    this.style.transform = 'scaleY(1)';
+                    
+                    // Remove highlight from experience section
+                    if (experienceSections[index]) {
+                        experienceSections[index].style.backgroundColor = '';
+                    }
+                });
+                
+                // Click to scroll to corresponding section
+                segment.addEventListener('click', function() {
+                    if (experienceSections[index]) {
+                        experienceSections[index].scrollIntoView({ 
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        }
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            calculateWorkDurations();
+            setupTimelineInteractions();
+            
+            // Add IDs to experience sections for timeline linking
+            const sections = document.querySelectorAll('.experience-section, .earlier-roles');
+            const ids = ['quadsel', 'tcs', 'cognizant', 'hcl', 'earlier'];
+            
+            sections.forEach((section, index) => {
+                if (index < ids.length) {
+                    section.id = ids[index];
+                }
+            });
+        });
+    </script>
+</body>
+</html>

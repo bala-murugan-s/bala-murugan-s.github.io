@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>SD-WAN Toolbox | Professional Network Engineering Suite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Light theme (default) */
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --accent: #8b5cf6;
+            --accent-dark: #7c3aed;
+            --accent-glow: rgba(139, 92, 246, 0.2);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.dark {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: var(--transition);
+            line-height: 1.5;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Header & Navigation */
+        .top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(8px);
+            padding: 12px 0;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-icon {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .btn-icon:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            border-color: var(--accent);
+            background: var(--accent-glow);
+        }
+
+        .btn-icon:active {
+            transform: translateY(0);
+        }
+
+        .theme-toggle {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            color: var(--text-primary);
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            border-color: var(--accent);
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), #ec489a);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Tool Grid */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 28px;
+            margin: 40px 0;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .tool-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            animation: scaleIn 0.4s ease-out;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent);
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-primary) 100%);
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .card-header h3 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        button:not(.btn-icon):not(.theme-toggle) {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        button:not(.btn-icon):not(.theme-toggle):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        button:not(.btn-icon):not(.theme-toggle):active {
+            transform: translateY(0);
+        }
+
+        .result-area {
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--bg-primary);
+            border-radius: 16px;
+            border-left: 4px solid var(--accent);
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+            transition: var(--transition);
+        }
+
+        .result-area pre {
+            white-space: pre-wrap;
+            font-family: inherit;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: var(--accent-glow);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-left: 8px;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: blink 1.5s infinite;
+        }
+
+        .status-up { background: var(--success); }
+        .status-down { background: var(--danger); }
+        .status-degraded { background: var(--warning); }
+
+        .vendor-comparison {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .vendor-card {
+            padding: 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        /* Scroll to top indicator */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--accent);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            z-index: 99;
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+        }
+
+        .scroll-top:hover {
+            transform: translateY(-5px);
+            background: var(--accent-dark);
+        }
+
+        /* Footer */
+        .site-footer {
+            margin-top: 60px;
+            border-top: 1px solid var(--border);
+            padding: 32px 0;
+            background: var(--bg-secondary);
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .ft-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .ft-copy {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .ft-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .ft-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .ft-links a:hover {
+            color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            .footer-inner {
+                flex-direction: column;
+                text-align: center;
+            }
+            .logo-area {
+                flex-wrap: wrap;
+            }
+            .vendor-comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="container nav-container">
+            <div class="logo-area">
+                <a href="index.html" class="btn-icon" id="homeBtn">🏠 Home</a>
+                <button class="btn-icon" id="toolsHomeBtn">🛠️ Tools Home</button>
+                <h1>⚡ SD-WAN Toolbox</h1>
+            </div>
+            <button class="theme-toggle" id="themeToggle">🌙 Dark Mode</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="tools-grid" id="toolsGrid"></div>
+    </div>
+
+    <div class="scroll-top" id="scrollTop">↑</div>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-inner">
+                <span class="ft-name">Balamurugan Sivaraman</span>
+                <span class="ft-copy">© 2026 · Designed & built from scratch for SD-WAN engineers.</span>
+                <div class="ft-links">
+                    <a href="https://www.linkedin.com/in/bala-murugan-s/" target="_blank" rel="noopener">LinkedIn</a>
+                    <a href="https://bala-murugan-s.github.io" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://wa.me/919003234312" target="_blank" rel="noopener">WhatsApp</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Session Cache for storing user data
+        const sessionCache = {
+            get: (key) => {
+                try {
+                    const item = sessionStorage.getItem(key);
+                    return item ? JSON.parse(item) : null;
+                } catch(e) { return null; }
+            },
+            set: (key, value) => {
+                sessionStorage.setItem(key, JSON.stringify(value));
+            }
+        };
+
+        // SD-WAN Vendor Data
+        const vendors = {
+            'Cisco Viptela': { features: { 'Routing': 5, 'Security': 5, 'Analytics': 5, 'Ease of Use': 4, 'Cloud Integration': 5 }, price: 'High' },
+            'VMware Velocloud': { features: { 'Routing': 4, 'Security': 4, 'Analytics': 5, 'Ease of Use': 5, 'Cloud Integration': 5 }, price: 'Medium-High' },
+            'Fortinet': { features: { 'Routing': 4, 'Security': 5, 'Analytics': 4, 'Ease of Use': 4, 'Cloud Integration': 4 }, price: 'Medium' },
+            'Silver Peak (HPE)': { features: { 'Routing': 5, 'Security': 4, 'Analytics': 4, 'Ease of Use': 4, 'Cloud Integration': 4 }, price: 'Medium-High' }
+        };
+
+        function buildToolHTML(tool) {
+            if (tool.id === "tunnel") {
+                return `<div class="tool-card"><div class="card-header"><h3>🔌 Tunnel Health Simulator <span class="badge">Visual Metrics</span></h3></div><div class="card-body"><div class="input-group"><label>Tunnel Name</label><input type="text" id="tunnelName" placeholder="MPLS-Tunnel-01"><label style="margin-top:12px">Latency (ms)</label><input type="number" id="tunnelLatency" placeholder="45"><label style="margin-top:12px">Packet Loss (%)</label><input type="number" id="tunnelLoss" placeholder="0.5" step="0.1"><label style="margin-top:12px">Jitter (ms)</label><input type="number" id="tunnelJitter" placeholder="10"></div><button onclick="simulateTunnelHealth()">Simulate Health</button><div class="result-area" id="tunnelResult">Configure tunnel parameters to check health status</div></div></div>`;
+            }
+            if (tool.id === "qos") {
+                return `<div class="tool-card"><div class="card-header"><h3>📊 QoS Policy Builder <span class="badge">Traffic Classes</span></h3></div><div class="card-body"><div class="input-group"><label>Application Type</label><select id="qosApp"><option>VoIP</option><option>Video Conferencing</option><option>Transactional Data</option><option>Bulk Data</option><option>Best Effort</option></select><label style="margin-top:12px">Bandwidth %</label><input type="number" id="qosBandwidth" placeholder="30"><label style="margin-top:12px">DSCP Value</label><input type="number" id="qosDscp" placeholder="46"></div><button onclick="buildQoSPolicy()">Generate Policy</button><div class="result-area" id="qosResult">QoS policy template will appear here</div></div></div>`;
+            }
+            if (tool.id === "path") {
+                return `<div class="tool-card"><div class="card-header"><h3>🛣️ Path Selection Visualizer <span class="badge">Dynamic Routing</span></h3></div><div class="card-body"><div class="input-group"><label>Primary Path Latency (ms)</label><input type="number" id="primaryLatency" placeholder="20"><label style="margin-top:12px">Backup Path Latency (ms)</label><input type="number" id="backupLatency" placeholder="80"><label style="margin-top:12px">Packet Loss Threshold (%)</label><input type="number" id="lossThreshold" placeholder="2" step="0.1"></div><button onclick="visualizePathSelection()">Visualize Selection</button><div class="result-area" id="pathResult">Path selection algorithm output</div></div></div>`;
+            }
+            if (tool.id === "bandwidth") {
+                return `<div class="tool-card"><div class="card-header"><h3>📈 Bandwidth Calculator <span class="badge">Capacity Planning</span></h3></div><div class="card-body"><div class="input-group"><label>Number of Users</label><input type="number" id="numUsers" placeholder="500"><label style="margin-top:12px">Average Bandwidth per User (Mbps)</label><input type="number" id="perUserBW" placeholder="5" step="0.5"><label style="margin-top:12px">Concurrent Usage Factor (%)</label><input type="number" id="concurrentFactor" placeholder="70"></div><button onclick="calculateBandwidth()">Calculate Requirements</button><div class="result-area" id="bandwidthResult">Bandwidth requirements estimation</div></div></div>`;
+            }
+            if (tool.id === "sla") {
+                return `<div class="tool-card"><div class="card-header"><h3>📡 SLA Probe Configurator <span class="badge">IP SLA</span></h3></div><div class="card-body"><div class="input-group"><label>Target IP/Hostname</label><input type="text" id="slaTarget" placeholder="8.8.8.8"><label style="margin-top:12px">Probe Type</label><select id="slaType"><option>ICMP Echo</option><option>UDP Jitter</option><option>HTTP</option><option>DNS</option></select><label style="margin-top:12px">Frequency (seconds)</label><input type="number" id="slaFreq" placeholder="60"></div><button onclick="generateSLAConfig()">Generate Config</button><div class="result-area" id="slaResult">SLA probe configuration template</div></div></div>`;
+            }
+            if (tool.id === "edge") {
+                return `<div class="tool-card"><div class="card-header"><h3>🖧 Edge Device Config Generator <span class="badge">Template Based</span></h3></div><div class="card-body"><div class="input-group"><label>Device Model</label><select id="edgeModel"><option>Cisco Catalyst 8000V</option><option>VMware SD-WAN Edge</option><option>FortiGate 80F</option><option>Silver Peak Edge</option></select><label style="margin-top:12px">Site ID</label><input type="text" id="siteId" placeholder="SITE-001"><label style="margin-top:12px">VPN/VRF ID</label><input type="number" id="vrfId" placeholder="10"></div><button onclick="generateEdgeConfig()">Generate Config</button><div class="result-area" id="edgeResult">Edge device configuration template</div></div></div>`;
+            }
+            if (tool.id === "failover") {
+                return `<div class="tool-card"><div class="card-header"><h3>🔄 Circuit Failover Simulator <span class="badge">High Availability</span></h3></div><div class="card-body"><div class="input-group"><label>Primary Circuit Status</label><select id="primaryStatus"><option value="up">UP - Operational</option><option value="down">DOWN - Failed</option></select><label style="margin-top:12px">Backup Circuit Status</label><select id="backupStatus"><option value="up">UP - Standby</option><option value="down">DOWN - Failed</option></select><label style="margin-top:12px">Failover Time (seconds)</label><input type="number" id="failoverTime" placeholder="3"></div><button onclick="simulateFailover()">Simulate Failover</button><div class="result-area" id="failoverResult">Failover scenario visualization</div></div></div>`;
+            }
+            if (tool.id === "appsig") {
+                return `<div class="tool-card"><div class="card-header"><h3>📝 Application Signature Builder <span class="badge">DPI Rules</span></h3></div><div class="card-body"><div class="input-group"><label>Application Name</label><input type="text" id="appName" placeholder="CustomApp"><label style="margin-top:12px">Protocol</label><select id="appProto"><option>TCP</option><option>UDP</option></select><label style="margin-top:12px">Port Range</label><input type="text" id="appPorts" placeholder="8000-8100"><label style="margin-top:12px">Signature Pattern (regex)</label><input type="text" id="appPattern" placeholder=".*custom.*"></div><button onclick="buildAppSignature()">Build Signature</button><div class="result-area" id="appResult">Application signature definition</div></div></div>`;
+            }
+            if (tool.id === "ztp") {
+                return `<div class="tool-card"><div class="card-header"><h3>🚀 ZTP Validator <span class="badge">Zero-Touch Provisioning</span></h3></div><div class="card-body"><div class="input-group"><label>Device Serial Number</label><input type="text" id="serialNum" placeholder="FOC1234ABCD"><label style="margin-top:12px">Template Name</label><input type="text" id="templateName" placeholder="Branch-Template-v1"><label style="margin-top:12px">Management IP</label><input type="text" id="mgmtIP" placeholder="192.168.1.1/24"></div><button onclick="validateZTP()">Validate Provisioning</button><div class="result-area" id="ztpResult">ZTP validation results</div></div></div>`;
+            }
+            if (tool.id === "vendor") {
+                return `<div class="tool-card"><div class="card-header"><h3>🏢 Vendor Comparison Matrix <span class="badge">Interactive</span></h3></div><div class="card-body"><div class="input-group"><label>Select Feature Focus</label><select id="vendorFeature"><option>Routing</option><option>Security</option><option>Analytics</option><option>Ease of Use</option><option>Cloud Integration</option></select></div><button onclick="compareVendors()">Compare Vendors</button><div class="result-area" id="vendorResult">Vendor comparison matrix</div></div></div>`;
+            }
+            return "";
+        }
+
+        // Tool Functions with Session Caching
+        window.simulateTunnelHealth = () => {
+            let name = document.getElementById("tunnelName").value;
+            let latency = parseFloat(document.getElementById("tunnelLatency").value);
+            let loss = parseFloat(document.getElementById("tunnelLoss").value);
+            let jitter = parseFloat(document.getElementById("tunnelJitter").value);
+            
+            let healthScore = 100;
+            let status = "UP";
+            let statusClass = "status-up";
+            
+            if (latency > 150) healthScore -= 20;
+            if (loss > 2) { healthScore -= 30; status = "DEGRADED"; statusClass = "status-degraded"; }
+            if (loss > 5) { healthScore -= 50; status = "DOWN"; statusClass = "status-down"; }
+            if (jitter > 30) healthScore -= 15;
+            
+            healthScore = Math.max(0, healthScore);
+            
+            let result = `<span class="status-indicator ${statusClass}"></span><strong>Tunnel: ${name}</strong><br><br>`;
+            result += `📊 Health Score: ${healthScore}/100 (${status})<br>`;
+            result += `⏱️ Latency: ${latency}ms | 📉 Packet Loss: ${loss}% | ⚡ Jitter: ${jitter}ms<br><br>`;
+            result += `💡 Recommendation: `;
+            if (healthScore >= 80) result += `Tunnel is healthy. No action required.`;
+            else if (healthScore >= 60) result += `Degraded performance. Investigate latency/jitter issues.`;
+            else result += `Critical condition. Immediate troubleshooting required.`;
+            
+            sessionCache.set('lastTunnelHealth', { name, latency, loss, jitter, healthScore });
+            document.getElementById("tunnelResult").innerHTML = result;
+        };
+        
+        window.buildQoSPolicy = () => {
+            let app = document.getElementById("qosApp").value;
+            let bw = document.getElementById("qosBandwidth").value;
+            let dscp = document.getElementById("qosDscp").value;
+            
+            let dscpMap = { '46': 'EF (Expedited Forwarding)', '34': 'AF41', '26': 'AF31', '18': 'AF21', '10': 'AF11', '0': 'BE' };
+            let dscpName = dscpMap[dscp] || `DSCP ${dscp}`;
+            
+            let config = `! QoS Policy for ${app}\n`;
+            config += `class-map match-any ${app.toLowerCase().replace(/\s/g, '-')}_class\n`;
+            config += ` match dscp ${dscp}\n`;
+            config += `!\n`;
+            config += `policy-map SDWAN_QOS_POLICY\n`;
+            config += ` class ${app.toLowerCase().replace(/\s/g, '-')}_class\n`;
+            config += `  bandwidth percent ${bw}\n`;
+            config += `  random-detect dscp-based\n`;
+            config += `  police cir percent ${bw} bc 100ms\n`;
+            config += `   conform-action transmit\n`;
+            config += `   exceed-action drop\n`;
+            config += `!\n`;
+            config += `! Apply to interface:\n`;
+            config += `interface Tunnel1\n`;
+            config += ` service-policy output SDWAN_QOS_POLICY\n`;
+            
+            sessionCache.set('lastQoSPolicy', { app, bw, dscp });
+            document.getElementById("qosResult").innerHTML = `<pre>${config}</pre><br><small>📌 DSCP ${dscp} = ${dscpName} | Bandwidth: ${bw}% guaranteed</small>`;
+        };
+        
+        window.visualizePathSelection = () => {
+            let primaryLat = parseFloat(document.getElementById("primaryLatency").value);
+            let backupLat = parseFloat(document.getElementById("backupLatency").value);
+            let threshold = parseFloat(document.getElementById("lossThreshold").value);
+            
+            let selected = primaryLat < backupLat ? "PRIMARY PATH" : "BACKUP PATH";
+            let reason = primaryLat < backupLat ? "Lower latency" : "Primary degraded, backup selected";
+            
+            let visualization = `╔══════════════════════════════════════╗\n`;
+            visualization += `║     SD-WAN PATH SELECTION ALGORITHM    ║\n`;
+            visualization += `╚══════════════════════════════════════╝\n\n`;
+            visualization += `🔵 PRIMARY PATH: ${primaryLat}ms latency\n`;
+            visualization += `🟢 BACKUP PATH: ${backupLat}ms latency\n`;
+            visualization += `⚠️  Loss Threshold: ${threshold}%\n`;
+            visualization += `\n${'='.repeat(40)}\n`;
+            visualization += `✅ SELECTED: ${selected}\n`;
+            visualization += `📝 Reason: ${reason}\n`;
+            visualization += `\n🔄 Dynamic factors considered:\n`;
+            visualization += `• Current latency metrics\n`;
+            visualization += `• Packet loss history\n`;
+            visualization += `• Jitter measurements\n`;
+            visualization += `• Application requirements\n`;
+            visualization += `• Active SLA probes\n`;
+            
+            sessionCache.set('lastPathSelection', { primaryLat, backupLat, selected });
+            document.getElementById("pathResult").innerHTML = `<pre>${visualization}</pre>`;
+        };
+        
+        window.calculateBandwidth = () => {
+            let users = parseInt(document.getElementById("numUsers").value);
+            let perUser = parseFloat(document.getElementById("perUserBW").value);
+            let concurrent = parseFloat(document.getElementById("concurrentFactor").value) / 100;
+            
+            let peakBW = users * perUser;
+            let concurrentBW = peakBW * concurrent;
+            let recommended = concurrentBW * 1.2; // 20% overhead
+            
+            let result = `📊 Bandwidth Calculation Report\n${'='.repeat(40)}\n`;
+            result += `👥 Total Users: ${users}\n`;
+            result += `📈 Per User Requirement: ${perUser} Mbps\n`;
+            result += `🔝 Peak Bandwidth: ${peakBW.toFixed(2)} Mbps\n`;
+            result += `🔄 Concurrent Factor: ${(concurrent*100)}%\n`;
+            result += `⚡ Concurrent Bandwidth: ${concurrentBW.toFixed(2)} Mbps\n`;
+            result += `✨ Recommended (20% overhead): ${recommended.toFixed(2)} Mbps\n\n`;
+            result += `💡 SD-WAN Sizing:\n`;
+            result += `• Primary Circuit: ${(recommended * 0.6).toFixed(2)} Mbps\n`;
+            result += `• Backup Circuit: ${(recommended * 0.4).toFixed(2)} Mbps\n`;
+            result += `• Total Active-Active: ${recommended.toFixed(2)} Mbps\n`;
+            
+            sessionCache.set('lastBandwidthCalc', { users, perUser, concurrent, recommended });
+            document.getElementById("bandwidthResult").innerHTML = `<pre>${result}</pre>`;
+        };
+        
+        window.generateSLAConfig = () => {
+            let target = document.getElementById("slaTarget").value;
+            let type = document.getElementById("slaType").value;
+            let freq = document.getElementById("slaFreq").value;
+            
+            let config = `! IP SLA Configuration for SD-WAN\n`;
+            config += `ip sla 1\n`;
+            config += ` ${type.toLowerCase()} ${target}\n`;
+            if (type === "ICMP Echo") config += `  timeout 2000\n`;
+            if (type === "UDP Jitter") config += `  udp-jitter ${target} 15000\n`;
+            config += `  frequency ${freq}\n`;
+            config += `ip sla schedule 1 life forever start-time now\n`;
+            config += `!\n`;
+            config += `! Track SLA for path selection\n`;
+            config += `track 1 ip sla 1 reachability\n`;
+            config += ` delay down 10 up 5\n`;
+            config += `!\n`;
+            config += `! Apply to SD-WAN policy\n`;
+            config += `vpn 0\n`;
+            config += ` interface eth0\n`;
+            config += `  track-sla 1\n`;
+            
+            sessionCache.set('lastSLAConfig', { target, type, freq });
+            document.getElementById("slaResult").innerHTML = `<pre>${config}</pre><br><small>📡 SLA probe monitoring ${target} every ${freq} seconds</small>`;
+        };
+        
+        window.generateEdgeConfig = () => {
+            let model = document.getElementById("edgeModel").value;
+            let siteId = document.getElementById("siteId").value;
+            let vrfId = document.getElementById("vrfId").value;
+            
+            let config = `! Edge Device Configuration - ${model}\n`;
+            config += `! Site: ${siteId} | VRF: ${vrfId}\n`;
+            config += `${'='.repeat(50)}\n\n`;
+            config += `hostname ${siteId.toLowerCase()}-edge\n`;
+            config += `!\n`;
+            config += `vrf definition ${vrfId}\n`;
+            config += ` rd ${vrfId}:${siteId}\n`;
+            config += ` address-family ipv4\n`;
+            config += `  route-target export ${vrfId}:${siteId}\n`;
+            config += `  route-target import ${vrfId}:${siteId}\n`;
+            config += ` exit-address-family\n`;
+            config += `!\n`;
+            config += `interface Tunnel0\n`;
+            config += ` description SD-WAN Transport\n`;
+            config += ` ip address 10.${vrfId}.1.1 255.255.255.252\n`;
+            config += ` tunnel source GigabitEthernet0/0/0\n`;
+            config += ` tunnel destination dynamic\n`;
+            config += `!\n`;
+            config += `sdwan\n`;
+            config += ` organization-name "Enterprise-Networks"\n`;
+            config += ` site-id ${siteId}\n`;
+            config += ` system-ip 10.${vrfId}.1.1\n`;
+            config += `!\n`;
+            
+            sessionCache.set('lastEdgeConfig', { model, siteId, vrfId });
+            document.getElementById("edgeResult").innerHTML = `<pre>${config}</pre>`;
+        };
+        
+        window.simulateFailover = () => {
+            let primary = document.getElementById("primaryStatus").value;
+            let backup = document.getElementById("backupStatus").value;
+            let failoverTime = document.getElementById("failoverTime").value;
+            
+            let result = `🔄 FAILOVER SIMULATION\n${'='.repeat(40)}\n\n`;
+            result += `🔵 PRIMARY CIRCUIT: ${primary.toUpperCase()}\n`;
+            result += `🟢 BACKUP CIRCUIT: ${backup.toUpperCase()}\n`;
+            result += `⏱️  Failover Time: ${failoverTime} seconds\n\n`;
+            
+            if (primary === "up") {
+                result += `✅ Active Circuit: PRIMARY\n`;
+                result += `📡 Backup on standby (warm)\n`;
+                result += `💡 No failover required\n`;
+            } else if (primary === "down" && backup === "up") {
+                result += `⚠️ FAILOVER TRIGGERED!\n`;
+                result += `├─ Primary circuit failure detected\n`;
+                result += `├─ BFD session down (3.5 x 1s intervals)\n`;
+                result += `├─ Switching to backup in ${failoverTime}s\n`;
+                result += `├─ Active Circuit: BACKUP\n`;
+                result += `└─ Traffic restored via backup path\n`;
+                result += `\n📊 Impact: ${failoverTime}s outage\n`;
+            } else {
+                result += `❌ CRITICAL: Both circuits DOWN!\n`;
+                result += `🚨 Site is isolated - Immediate intervention required\n`;
+            }
+            
+            sessionCache.set('lastFailoverSim', { primary, backup, failoverTime });
+            document.getElementById("failoverResult").innerHTML = `<pre>${result}</pre>`;
+        };
+        
+        window.buildAppSignature = () => {
+            let name = document.getElementById("appName").value;
+            let proto = document.getElementById("appProto").value;
+            let ports = document.getElementById("appPorts").value;
+            let pattern = document.getElementById("appPattern").value;
+            
+            let signature = `application-signature ${name.toLowerCase()}\n`;
+            signature += `  protocol ${proto}\n`;
+            signature += `  destination-port ${ports}\n`;
+            signature += `  signature-regex "${pattern}"\n`;
+            signature += ` !\n`;
+            signature += `  action classify\n`;
+            signature += `  set-dscp ${proto === "TCP" ? "AF31" : "EF"}\n`;
+            signature += `  set-application ${name}\n`;
+            
+            sessionCache.set('lastAppSignature', { name, proto, ports, pattern });
+            document.getElementById("appResult").innerHTML = `<pre>${signature}</pre><br><small>📝 Application signature created for DPI engine</small>`;
+        };
+        
+        window.validateZTP = () => {
+            let serial = document.getElementById("serialNum").value;
+            let template = document.getElementById("templateName").value;
+            let mgmtIP = document.getElementById("mgmtIP").value;
+            
+            let validation = `🔍 ZTP PROVISIONING VALIDATION\n${'='.repeat(50)}\n\n`;
+            validation += `📋 Device: ${serial}\n`;
+            validation += `📄 Template: ${template}\n`;
+            validation += `🌐 Management IP: ${mgmtIP}\n\n`;
+            
+            let errors = [];
+            if (!serial.match(/^[A-Z0-9]{10,}$/)) errors.push("• Serial number format invalid (must be 10+ alphanumeric)");
+            if (!template.match(/^[a-zA-Z0-9\-]+$/)) errors.push("• Template name contains invalid characters");
+            if (!mgmtIP.match(/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/)) errors.push("• Management IP format invalid (CIDR required)");
+            
+            if (errors.length === 0) {
+                validation += `✅ VALIDATION PASSED\n`;
+                validation += `\n📌 Provisioning Checklist:\n`;
+                validation += `✓ Device added to inventory\n`;
+                validation += `✓ Template ${template} assigned\n`;
+                validation += `✓ Management reachable via ${mgmtIP}\n`;
+                validation += `✓ Certificates provisioned\n`;
+                validation += `✓ Configuration pushed to controller\n`;
+                validation += `\n🚀 Device ready for ZTP deployment\n`;
+            } else {
+                validation += `❌ VALIDATION FAILED\n`;
+                validation += `Issues found:\n${errors.join('\n')}\n`;
+                validation += `\n⚠️  Correct errors before deployment\n`;
+            }
+            
+            sessionCache.set('lastZTPValidation', { serial, template, mgmtIP, passed: errors.length === 0 });
+            document.getElementById("ztpResult").innerHTML = `<pre>${validation}</pre>`;
+        };
+        
+        window.compareVendors = () => {
+            let feature = document.getElementById("vendorFeature").value;
+            
+            let comparison = `<div class="vendor-comparison">`;
+            for (let [vendor, data] of Object.entries(vendors)) {
+                let score = data.features[feature];
+                let stars = "★".repeat(score) + "☆".repeat(5-score);
+                comparison += `
+                    <div class="vendor-card">
+                        <strong>${vendor}</strong><br>
+                        <div style="font-size: 1.2rem; margin: 8px 0;">${stars}</div>
+                        <small>${feature}: ${score}/5</small><br>
+                        <small>💰 ${data.price}</small>
+                    </div>
+                `;
+            }
+            comparison += `</div><br><small>📊 Rating based on ${feature} capability. Click different features to compare.</small>`;
+            
+            sessionCache.set('lastVendorCompare', { feature });
+            document.getElementById("vendorResult").innerHTML = comparison;
+        };
+        
+        // Tools list
+        const tools = [
+            { id: "tunnel", name: "🔌 Tunnel Health Simulator", desc: "Visualize tunnel status and metrics", comp: "Medium" },
+            { id: "qos", name: "📊 QoS Policy Builder", desc: "Create quality-of-service policy templates", comp: "Medium" },
+            { id: "path", name: "🛣️ Path Selection Visualizer", desc: "Show how SD-WAN chooses paths", comp: "Medium" },
+            { id: "bandwidth", name: "📈 Bandwidth Calculator", desc: "Estimate bandwidth requirements", comp: "Easy" },
+            { id: "sla", name: "📡 SLA Probe Configurator", desc: "Generate SLA probe configurations", comp: "Medium" },
+            { id: "edge", name: "🖧 Edge Device Config Generator", desc: "Template-based edge config builder", comp: "Medium" },
+            { id: "failover", name: "🔄 Circuit Failover Simulator", desc: "Visualize failover scenarios", comp: "Medium" },
+            { id: "appsig", name: "📝 Application Signature Builder", desc: "Define app recognition rules", comp: "Medium" },
+            { id: "ztp", name: "🚀 ZTP Validator", desc: "Validate provisioning templates", comp: "Medium" },
+            { id: "vendor", name: "🏢 Vendor Comparison Matrix", desc: "Interactive feature comparison", comp: "Easy" }
+        ];
+        
+        function renderTools() {
+            const grid = document.getElementById("toolsGrid");
+            grid.innerHTML = tools.map(t => buildToolHTML(t)).join('');
+        }
+        
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function toolsHomeAction() {
+            scrollToTop();
+            const toolsGrid = document.getElementById("toolsGrid");
+            toolsGrid.style.animation = 'none';
+            setTimeout(() => {
+                toolsGrid.style.animation = 'fadeInUp 0.6s ease-out';
+            }, 10);
+        }
+        
+        // Theme handling
+        const themeToggle = document.getElementById("themeToggle");
+        themeToggle.addEventListener("click", () => {
+            document.body.classList.toggle("dark");
+            themeToggle.innerText = document.body.classList.contains("dark") ? "☀️ Light Mode" : "🌙 Dark Mode";
+        });
+        
+        // Button Event Listeners
+        document.getElementById("homeBtn").addEventListener("click", (e) => {
+            e.preventDefault();
+            window.location.href = window.location.pathname.replace(/sdwan.*\.html/, '') + 'index.html';
+        });
+        document.getElementById("toolsHomeBtn").addEventListener("click", toolsHomeAction);
+        
+        // Scroll to top button
+        const scrollTopBtn = document.getElementById("scrollTop");
+        window.addEventListener("scroll", () => {
+            if (window.pageYOffset > 300) {
+                scrollTopBtn.classList.add("visible");
+            } else {
+                scrollTopBtn.classList.remove("visible");
+            }
+        });
+        scrollTopBtn.addEventListener("click", scrollToTop);
+        
+        // Initialize
+        renderTools();
+        
+        // Load any cached data if needed (optional)
+        console.log("SD-WAN Toolbox initialized with session caching support");
+    </script>
+</body>
+</html>

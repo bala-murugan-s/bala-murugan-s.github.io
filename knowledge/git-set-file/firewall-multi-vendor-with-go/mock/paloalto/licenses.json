@@ -1,0 +1,26 @@
+[
+    {
+        "name": "Threat Prevention",
+        "status": "active",
+        "expiration": "2025-12-31",
+        "description": "IPS, Anti-Malware, Anti-Spyware"
+    },
+    {
+        "name": "WildFire",
+        "status": "active",
+        "expiration": "2025-12-31",
+        "description": "Advanced threat detection"
+    },
+    {
+        "name": "URL Filtering",
+        "status": "active",
+        "expiration": "2025-12-31",
+        "description": "Web categorization and filtering"
+    },
+    {
+        "name": "GlobalProtect",
+        "status": "expiring",
+        "expiration": "2025-05-15",
+        "description": "VPN and mobile security"
+    }
+]

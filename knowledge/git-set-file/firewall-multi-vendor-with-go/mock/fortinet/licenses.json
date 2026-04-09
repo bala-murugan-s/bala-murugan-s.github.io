@@ -1,0 +1,26 @@
+[
+    {
+        "name": "UTM Bundle",
+        "status": "active",
+        "expiration": "2025-10-31",
+        "description": "Antivirus, IPS, Web Filtering, Anti-Spam"
+    },
+    {
+        "name": "FortiGuard IPS",
+        "status": "active",
+        "expiration": "2025-10-31",
+        "description": "Intrusion Prevention Service"
+    },
+    {
+        "name": "FortiGuard Web Filtering",
+        "status": "active",
+        "expiration": "2025-10-31",
+        "description": "URL and content filtering"
+    },
+    {
+        "name": "FortiGuard Antivirus",
+        "status": "expiring",
+        "expiration": "2025-06-30",
+        "description": "Anti-Malware protection"
+    }
+]

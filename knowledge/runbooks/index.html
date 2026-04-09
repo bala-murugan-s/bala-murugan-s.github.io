@@ -1,0 +1,56 @@
+<div class="panel">
+    <h3>Runbooks</h3>
+
+    <div class="panel-body">
+
+        <div class="runbook">
+            <div class="runbook-title">SASE Branch Onboarding</div>
+            <div class="runbook-content">
+                <ul class="clean">
+                    <li>Validate connectivity</li>
+                    <li>Apply security policies</li>
+                    <li>Test user access</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="runbook">
+            <div class="runbook-title">Firewall Change Procedure</div>
+            <div class="runbook-content">
+                <ul class="clean">
+                    <li>Review request</li>
+                    <li>Validate rules</li>
+                    <li>Deploy & verify logs</li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .runbook-title {
+        cursor: pointer;
+        padding: 8px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin-bottom: 6px;
+    }
+
+    .runbook-content {
+        display: none;
+        padding: 8px;
+    }
+
+    .runbook.open .runbook-content {
+        display: block;
+    }
+</style>
+
+<script>
+    document.querySelectorAll(".runbook-title").forEach(title => {
+        title.onclick = () => {
+            title.parentElement.classList.toggle("open");
+        };
+    });
+</script>

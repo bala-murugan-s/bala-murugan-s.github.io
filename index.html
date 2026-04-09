@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Balamurugan Sivaraman — Principal Security Architect & Developer. Crafting secure, elegant digital systems." />
+  <title>Balamurugan Sivaraman — Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Ambient background -->
+  <div class="bg-canvas" aria-hidden="true">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    <div class="grain"></div>
+  </div>
+  
+  <!-- Welcome Popup -->
+<div id="welcomePopup" class="popup hidden">
+  <div class="popup-box">
+    <h2 id="mainGreeting"></h2>
+    <p id="multiLang">Hello / Hola / Bonjour</p>
+    <p id="locationStatus"></p>
+    <button onclick="closePopup()">Enter</button>
+  </div>
+</div>
+
+
+
+
+  <!-- ════════════════════════════════════════
+       FLOATING NAVBAR (desktop top)
+  ════════════════════════════════════════ -->
+  <header class="navbar-wrapper" id="navbarWrapper">
+    <nav class="navbar" id="navbar" role="navigation" aria-label="Main navigation">
+      <a href="#hero" class="nav-logo prism-logo" aria-label="Balamurugan Sivaraman – home">
+        <span class="logo-glyph prism-triangle"></span>
+        <span class="logo-name">BaLa<em>MuRuGaN</em></span>
+      </a>
+
+      <ul class="nav-links" role="list">
+        <li><a href="#hero"      class="nav-link" data-section="hero">Home</a></li>
+        <li><a href="#about"     class="nav-link" data-section="about">About</a></li>
+        <li><a href="#work"      class="nav-link" data-section="work">Work</a></li>
+        <li><a href="#workspace" class="nav-link" data-section="workspace">Stack</a></li>
+        <li><a href="./tools/tools-home.html"     class="nav-link" data-section="tools">Tools</a></li>
+        <li><a href="#contact"   class="nav-link" data-section="contact">Contact</a></li>
+      </ul>
+
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle light/dark mode">
+        <span class="t-sun" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+        </span>
+        <span class="t-moon" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Mobile bottom nav -->
+  <nav class="navbar-mobile" id="navbarMobile" aria-label="Mobile navigation">
+    <a href="#hero"      class="mob-link" data-section="hero">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3 12L12 3l9 9M4 10v10h5v-6h6v6h5V10"/></svg>
+      <span>Home</span>
+    </a>
+    <a href="#about"     class="mob-link" data-section="about">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+      <span>About</span>
+    </a>
+    <a href="#work"      class="mob-link" data-section="work">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+      <span>Work</span>
+    </a>
+    <a href="#workspace" class="mob-link" data-section="workspace">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      <span>Stack</span>
+    </a>
+    <a href="#contact"   class="mob-link" data-section="contact">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      <span>Contact</span>
+    </a>
+  </nav>
+
+  <!-- ════════════════════════════════════════
+       FLOATING TOOLKIT FAB
+  ════════════════════════════════════════ -->
+  <div class="toolkit-wrap" id="toolkitWrap">
+    <button class="fab" id="toolkitFab" aria-label="Open toolkit menu" aria-expanded="false" aria-controls="toolkitMenu">
+      <span class="fab-cross" aria-hidden="true"></span>
+    </button>
+    <ul class="toolkit-menu" id="toolkitMenu" role="menu" aria-hidden="true">
+      <li role="none">
+        <a href="#workspace" role="menuitem" class="tk-item" data-label="Stack">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        </a>
+      </li>
+      <li role="none">
+        <a href="#work" role="menuitem" class="tk-item" data-label="Experiments">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="11" y2="17"/></svg>
+        </a>
+      </li>
+      <li role="none">
+        <a href="/resume/s-bala-murugan-profile-compressed.pdf" role="menuitem" class="tk-item" data-label="Profile" target="_blank" rel="noopener noreferrer">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><polygon points="6 8 12 4 18 8 18 16 12 20 6 16 6 8"/></svg>
+        </a>
+      </li>
+      <li role="none">
+        <a href="#about" role="menuitem" class="tk-item" data-label="About Me">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><polygon points="12 2 15 9 22 9 17 14 19 22 12 18 5 22 7 14 2 9 9 9"/></svg>
+        </a>
+      </li>
+      <li role="none">
+        <a href="#hero" role="menuitem" class="tk-item" data-label="Home">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><polygon points="3 11 12 2 21 11 21 22 3 22"/></svg>
+        </a>
+      </li>
+      <li role="none">
+        <a href="./knowledge/knowledge-home-index.html" role="menuitem" class="tk-item" data-label="knowledgehome">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><polygon points="4 6 12 2 20 6 20 18 12 22 4 18 4 6"/></svg>
+        </a>
+      </li>
+      <li role="none">
+        <a href="./tools/tools-home.html" role="menuitem" class="tk-item" data-label="toolshome">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- ════════════════════════════════════════
+       MAIN CONTENT
+  ════════════════════════════════════════ -->
+  <main id="main">
+
+    <!-- ─── HERO ─────────────────────────────── -->
+    <section class="section" id="hero">
+      <div class="hero-layout">
+
+        <div class="hero-copy">
+          <div class="hero-badge reveal-up" style="--d:0">
+            <span class="badge-pulse" aria-hidden="true"></span>
+            Available for projects
+          </div>
+
+          <h1 class="hero-h1">
+            <span class="h1-line reveal-up" style="--d:1">Securing the</span>
+            <span class="h1-line h1-accent reveal-up" style="--d:2">
+              <span id="typedText" aria-live="polite"></span><span class="type-cursor" aria-hidden="true"></span>
+            </span>
+            <span class="h1-line reveal-up" style="--d:3">digital frontier.</span>
+          </h1>
+
+          <p class="hero-sub reveal-up" style="--d:4">
+            Principal Security Architect &amp; Developer — building resilient,
+            zero-trust infrastructure across cloud, network, and application layers.
+          </p>
+
+          <div class="hero-cta reveal-up" style="--d:5">
+            <a href="#work"    class="btn btn-primary magnetic">
+              <span>View Work</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+            <a href="#contact" class="btn btn-ghost magnetic">Get in Touch</a>
+          </div>
+
+          <div class="hero-stats reveal-up" style="--d:6">
+            <div class="h-stat">
+              <strong class="counter" data-target="14">0</strong><sup>+</sup>
+              <span>Years Exp.</span>
+            </div>
+            <div class="h-stat-sep" aria-hidden="true"></div>
+            <div class="h-stat">
+              <strong class="counter" data-target="36">0</strong><sup>+</sup>
+              <span>Global Sites</span>
+            </div>
+            <div class="h-stat-sep" aria-hidden="true"></div>
+            <div class="h-stat">
+              <strong class="counter" data-target="120">0</strong><sup>+</sup>
+              <span>Projects</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+          <div class="orb-wrap">
+            <div class="orb-ring r1"><span class="orb-dot d-purple"></span></div>
+            <div class="orb-ring r2"><span class="orb-dot d-cyan"></span></div>
+            <div class="orb-ring r3"><span class="orb-dot d-white"></span></div>
+            <div class="orb-core">
+              <span class="orb-glyph">⬡</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="scroll-cue" aria-hidden="true">
+        <div class="scroll-line"></div>
+        <span>scroll</span>
+      </div>
+    </section>
+
+    <!-- ─── ABOUT ─────────────────────────────── -->
+    <section class="section" id="about">
+      <div class="container">
+
+        <header class="sec-head reveal-up">
+          <span class="sec-tag">/ About</span>
+          <h2 class="sec-title">Building at the intersection<br>of <em>security &amp; innovation.</em></h2>
+        </header>
+
+        <div class="about-layout">
+
+          <div class="about-body">
+            <p class="reveal-up" style="--d:1">
+              I'm Balamurugan Sivaraman — a Principal Security Architect with over 14 years of experience
+              designing and delivering enterprise-grade security infrastructure across cloud, network, and
+              application layers.
+            </p>
+            <p class="reveal-up" style="--d:2">
+              My work spans Zero Trust architecture, SD-WAN transformation, cloud security baselines (Azure,
+              AWS), firewall policy automation, and AI-driven threat intelligence — always with a developer's
+              precision and an architect's perspective.
+            </p>
+            <p class="reveal-up" style="--d:3">
+              The best security is invisible to the user and impenetrable to the attacker.
+              I build systems that embody that philosophy.
+            </p>
+            <div class="about-links reveal-up" style="--d:4">
+              <a href="mailto:balamurugan@example.com" class="tlink">Email me ↗</a>
+              <a href="https://linkedin.com" target="_blank" rel="noopener" class="tlink">LinkedIn ↗</a>
+              <a href="https://github.com"   target="_blank" rel="noopener" class="tlink">GitHub ↗</a>
+            </div>
+          </div>
+
+          <div class="about-pillars">
+            <div class="pillar glass reveal-up" style="--d:2">
+              <div class="pillar-icon">☁</div>
+              <h3>Cloud Security</h3>
+              <p>Azure, AWS, GCP security baseline design, CSPM, CWPP, and cloud-native zero trust.</p>
+            </div>
+            <div class="pillar glass reveal-up" style="--d:3">
+              <div class="pillar-icon">⬡</div>
+              <h3>Network Architecture</h3>
+              <p>SD-WAN, SASE, ZTNA, firewall policy at scale, micro-segmentation and east-west traffic.</p>
+            </div>
+            <div class="pillar glass reveal-up" style="--d:4">
+              <div class="pillar-icon">✦</div>
+              <h3>AI &amp; Automation</h3>
+              <p>Firewall AI optimisation, Terraform/Ansible automation, threat intelligence pipelines.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── WORK ──────────────────────────────── -->
+    <section class="section" id="work">
+      <div class="container">
+
+        <header class="sec-head reveal-up">
+          <span class="sec-tag">/ Work</span>
+          <h2 class="sec-title">Selected projects &amp;<br><em>featured work.</em></h2>
+        </header>
+
+        <div class="projects-grid">
+
+          <article class="proj-card glass reveal-up" style="--d:1">
+            <div class="proj-top">
+              <span class="proj-num">01</span>
+              <div class="proj-tags">
+                <span class="ptag">SD-WAN</span><span class="ptag">Network</span><span class="ptag">SASE</span>
+              </div>
+            </div>
+            <h3>Global SD-WAN Transformation</h3>
+            <p>
+              Architected and deployed a global SD-WAN rollout across 36 sites, replacing legacy MPLS
+              with cloud-native SASE — reducing WAN costs by 40% while improving uptime to 99.99%.
+            </p>
+            <div class="proj-foot">
+              <div class="proj-tech">
+                <span>Cisco Viptela</span><span>Zscaler</span><span>Azure</span>
+              </div>
+              <a href="#" class="proj-arrow" aria-label="View Global SD-WAN project">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 17L17 7M7 7h10v10"/></svg>
+              </a>
+            </div>
+            <div class="proj-glow" aria-hidden="true"></div>
+          </article>
+
+          <article class="proj-card glass reveal-up" style="--d:2">
+            <div class="proj-top">
+              <span class="proj-num">02</span>
+              <div class="proj-tags">
+                <span class="ptag">Cloud</span><span class="ptag">Zero Trust</span>
+              </div>
+            </div>
+            <h3>Azure Cloud Security Baseline</h3>
+            <p>
+              Designed a comprehensive Azure security baseline framework — covering IAM, RBAC, network
+              segmentation, threat detection, and compliance automation across a 500+ workload estate.
+            </p>
+            <div class="proj-foot">
+              <div class="proj-tech">
+                <span>Azure Sentinel</span><span>Terraform</span><span>Defender</span>
+              </div>
+              <a href="#" class="proj-arrow" aria-label="View Azure Cloud Security project">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 17L17 7M7 7h10v10"/></svg>
+              </a>
+            </div>
+            <div class="proj-glow" aria-hidden="true"></div>
+          </article>
+
+          <article class="proj-card glass reveal-up" style="--d:3">
+            <div class="proj-top">
+              <span class="proj-num">03</span>
+              <div class="proj-tags">
+                <span class="ptag">AI</span><span class="ptag">Automation</span>
+              </div>
+            </div>
+            <h3>Firewall AI Optimisation Engine</h3>
+            <p>
+              Built an AI-driven engine that analyses firewall rulebases, identifies shadowed/redundant
+              rules, and auto-generates optimised policy recommendations — cutting rule count by 60%.
+            </p>
+            <div class="proj-foot">
+              <div class="proj-tech">
+                <span>Python</span><span>Palo Alto</span><span>ML</span>
+              </div>
+              <a href="#" class="proj-arrow" aria-label="View AI Optimisation Engine project">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 17L17 7M7 7h10v10"/></svg>
+              </a>
+            </div>
+            <div class="proj-glow" aria-hidden="true"></div>
+          </article>
+
+          <article class="proj-card glass reveal-up" style="--d:4">
+            <div class="proj-top">
+              <span class="proj-num">04</span>
+              <div class="proj-tags">
+                <span class="ptag">VAPT</span><span class="ptag">Red Team</span>
+              </div>
+            </div>
+            <h3>Enterprise VAPT Framework</h3>
+            <p>
+              Developed and executed a full-spectrum vulnerability assessment and penetration testing
+              framework for a 10,000-employee enterprise — identifying 230+ critical findings.
+            </p>
+            <div class="proj-foot">
+              <div class="proj-tech">
+                <span>Burp Suite</span><span>Nessus</span><span>Metasploit</span>
+              </div>
+              <a href="#" class="proj-arrow" aria-label="View VAPT Framework project">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 17L17 7M7 7h10v10"/></svg>
+              </a>
+            </div>
+            <div class="proj-glow" aria-hidden="true"></div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── STACK / WORKSPACE ─────────────────── -->
+    <section class="section" id="workspace">
+      <div class="container">
+
+        <header class="sec-head reveal-up">
+          <span class="sec-tag">/ Stack</span>
+          <h2 class="sec-title">Tools &amp; technologies<br><em>I work with.</em></h2>
+        </header>
+
+        <div class="stack-cols">
+
+          <div class="stack-col reveal-up" style="--d:1">
+            <h3 class="stack-col-title">Security Platforms</h3>
+            <div class="stack-row">
+              <div class="sitem" tabindex="0">
+                <div class="sitem-icon">🔥</div>
+                <span>Palo Alto</span>
+              </div>
+              <div class="sitem" tabindex="0">
+                <div class="sitem-icon">⚡</div>
+                <span>Zscaler</span>
+              </div>
+              <div class="sitem" tabindex="0">
+                <div class="sitem-icon">🛡</div>
+                <span>FortiGate</span>
+              </div>
+              <div class="sitem" tabindex="0">
+                <div class="sitem-icon">🦅</div>
+                <span>CrowdStrike</span>
+              </div>
+              <div class="sitem" tabindex="0">
+                <div class="sitem-icon">◎</div>
+                <span>Cisco</span>
+              </div>
+              <div class="sitem" tabindex="0">
+                <div class="sitem-icon">📊</div>
+                <span>Splunk</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="stack-col reveal-up" style="--d:2">
+            <h3 class="stack-col-title">Cloud &amp; Infrastructure</h3>
+            <div class="stack-row">
+              <div class="sitem" tabindex="0">
+                <div class="sitem-icon">☁</div>
+                <span>Azure</span>
+              </div>
+              <div class="sitem" tabindex="0">
+                <div class="sitem-icon">⬡</div>
+                <span>AWS</span>
+              </div>
+              <div class="sitem" tabindex="0">
+                <div class="sitem-icon">🌐</div>
+                <span>GCP</span>
+              </div>
+              <div class="sitem" tabindex="0">
+                <div class="sitem-icon">⬤</div>
+                <span>Terraform</span>
+              </div>
+              <div class="sitem" tabindex="0">
+                <div class="sitem-icon">⚙</div>
+                <span>Ansible</span>
+              </div>
+              <div class="sitem" tabindex="0">
+                <div class="sitem-icon">☸</div>
+                <span>Kubernetes</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="stack-col reveal-up" style="--d:3">
+            <h3 class="stack-col-title">Development</h3>
+            <div class="stack-row">
+              <div class="sitem" tabindex="0">
+                <div class="sitem-icon">🐍</div>
+                <span>Python</span>
+              </div>
+              <div class="sitem" tabindex="0">
+                <div class="sitem-icon">✦</div>
+                <span>JavaScript</span>
+              </div>
+              <div class="sitem" tabindex="0">
+                <div class="sitem-icon">$_</div>
+                <span>Bash</span>
+              </div>
+              <div class="sitem" tabindex="0">
+                <div class="sitem-icon">⇄</div>
+                <span>REST APIs</span>
+              </div>
+              <div class="sitem" tabindex="0">
+                <div class="sitem-icon">⑂</div>
+                <span>Git</span>
+              </div>
+              <div class="sitem" tabindex="0">
+                <div class="sitem-icon">🐳</div>
+                <span>Docker</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+   
+    <!-- ─── CONTACT ───────────────────────────── -->
+    <section class="section" id="contact">
+      <div class="container">
+
+        <header class="sec-head reveal-up">
+          <span class="sec-tag">/ Contact</span>
+          <h2 class="sec-title">Let's build something<br><em>exceptional together.</em></h2>
+        </header>
+
+        <div class="contact-layout">
+
+          <div class="contact-lhs reveal-up" style="--d:1">
+            <p class="contact-lead">
+              Whether you need a security architecture review, a cloud transformation,
+              or a VAPT engagement — I'd love to hear about your challenge.
+            </p>
+            <ul class="contact-details" role="list">
+              <li>
+                <span class="cd-ico" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </span>
+                <a href="mailto:s-balamurugan@zohomail.in">s-balamurugan@zohomail.in</a>
+              </li>
+              <li>
+                <span class="cd-ico" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                </span>
+                <span>Remote Global</span>
+              </li>
+              <li>
+                <span class="cd-ico" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                </span>
+                <span>Typically replies within 24h</span>
+              </li>
+              <li>
+                <span class="cd-ico" aria-hidden="true">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14 2 14 8 20 8"/>
+                    <line x1="12" y1="12" x2="12" y2="18"/>
+                    <polyline points="9 15 12 18 15 15"/>
+                  </svg>
+                </span>
+                <a href="/resume/s-bala-murugan-profile-compressed.pdf" target="_blank" rel="noopener noreferrer">
+                  Download Resume
+                </a>
+              </li>
+            </ul>
+            <div class="contact-socials">
+              <a href="https://www.linkedin.com/in/bala-murugan-s/" target="_blank" rel="noopener" class="soc-btn">LinkedIn</a>
+              <a href="https://bala-murugan-s.github.io"   target="_blank" rel="noopener" class="soc-btn">GitHub</a>
+              <a href="https://www.credly.com/users/s-bala-murugan/badges#credly"  target="_blank" rel="noopener" class="soc-btn">Credly</a>
+              <a href="https://wa.me/919003234312" target="_blank" rel="noopener" class="soc-btn">WhatsApp</a>
+            </div>
+          </div>
+
+          <form class="contact-form glass reveal-up" style="--d:2" id="contactForm" novalidate aria-label="Contact form">
+            <div class="form-row">
+              <div class="fgroup">
+                <label for="fname">First Name</label>
+                <input type="text" id="fname" name="fname" placeholder="bala" required autocomplete="given-name" />
+              </div>
+              <div class="fgroup">
+                <label for="lname">Last Name</label>
+                <input type="text" id="lname" name="lname" placeholder="murugan" required autocomplete="family-name" />
+              </div>
+            </div>
+            <div class="fgroup">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" name="email" placeholder="bala@company.com" required autocomplete="email" />
+            </div>
+            <div class="fgroup">
+              <label for="service">Service Type</label>
+              <select id="service" name="service" required>
+                <option value="" disabled selected>Select a service…</option>
+                <option value="consulting">Security Consulting</option>
+                <option value="architecture">Architecture Review</option>
+                <option value="vapt">VAPT Engagement</option>
+                <option value="cloud">Cloud Security</option>
+                <option value="automation">Automation &amp; Tooling</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="fgroup">
+              <label for="message">Message</label>
+              <textarea id="message" name="message" placeholder="Tell me about your project or challenge…" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-full magnetic">
+              <span>Send Message</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+            <p class="form-success" id="formSuccess" aria-live="polite" hidden>
+              ✓ Message sent! I'll get back to you within 24h.
+            </p>
+          </form>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ─── FOOTER ────────────────────────────── -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span class="ft-name">Balamurugan Sivaraman</span>
+        <span class="ft-copy">© 2026 · Designed &amp; built from scratch.</span>
+        <div class="ft-links">
+          <a href="https://www.linkedin.com/in/bala-murugan-s/" target="_blank" rel="noopener">LinkedIn</a>
+          <a href="https://bala-murugan-s.github.io"   target="_blank" rel="noopener">GitHub</a>
+          <a href="https://wa.me/919003234312" target="_blank" rel="noopener">WhatsApp</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

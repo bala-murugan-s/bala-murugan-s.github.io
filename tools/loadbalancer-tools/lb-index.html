@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>App Delivery Suite | Load Balancing & Traffic Engineering</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --accent: #3b82f6;
+            --accent-dark: #2563eb;
+            --accent-glow: rgba(59, 130, 246, 0.2);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #8b5cf6;
+            --nginx: #009639;
+            --haproxy: #d43f1e;
+            --f5: #e4002b;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.dark {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: var(--transition);
+            line-height: 1.5;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes trafficFlow {
+            0% { background-position: -100% 0; }
+            100% { background-position: 200% 0; }
+        }
+
+        @keyframes serverPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(8px);
+            padding: 12px 0;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-icon {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .btn-icon:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            border-color: var(--accent);
+            background: var(--accent-glow);
+        }
+
+        .theme-toggle {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            color: var(--text-primary);
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--nginx), var(--haproxy));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(540px, 1fr));
+            gap: 28px;
+            margin: 40px 0;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .tool-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            animation: scaleIn 0.4s ease-out;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent);
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-primary) 100%);
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .card-header h3 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: var(--transition);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        button:not(.btn-icon):not(.theme-toggle) {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        button:hover:not(.btn-icon):not(.theme-toggle) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .result-area {
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--bg-primary);
+            border-radius: 16px;
+            border-left: 4px solid var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .result-area pre {
+            white-space: pre-wrap;
+            font-family: inherit;
+            margin: 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: var(--accent-glow);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-left: 8px;
+        }
+
+        .server-bar {
+            background: linear-gradient(90deg, var(--success), var(--accent));
+            height: 30px;
+            border-radius: 8px;
+            margin: 4px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            transition: width 0.5s ease;
+        }
+
+        .traffic-visual {
+            background: repeating-linear-gradient(45deg, var(--accent) 0px, var(--accent) 2px, transparent 2px, transparent 8px);
+            animation: trafficFlow 1s linear infinite;
+        }
+
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--accent);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: var(--transition);
+            z-index: 99;
+        }
+
+        .scroll-top.visible { opacity: 1; }
+
+        .site-footer {
+            margin-top: 60px;
+            border-top: 1px solid var(--border);
+            padding: 32px 0;
+            background: var(--bg-secondary);
+        }
+
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .ft-links { display: flex; gap: 24px; }
+        .ft-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .ft-links a:hover { color: var(--accent); }
+
+        @media (max-width: 768px) {
+            .tools-grid { grid-template-columns: 1fr; }
+            .footer-inner { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="container nav-container">
+            <div class="logo-area">
+                <a href="index.html" class="btn-icon" id="homeBtn">🏠 Home</a>
+                <button class="btn-icon" id="toolsHomeBtn">🛠️ Tools Home</button>
+                <h1>⚖️ App Delivery & Traffic Suite</h1>
+            </div>
+            <button class="theme-toggle" id="themeToggle">🌙 Dark Mode</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="tools-grid" id="toolsGrid"></div>
+    </div>
+
+    <div class="scroll-top" id="scrollTop">↑</div>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-inner">
+                <span class="ft-name">Balamurugan Sivaraman</span>
+                <span class="ft-copy">© 2026 · App Delivery Suite · Load Balancing & Traffic Engineering for Production</span>
+                <div class="ft-links">
+                    <a href="https://www.linkedin.com/in/bala-murugan-s/" target="_blank">LinkedIn</a>
+                    <a href="https://bala-murugan-s.github.io" target="_blank">GitHub</a>
+                    <a href="https://wa.me/919003234312" target="_blank">WhatsApp</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const sessionCache = {
+            get: (key) => {
+                try {
+                    const item = sessionStorage.getItem(key);
+                    return item ? JSON.parse(item) : null;
+                } catch(e) { return null; }
+            },
+            set: (key, value) => {
+                sessionStorage.setItem(key, JSON.stringify(value));
+            }
+        };
+
+        function buildToolHTML(tool) {
+            const toolsMap = {
+                lb: `<div class="tool-card"><div class="card-header"><h3>⚖️ Load Balancer Algorithm Visualizer <span class="badge">Compare Algorithms</span></h3></div><div class="card-body"><div class="input-group"><label>Number of Backend Servers</label><input type="number" id="numServers" value="4" min="2" max="10"><label>Algorithm</label><select id="lbAlgorithm"><option value="roundrobin">Round Robin</option><option value="leastconn">Least Connections</option><option value="weighted">Weighted Round Robin</option><option value="iphash">IP Hash (Session Persistence)</option><option value="random">Random</option></select><label>Requests to Simulate</label><input type="number" id="numRequests" value="20" min="5" max="100"></div><button onclick="visualizeLB()">Visualize Traffic Distribution</button><div class="result-area" id="lbResult"></div></div></div>`,
+                
+                health: `<div class="tool-card"><div class="card-header"><h3>❤️ Health Check Configurator <span class="badge">HTTP/TCP/ICMP</span></h3></div><div class="card-body"><div class="input-group"><label>Check Type</label><select id="healthType"><option value="http">HTTP/HTTPS</option><option value="tcp">TCP Port</option><option value="icmp">ICMP Ping</option><option value="script">Custom Script</option></select><label>Endpoint/Port</label><input type="text" id="healthEndpoint" value="/health"><label>Interval (seconds)</label><input type="number" id="healthInterval" value="30"><label>Timeout (seconds)</label><input type="number" id="healthTimeout" value="5"><label>Healthy Threshold</label><input type="number" id="healthHealthy" value="2"><label>Unhealthy Threshold</label><input type="number" id="healthUnhealthy" value="3"></div><button onclick="generateHealthCheck()">Generate Health Check Config</button><div class="result-area" id="healthResult"></div></div></div>`,
+                
+                ratelimit: `<div class="tool-card"><div class="card-header"><h3>🚦 Rate Limiter Designer <span class="badge">Visual Rules</span></h3></div><div class="card-body"><div class="input-group"><label>Rate Limit Type</label><select id="rateType"><option value="ip">Per IP Address</option><option value="user">Per User/API Key</option><option value="global">Global (All Clients)</option></select><label>Requests per Window</label><input type="number" id="rateRequests" value="100"><label>Time Window (seconds)</label><input type="number" id="rateWindow" value="60"><label>Burst Size (optional)</label><input type="number" id="rateBurst" value="20"><label>Response Status Code</label><select id="rateStatusCode"><option value="429">429 Too Many Requests</option><option value="503">503 Service Unavailable</option></select></div><button onclick="designRateLimiter()">Generate Rate Limit Rules</button><div class="result-area" id="rateResult"></div></div></div>`,
+                
+                ssl: `<div class="tool-card"><div class="card-header"><h3>🔒 SSL/TLS Termination Helper <span class="badge">Certificate Configs</span></h3></div><div class="card-body"><div class="input-group"><label>Platform</label><select id="sslPlatform"><option value="nginx">Nginx</option><option value="haproxy">HAProxy</option><option value="f5">F5 BIG-IP</option><option value="aws">AWS ALB/CLB</option></select><label>Domain Name</label><input type="text" id="sslDomain" value="example.com"><label>Certificate Path</label><input type="text" id="sslCert" value="/etc/ssl/certs/example.crt"><label>Private Key Path</label><input type="text" id="sslKey" value="/etc/ssl/private/example.key"><label>Minimum TLS Version</label><select id="sslMinVersion"><option value="1.2">TLS 1.2</option><option value="1.3">TLS 1.3</option></select><label>Cipher Suite</label><select id="sslCiphers"><option value="modern">Modern (High Security)</option><option value="intermediate">Intermediate (Compatibility)</option><option value="old">Old (Legacy Clients)</option></select></div><button onclick="generateSSLConfig()">Generate SSL/TLS Config</button><div class="result-area" id="sslResult"></div></div></div>`,
+                
+                split: `<div class="tool-card"><div class="card-header"><h3>📊 Traffic Split Visualizer <span class="badge">A/B Testing</span></h3></div><div class="card-body"><div class="input-group"><label>Backend A Name</label><input type="text" id="backendA" value="api-v1"><label>Backend A Weight (%)</label><input type="number" id="weightA" value="70"><label>Backend B Name</label><input type="text" id="backendB" value="api-v2"><label>Backend B Weight (%)</label><input type="number" id="weightB" value="30"><label>Traffic Distribution Method</label><select id="splitMethod"><option value="random">Random (Probability)</option><option value="header">HTTP Header (User-Test)</option><option value="cookie">Cookie (Session Stickiness)</option></select></div><button onclick="visualizeTrafficSplit()">Visualize Traffic Split</button><div class="result-area" id="splitResult"></div></div></div>`,
+                
+                f5: `<div class="tool-card"><div class="card-header"><h3>🎯 F5 iRule Builder <span class="badge">Traffic Manipulation</span></h3></div><div class="card-body"><div class="input-group"><label>iRule Use Case</label><select id="iruleType"><option value="redirect">HTTP to HTTPS Redirect</option><option value="persist">Session Persistence (Source IP)</option><option value="uri">URI Rewrite</option><option value="ratelimit">Rate Limiting</option><option value="header">Header Injection</option></select><label>Target/Parameter</label><input type="text" id="iruleTarget" placeholder="/old-path or example.com"><label>Additional Options</label><input type="text" id="iruleOptions" placeholder="new-path or rate limit value"></div><button onclick="buildF5iRule()">Generate iRule</button><div class="result-area" id="f5Result"></div></div></div>`,
+                
+                nginx: `<div class="tool-card"><div class="card-header"><h3>🟢 Nginx Config Generator <span class="badge">Reverse Proxy</span></h3></div><div class="card-body"><div class="input-group"><label>Domain Name</label><input type="text" id="nginxDomain" value="api.example.com"><label>Upstream Servers (comma-separated)</label><input type="text" id="nginxUpstreams" value="10.0.1.10:8080,10.0.1.11:8080"><label>Load Balancing Method</label><select id="nginxLB"><option value="round_robin">Round Robin</option><option value="least_conn">Least Connections</option><option value="ip_hash">IP Hash</option><option value="random">Random</option></select><label>SSL/HTTP</label><select id="nginxSSL"><option value="http">HTTP Only</option><option value="https">HTTPS (SSL)</option></select><label>Proxy Pass Path</label><input type="text" id="nginxPath" value="/"></div><button onclick="generateNginxConfig()">Generate Nginx Config</button><div class="result-area" id="nginxResult"></div></div></div>`,
+                
+                haproxy: `<div class="tool-card"><div class="card-header"><h3>🟠 HAProxy ACL Builder <span class="badge">Access Control Lists</span></h3></div><div class="card-body"><div class="input-group"><label>ACL Type</label><select id="aclType"><option value="path">URL Path Match</option><option value="src">Source IP Range</option><option value="hdr">HTTP Header</option><option value="method">HTTP Method</option><option value="ssl">SSL/TLS</option></select><label>Match Condition</label><input type="text" id="aclCondition" placeholder="/admin or 192.168.1.0/24"><label>Action on Match</label><select id="aclAction"><option value="use_backend">Use Backend</option><option value="redirect">Redirect</option><option value="deny">Deny Access</option><option value="add_header">Add Header</option></select><label>Target Backend (if applicable)</label><input type="text" id="aclTarget" value="backend_app"></div><button onclick="buildHAProxyACL()">Generate ACL Rules</button><div class="result-area" id="haproxyResult"></div></div></div>`,
+                
+                websocket: `<div class="tool-card"><div class="card-header"><h3>🔌 WebSocket Tester <span class="badge">Connection Diagnostics</span></h3></div><div class="card-body"><div class="input-group"><label>WebSocket URL</label><input type="text" id="wsUrl" placeholder="wss://echo.websocket.org"><label>Test Message</label><input type="text" id="wsMessage" value="Hello WebSocket!"><label>Connection Timeout (ms)</label><input type="number" id="wsTimeout" value="5000"></div><button onclick="testWebSocket()">Test Connection</button><div class="result-area" id="wsResult">⚠️ Note: This simulates WebSocket testing. In production, use browser DevTools or wscat.</div></div></div>`,
+                
+                cache: `<div class="tool-card"><div class="card-header"><h3>💾 Cache Policy Designer <span class="badge">Caching Strategies</span></h3></div><div class="card-body"><div class="input-group"><label>Cache Type</label><select id="cacheType"><option value="static">Static Assets (JS/CSS/Images)</option><option value="api">API Responses</option><option value="fullpage">Full Page Cache</option><option value="micro">Micro-caching (1s)</option></select><label>TTL (seconds)</label><input type="number" id="cacheTTL" value="3600"><label>Cache Key Strategy</label><select id="cacheKey"><option value="full">Full URL + Host</option><option value="path">Path Only (Ignore Query)</option><option value="custom">Custom (User/Auth)</option></select><label>Purge Method</label><select id="cachePurge"><option value="manual">Manual Purge</option><option value="auto">Auto on Update</option><option value="time">Time-based Expiry</option></select></div><button onclick="designCachePolicy()">Generate Cache Policy</button><div class="result-area" id="cacheResult"></div></div></div>`
+            };
+            return toolsMap[tool.id] || '';
+        }
+
+        // Tool implementations - Real-world production ready
+        window.visualizeLB = () => {
+            let numServers = parseInt(document.getElementById("numServers").value);
+            let algorithm = document.getElementById("lbAlgorithm").value;
+            let requests = parseInt(document.getElementById("numRequests").value);
+            
+            let distribution = new Array(numServers).fill(0);
+            let weights = [5, 3, 2, 1, 1, 1, 1, 1, 1, 1];
+            
+            for (let i = 0; i < requests; i++) {
+                if (algorithm === "roundrobin") {
+                    distribution[i % numServers]++;
+                } else if (algorithm === "leastconn") {
+                    let minIndex = distribution.indexOf(Math.min(...distribution));
+                    distribution[minIndex]++;
+                } else if (algorithm === "weighted") {
+                    let totalWeight = weights.slice(0, numServers).reduce((a, b) => a + b, 0);
+                    let random = Math.floor(Math.random() * totalWeight);
+                    let sum = 0;
+                    for (let j = 0; j < numServers; j++) {
+                        sum += weights[j];
+                        if (random < sum) { distribution[j]++; break; }
+                    }
+                } else if (algorithm === "iphash") {
+                    let hash = i % numServers;
+                    distribution[hash]++;
+                } else {
+                    distribution[Math.floor(Math.random() * numServers)]++;
+                }
+            }
+            
+            let result = `⚖️ LOAD BALANCER SIMULATION\n${'='.repeat(50)}\n`;
+            result += `Algorithm: ${algorithm.toUpperCase()}\n`;
+            result += `Servers: ${numServers} | Requests: ${requests}\n\n`;
+            result += `📊 DISTRIBUTION:\n`;
+            
+            for (let i = 0; i < numServers; i++) {
+                let percent = (distribution[i] / requests * 100).toFixed(1);
+                let bar = "█".repeat(Math.floor(percent / 2));
+                result += `Server ${i+1}: ${bar.padEnd(25)} ${distribution[i]} req (${percent}%)\n`;
+            }
+            
+            let variance = Math.max(...distribution) - Math.min(...distribution);
+            result += `\n💡 ALGORITHM INSIGHTS:\n`;
+            result += `• Distribution variance: ${variance} requests\n`;
+            if (algorithm === "roundrobin") result += `✓ Best for: Identical server capacity, simple round-robin\n`;
+            else if (algorithm === "leastconn") result += `✓ Best for: Variable request processing time, long-lived connections\n`;
+            else if (algorithm === "weighted") result += `✓ Best for: Unequal server capacity, A/B testing\n`;
+            else if (algorithm === "iphash") result += `✓ Best for: Session persistence, consistent hashing\n`;
+            result += `• Recommended for production: Least Connections or Weighted for most workloads`;
+            
+            sessionCache.set('lb', { algorithm, distribution });
+            document.getElementById("lbResult").innerHTML = `<pre>${result}</pre>`;
+        };
+
+        window.generateHealthCheck = () => {
+            let type = document.getElementById("healthType").value;
+            let endpoint = document.getElementById("healthEndpoint").value;
+            let interval = document.getElementById("healthInterval").value;
+            let timeout = document.getElementById("healthTimeout").value;
+            let healthy = document.getElementById("healthHealthy").value;
+            let unhealthy = document.getElementById("healthUnhealthy").value;
+            
+            let configs = {
+                nginx: `upstream backend {\n    server backend1.example.com;\n    server backend2.example.com;\n    \n    # Health Check Configuration\n    health_check interval=${interval}s fails=${unhealthy} passes=${healthy} uri=${endpoint};\n}\n\nserver {\n    listen 80;\n    location / {\n        proxy_pass http://backend;\n        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;\n    }\n}`,
+                haproxy: `backend app_backend\n    option httpchk GET ${endpoint} HTTP/1.0\\r\\nHost:\\ example.com\n    http-check expect status 200\n    server app1 10.0.1.10:8080 check inter ${interval}s rise ${healthy} fall ${unhealthy} timeout ${timeout}s\n    server app2 10.0.1.11:8080 check inter ${interval}s rise ${healthy} fall ${unhealthy} timeout ${timeout}s`,
+                aws: `# Target Group Health Check Settings\nHealthCheckEnabled: true\nHealthCheckPath: "${endpoint}"\nHealthCheckIntervalSeconds: ${interval}\nHealthCheckTimeoutSeconds: ${timeout}\nHealthyThresholdCount: ${healthy}\nUnhealthyThresholdCount: ${unhealthy}\nHealthCheckProtocol: HTTP`
+            };
+            
+            let result = `❤️ HEALTH CHECK CONFIGURATION\n${'='.repeat(50)}\n`;
+            result += `Type: ${type.toUpperCase()}\n`;
+            result += `Endpoint: ${endpoint} | Interval: ${interval}s | Timeout: ${timeout}s\n`;
+            result += `Healthy: ${healthy} checks | Unhealthy: ${unhealthy} checks\n\n`;
+            result += `📝 Nginx Configuration:\n${configs.nginx}\n\n`;
+            result += `📝 HAProxy Configuration:\n${configs.haproxy}\n\n`;
+            result += `📝 AWS ALB Configuration:\n${configs.aws}\n\n`;
+            result += `💡 Best Practices:\n• Health check endpoint should be lightweight (< 100ms)\n• Avoid authentication on health endpoints\n• Use separate health check port for internal monitoring\n• Set timeout = interval / 2 for reliable detection`;
+            
+            sessionCache.set('health', { type, endpoint });
+            document.getElementById("healthResult").innerHTML = `<pre>${result}</pre>`;
+        };
+
+        window.designRateLimiter = () => {
+            let type = document.getElementById("rateType").value;
+            let requests = document.getElementById("rateRequests").value;
+            let windowSec = document.getElementById("rateWindow").value;
+            let burst = document.getElementById("rateBurst").value;
+            let statusCode = document.getElementById("rateStatusCode").value;
+            
+            let configs = {
+                nginx: `# Rate Limiting Configuration\nlimit_req_zone $binary_remote_addr zone=mylimit:10m rate=${requests}r/${windowSec}s;\n\nserver {\n    location / {\n        limit_req zone=mylimit burst=${burst} nodelay;\n        limit_req_status ${statusCode};\n        proxy_pass http://backend;\n    }\n}`,
+                haproxy: `# Rate Limiting Configuration\nfrontend web_frontend\n    stick-table type ip size 1m expire ${windowSec}s store http_req_rate(${windowSec}s)\n    http-request track-sc0 src\n    http-request deny deny_status ${statusCode} if { sc_http_req_rate(0) gt ${requests} }\n    default_backend app_backend`,
+                cloudflare: `# Rate Limit Rule (Cloudflare)\nPath: /*\nRequests: ${requests}\nPeriod: ${windowSec} seconds\nAction: Block\nDuration: 10 minutes\nResponse Code: ${statusCode}`
+            };
+            
+            let result = `🚦 RATE LIMITER CONFIGURATION\n${'='.repeat(50)}\n`;
+            result += `Type: ${type} | ${requests} requests per ${windowSec}s\n`;
+            result += `Burst: ${burst} | Response: ${statusCode}\n\n`;
+            result += `📝 Nginx:\n${configs.nginx}\n\n`;
+            result += `📝 HAProxy:\n${configs.haproxy}\n\n`;
+            result += `📝 Cloudflare:\n${configs.cloudflare}\n\n`;
+            result += `💡 Production Notes:\n• Burst allows temporary spikes beyond limit\n• Use Redis for distributed rate limiting\n• Exclude health checks from rate limits\n• Implement exponential backoff for API clients`;
+            
+            sessionCache.set('ratelimit', { type, requests, windowSec });
+            document.getElementById("rateResult").innerHTML = `<pre>${result}</pre>`;
+        };
+
+        window.generateSSLConfig = () => {
+            let platform = document.getElementById("sslPlatform").value;
+            let domain = document.getElementById("sslDomain").value;
+            let certPath = document.getElementById("sslCert").value;
+            let keyPath = document.getElementById("sslKey").value;
+            let minVersion = document.getElementById("sslMinVersion").value;
+            let cipherProfile = document.getElementById("sslCiphers").value;
+            
+            let ciphers = {
+                modern: "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384",
+                intermediate: "ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256",
+                old: "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:AES128-GCM-SHA256"
+            };
+            
+            let configs = {
+                nginx: `server {\n    listen 443 ssl http2;\n    server_name ${domain};\n    \n    ssl_certificate ${certPath};\n    ssl_certificate_key ${keyPath};\n    ssl_protocols TLSv${minVersion};\n    ssl_ciphers ${ciphers[cipherProfile]};\n    ssl_prefer_server_ciphers on;\n    \n    ssl_session_cache shared:SSL:10m;\n    ssl_session_timeout 10m;\n    \n    ssl_stapling on;\n    ssl_stapling_verify on;\n    \n    location / {\n        proxy_pass http://backend;\n    }\n}`,
+                haproxy: `frontend https_frontend\n    bind :443 ssl crt ${certPath} alpn h2,http/1.1\n    http-request redirect scheme https unless { ssl_fc }\n    \n    bind :443 ssl crt ${certPath} ciphers ${ciphers[cipherProfile]}\n    option ssl-min-ver TLSv${minVersion}\n    \n    default_backend app_backend`,
+                f5: `ltm virtual VS_https_${domain} {\n    destination 0.0.0.0:443\n    ip-protocol tcp\n    profiles {\n        tcp { }\n        http { }\n        clientssl {\n            cert ${certPath}\n            key ${keyPath}\n            ciphers ${ciphers[cipherProfile]}\n            options { no_ssl } \n        }\n    }\n    source 0.0.0.0/0\n}`
+            };
+            
+            let result = `🔒 SSL/TLS TERMINATION CONFIG\n${'='.repeat(50)}\n`;
+            result += `Platform: ${platform.toUpperCase()} | Domain: ${domain}\n`;
+            result += `Min TLS: 1.${minVersion} | Ciphers: ${cipherProfile}\n\n`;
+            result += `📝 ${platform.toUpperCase()} Configuration:\n${configs[platform]}\n\n`;
+            result += `🔐 Security Score: ${minVersion === "1.3" ? "A+ (Perfect)" : "A- (Good)"}\n`;
+            result += `💡 Recommendations:\n• Enable HSTS: add_header Strict-Transport-Security "max-age=31536000"\n• Use automated cert renewal (Let's Encrypt, cert-manager)\n• Monitor expiration: ${new Date(Date.now() + 90*24*60*60*1000).toLocaleDateString()}\n• Test with SSL Labs for production deployment`;
+            
+            sessionCache.set('ssl', { platform, domain });
+            document.getElementById("sslResult").innerHTML = `<pre>${result}</pre>`;
+        };
+
+        window.visualizeTrafficSplit = () => {
+            let backendA = document.getElementById("backendA").value;
+            let weightA = parseInt(document.getElementById("weightA").value);
+            let backendB = document.getElementById("backendB").value;
+            let weightB = parseInt(document.getElementById("weightB").value);
+            let method = document.getElementById("splitMethod").value;
+            let totalWeight = weightA + weightB;
+            
+            let percentA = (weightA / totalWeight * 100).toFixed(1);
+            let percentB = (weightB / totalWeight * 100).toFixed(1);
+            
+            let result = `📊 TRAFFIC SPLIT VISUALIZATION\n${'='.repeat(50)}\n`;
+            result += `Method: ${method.toUpperCase()}\n\n`;
+            result += `┌─────────────────────────────────────────┐\n`;
+            result += `│           TRAFFIC DISTRIBUTION          │\n`;
+            result += `├─────────────────────────────────────────┤\n`;
+            result += `│ ${backendA.padEnd(20)} █${"█".repeat(Math.floor(percentA/2)).padEnd(25)} ${percentA}% │\n`;
+            result += `│ ${backendB.padEnd(20)} █${"█".repeat(Math.floor(percentB/2)).padEnd(25)} ${percentB}% │\n`;
+            result += `└─────────────────────────────────────────┘\n\n`;
+            
+            if (method === "random") {
+                result += `📌 Random (Probability-based):\n• Each request has ${percentA}% chance to hit ${backendA}\n• ${percentB}% chance to hit ${backendB}\n• True random distribution over large sample size\n`;
+            } else if (method === "header") {
+                result += `📌 HTTP Header (User-Test):\n• Clients with header 'X-Test-Group: A' → ${backendA}\n• Clients with header 'X-Test-Group: B' → ${backendB}\n• Great for A/B testing with user cohorts\n`;
+            } else {
+                result += `📌 Cookie-based (Session Stickiness):\n• First request determines assignment\n• Subsequent requests use same backend\n• Maintains user session consistency\n`;
+            }
+            
+            result += `\n💡 Production Config (Nginx):\nupstream backend {\n    server ${backendA} weight=${weightA};\n    server ${backendB} weight=${weightB};\n}\n\n`;
+            result += `📊 Sample distribution for 1000 requests:\n${backendA}: ~${Math.floor(1000 * weightA / totalWeight)} requests\n${backendB}: ~${Math.floor(1000 * weightB / totalWeight)} requests`;
+            
+            sessionCache.set('split', { backendA, backendB, weightA, weightB });
+            document.getElementById("splitResult").innerHTML = `<pre>${result}</pre>`;
+        };
+
+        window.buildF5iRule = () => {
+            let type = document.getElementById("iruleType").value;
+            let target = document.getElementById("iruleTarget").value;
+            let options = document.getElementById("iruleOptions").value;
+            
+            let irules = {
+                redirect: `when HTTP_REQUEST {\n    if { [HTTP::host] equals "${target}" } {\n        HTTP::redirect "https://${options || target}[HTTP::uri]"\n    }\n}`,
+                persist: `when CLIENT_ACCEPTED {\n    persist source_addr 1800\n}\n\nwhen HTTP_REQUEST {\n    set client_ip [IP::client_addr]\n    persist add uie $client_ip 1800\n}`,
+                uri: `when HTTP_REQUEST {\n    if { [HTTP::uri] starts_with "${target}" } {\n        HTTP::uri [string map {"${target}" "${options}"} [HTTP::uri]]\n    }\n}`,
+                ratelimit: `when HTTP_REQUEST {\n    set class_max 100\n    set class_period 60\n    \n    if { [class lookup -value "requests" [IP::client_addr]] > ${options || "50"} } {\n        HTTP::respond 429 content "Rate limit exceeded"\n    }\n    \n    class increment "requests" [IP::client_addr]\n}`,
+                header: `when HTTP_REQUEST {\n    HTTP::header insert "${target}" "${options}"\n}\n\nwhen HTTP_RESPONSE {\n    HTTP::header insert "X-Powered-By" "F5 BIG-IP"\n}`
+            };
+            
+            let result = `🎯 F5 iRule - ${type.toUpperCase()}\n${'='.repeat(50)}\n\n`;
+            result += irules[type];
+            result += `\n\n💡 iRule Best Practices:\n• Test in staging before production\n• Use 'when' events appropriately\n• Avoid heavy processing in data plane\n• Monitor CPU impact with 'show running config'\n• Use class maps for large data sets\n\n📌 Deployment: tmsh modify ltm rule ${type}_rule definition @"${irules[type].replace(/"/g, '\\"')}"`;
+            
+            sessionCache.set('f5', { type });
+            document.getElementById("f5Result").innerHTML = `<pre>${result}</pre>`;
+        };
+
+        window.generateNginxConfig = () => {
+            let domain = document.getElementById("nginxDomain").value;
+            let upstreams = document.getElementById("nginxUpstreams").value.split(',').map(s => s.trim());
+            let lbMethod = document.getElementById("nginxLB").value;
+            let ssl = document.getElementById("nginxSSL").value;
+            let path = document.getElementById("nginxPath").value;
+            
+            let config = `# Nginx Reverse Proxy Configuration\n# Generated for ${domain}\n\nupstream backend_${domain.replace(/\./g, '_')} {\n`;
+            
+            if (lbMethod === "least_conn") config += `    least_conn;\n`;
+            else if (lbMethod === "ip_hash") config += `    ip_hash;\n`;
+            else if (lbMethod === "random") config += `    random;\n`;
+            
+            upstreams.forEach(upstream => {
+                config += `    server ${upstream} max_fails=3 fail_timeout=30s;\n`;
+            });
+            config += `}\n\nserver {\n`;
+            
+            if (ssl === "https") {
+                config += `    listen 443 ssl http2;\n    listen [::]:443 ssl http2;\n`;
+                config += `    server_name ${domain};\n\n`;
+                config += `    ssl_certificate /etc/nginx/ssl/${domain}.crt;\n`;
+                config += `    ssl_certificate_key /etc/nginx/ssl/${domain}.key;\n`;
+                config += `    ssl_protocols TLSv1.2 TLSv1.3;\n\n`;
+            } else {
+                config += `    listen 80;\n    listen [::]:80;\n`;
+                config += `    server_name ${domain};\n\n`;
+            }
+            
+            config += `    # Security Headers\n    add_header X-Frame-Options "SAMEORIGIN" always;\n    add_header X-Content-Type-Options "nosniff" always;\n    add_header X-XSS-Protection "1; mode=block" always;\n\n`;
+            config += `    # Logging\n    access_log /var/log/nginx/${domain}_access.log;\n    error_log /var/log/nginx/${domain}_error.log;\n\n`;
+            config += `    # Proxy Settings\n    location ${path} {\n        proxy_pass http://backend_${domain.replace(/\./g, '_')};\n        proxy_http_version 1.1;\n        proxy_set_header Upgrade $http_upgrade;\n        proxy_set_header Connection 'upgrade';\n        proxy_set_header Host $host;\n        proxy_cache_bypass $http_upgrade;\n        proxy_set_header X-Real-IP $remote_addr;\n        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;\n        proxy_set_header X-Forwarded-Proto $scheme;\n        \n        # Timeouts\n        proxy_connect_timeout 60s;\n        proxy_send_timeout 60s;\n        proxy_read_timeout 60s;\n    }\n}`;
+            
+            let result = `🟢 NGINX CONFIGURATION\n${'='.repeat(50)}\n\n`;
+            result += config;
+            result += `\n\n💡 Validation Commands:\nnginx -t\nnginx -s reload\n\n📌 Production Checklist:\n• Enable gzip compression\n• Configure client_max_body_size\n• Set up log rotation\n• Implement rate limiting\n• Use stub_status for monitoring`;
+            
+            sessionCache.set('nginx', { domain, upstreams });
+            document.getElementById("nginxResult").innerHTML = `<pre>${result}</pre>`;
+        };
+
+        window.buildHAProxyACL = () => {
+            let aclType = document.getElementById("aclType").value;
+            let condition = document.getElementById("aclCondition").value;
+            let action = document.getElementById("aclAction").value;
+            let target = document.getElementById("aclTarget").value;
+            
+            let aclConfigs = {
+                path: `acl is_admin path_beg ${condition}\n${action === "use_backend" ? `use_backend ${target} if is_admin` : action === "redirect" ? `http-request redirect location ${target} if is_admin` : action === "deny" ? `http-request deny if is_admin` : `http-request add-header X-Route ${target} if is_admin`}`,
+                src: `acl allowed_network src ${condition}\n${action === "use_backend" ? `use_backend ${target} if allowed_network` : action === "deny" ? `http-request deny if !allowed_network` : `http-request add-header X-Allowed true if allowed_network`}`,
+                hdr: `acl custom_header hdr(${condition.split(':')[0]}) -m str ${condition.split(':')[1] || "true"}\n${action === "use_backend" ? `use_backend ${target} if custom_header` : action === "redirect" ? `http-request redirect location ${target} if custom_header` : `http-request add-header X-Matched yes if custom_header`}`,
+                method: `acl is_method method ${condition.toUpperCase()}\n${action === "use_backend" ? `use_backend ${target} if is_method` : action === "deny" ? `http-request deny if is_method` : `http-request add-header X-Method ${condition} if is_method`}`,
+                ssl: `acl is_ssl ssl_fc\nhttp-request redirect scheme https unless is_ssl`
+            };
+            
+            let result = `🟠 HAPROXY ACL CONFIGURATION\n${'='.repeat(50)}\n\n`;
+            result += `frontend web_frontend\n    bind :80\n    bind :443 ssl crt /etc/haproxy/certs/\n    \n    # ACL Definitions\n    ${aclConfigs[aclType]}\n    \n    default_backend default_servers\n\nbackend default_servers\n    balance roundrobin\n    server app1 10.0.1.10:8080 check\n    server app2 10.0.1.11:8080 check\n\nbackend ${target}\n    balance leastconn\n    server special1 10.0.1.20:8080 check\n    server special2 10.0.1.21:8080 check\n\n`;
+            result += `💡 Testing Commands:\nhaproxy -c -f /etc/haproxy/haproxy.cfg\n\n📌 Common ACL Patterns:\n• Block bots: hdr_sub(User-Agent) -i bot crawler spider\n• API versioning: path_beg /v1 vs /v2\n• Maintenance mode: path /maintenance use_backend maint_page`;
+            
+            sessionCache.set('haproxy', { aclType, action });
+            document.getElementById("haproxyResult").innerHTML = `<pre>${result}</pre>`;
+        };
+
+        window.testWebSocket = () => {
+            let url = document.getElementById("wsUrl").value;
+            let message = document.getElementById("wsMessage").value;
+            let timeout = document.getElementById("wsTimeout").value;
+            
+            let result = `🔌 WEBSOCKET CONNECTION SIMULATION\n${'='.repeat(50)}\n`;
+            result += `URL: ${url}\n`;
+            result += `Test Message: "${message}"\n`;
+            result += `Timeout: ${timeout}ms\n\n`;
+            
+            if (url === "wss://echo.websocket.org") {
+                result += `✅ Demo Mode: Using public echo server\n`;
+                result += `📤 Sent: "${message}"\n`;
+                result += `📥 Expected Echo: "${message}"\n`;
+                result += `⏱️ Round-trip time: ~${Math.floor(Math.random() * 50 + 10)}ms\n\n`;
+            } else {
+                result += `⚠️ Production Testing Instructions:\n\n`;
+                result += `1. Using wscat (CLI):\n   npm install -g wscat\n   wscat -c "${url}"\n\n`;
+                result += `2. Using browser DevTools:\n   const ws = new WebSocket("${url}");\n   ws.onmessage = (e) => console.log(e.data);\n   ws.send("${message}");\n\n`;
+                result += `3. Using curl:\n   curl -i -N -H "Connection: Upgrade" -H "Upgrade: websocket" ${url}\n\n`;
+            }
+            
+            result += `💡 WebSocket Production Best Practices:\n`;
+            result += `• Implement ping/pong for keepalive (every 30s)\n`;
+            result += `• Handle reconnection with exponential backoff\n`;
+            result += `• Set appropriate timeouts (connection: 10s, idle: 60s)\n`;
+            result += `• Use wss:// in production for encryption\n`;
+            result += `• Monitor connection count and message rate\n`;
+            result += `• Configure load balancer for WebSocket support (Upgrade header)`;
+            
+            document.getElementById("wsResult").innerHTML = `<pre>${result}</pre>`;
+        };
+
+        window.designCachePolicy = () => {
+            let cacheType = document.getElementById("cacheType").value;
+            let ttl = document.getElementById("cacheTTL").value;
+            let keyStrategy = document.getElementById("cacheKey").value;
+            let purgeMethod = document.getElementById("cachePurge").value;
+            
+            let cacheConfigs = {
+                static: `# Static Assets Caching\nlocation ~* \\.(jpg|jpeg|png|gif|ico|css|js)$ {\n    expires ${Math.floor(ttl/86400)}d;\n    add_header Cache-Control "public, immutable";\n    add_header Pragma "public";\n}`,
+                api: `# API Response Caching\nproxy_cache_path /var/cache/nginx levels=1:2 keys_zone=api_cache:10m max_size=1g inactive=${ttl}s use_temp_path=off;\n\nlocation /api/ {\n    proxy_cache api_cache;\n    proxy_cache_key ${keyStrategy === "full" ? "$scheme$proxy_host$request_uri" : "$scheme$proxy_host$uri"};\n    proxy_cache_valid 200 302 ${ttl}s;\n    proxy_cache_valid 404 1m;\n    proxy_cache_use_stale error timeout updating;\n    add_header X-Cache-Status $upstream_cache_status;\n}`,
+                fullpage: `# Full Page Caching\nproxy_cache_path /var/cache/nginx levels=1:2 keys_zone=page_cache:100m max_size=5g inactive=${ttl}s;\n\nserver {\n    set $skip_cache 0;\n    if ($http_cookie ~* "wordpress_logged_in_") { set $skip_cache 1; }\n    \n    proxy_cache page_cache;\n    proxy_cache_bypass $skip_cache;\n    proxy_no_cache $skip_cache;\n    proxy_cache_key "$scheme$request_method$host$request_uri";\n    proxy_cache_valid 200 ${ttl}s;\n    proxy_cache_valid 404 1m;\n}`,
+                micro: `# Micro-caching (1 second TTL)\nproxy_cache_path /var/cache/nginx levels=1:2 keys_zone=micro_cache:10m max_size=1g;\n\nlocation / {\n    proxy_cache micro_cache;\n    proxy_cache_valid 200 1s;\n    proxy_cache_key "$scheme$request_method$host$request_uri$http_authorization";\n    add_header X-Cache-Micro $upstream_cache_status;\n}`
+            };
+            
+            let result = `💾 CACHE POLICY DESIGN\n${'='.repeat(50)}\n`;
+            result += `Cache Type: ${cacheType.toUpperCase()}\n`;
+            result += `TTL: ${ttl}s (${(ttl/60).toFixed(1)} minutes)\n`;
+            result += `Key Strategy: ${keyStrategy}\n`;
+            result += `Purge Method: ${purgeMethod}\n\n`;
+            result += `📝 Configuration:\n${cacheConfigs[cacheType]}\n\n`;
+            result += `💡 Cache Performance Metrics:\n`;
+            result += `• Expected Hit Ratio: ${cacheType === "static" ? "95-99%" : cacheType === "api" ? "70-85%" : "60-80%"}\n`;
+            result += `• Cache Invalidation Strategy: ${purgeMethod === "auto" ? "Automatic on content updates" : "Manual purge required"}\n`;
+            result += `• Memory Requirement: ${cacheType === "fullpage" ? "100MB+" : "10-50MB"}\n\n`;
+            result += `🔧 Purge Commands:\n`;
+            result += `nginx -s reload\n`;
+            result += `rm -rf /var/cache/nginx/*\n`;
+            result += `curl -X PURGE https://yourdomain.com/path`;
+            
+            sessionCache.set('cache', { cacheType, ttl });
+            document.getElementById("cacheResult").innerHTML = `<pre>${result}</pre>`;
+        };
+
+        const tools = ["lb", "health", "ratelimit", "ssl", "split", "f5", "nginx", "haproxy", "websocket", "cache"];
+        
+        function renderTools() {
+            const grid = document.getElementById("toolsGrid");
+            grid.innerHTML = tools.map(id => buildToolHTML({ id })).join('');
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toolsHomeAction() {
+            scrollToTop();
+            const grid = document.getElementById("toolsGrid");
+            grid.style.animation = 'none';
+            setTimeout(() => grid.style.animation = 'fadeInUp 0.6s ease-out', 10);
+        }
+
+        const themeToggle = document.getElementById("themeToggle");
+        themeToggle.addEventListener("click", () => {
+            document.body.classList.toggle("dark");
+            themeToggle.innerText = document.body.classList.contains("dark") ? "☀️ Light Mode" : "🌙 Dark Mode";
+        });
+
+        document.getElementById("homeBtn").addEventListener("click", (e) => {
+            e.preventDefault();
+            window.location.href = window.location.pathname.replace(/appdelivery.*\.html/, '') + 'index.html';
+        });
+        document.getElementById("toolsHomeBtn").addEventListener("click", toolsHomeAction);
+
+        const scrollTopBtn = document.getElementById("scrollTop");
+        window.addEventListener("scroll", () => {
+            scrollTopBtn.classList.toggle("visible", window.pageYOffset > 300);
+        });
+        scrollTopBtn.addEventListener("click", scrollTop);
+
+        renderTools();
+    </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+[
+    {
+        "timestamp": "2025-04-05T10:30:15Z",
+        "sourceIP": "10.0.1.25",
+        "destIP": "8.8.8.8",
+        "sourcePort": 54321,
+        "destPort": 443,
+        "protocol": "TCP",
+        "action": "allow"
+    },
+    {
+        "timestamp": "2025-04-05T10:29:45Z",
+        "sourceIP": "192.168.1.50",
+        "destIP": "185.130.5.253",
+        "sourcePort": 12345,
+        "destPort": 80,
+        "protocol": "TCP",
+        "action": "block",
+        "threatName": "Malicious URL",
+        "severity": "high"
+    },
+    {
+        "timestamp": "2025-04-05T10:28:30Z",
+        "sourceIP": "10.0.2.15",
+        "destIP": "192.168.1.1",
+        "sourcePort": 34567,
+        "destPort": 53,
+        "protocol": "UDP",
+        "action": "allow"
+    },
+    {
+        "timestamp": "2025-04-05T10:25:10Z",
+        "sourceIP": "10.0.1.100",
+        "destIP": "34.120.45.200",
+        "sourcePort": 56789,
+        "destPort": 22,
+        "protocol": "TCP",
+        "action": "allow"
+    },
+    {
+        "timestamp": "2025-04-05T10:20:05Z",
+        "sourceIP": "192.168.2.30",
+        "destIP": "185.130.5.250",
+        "sourcePort": 9876,
+        "destPort": 443,
+        "protocol": "TCP",
+        "action": "block",
+        "threatName": "Command Injection",
+        "severity": "critical"
+    }
+]

@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Azure Frontend AI Agent – SSL/TLS Misconfiguration Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Same design tokens and global styles as cache demo – for brevity, we embed the same CSS as before */
+/* (To avoid repetition, I'll include the full CSS from the previous file, but in a real answer we'd include it once. For completeness, we'll embed again.) */
+:root {
+  --bg: #080c14; --surface: #0d1421; --card: #111827; --border: #1e2d45; --border2: #243550;
+  --text: #c8d6e8; --text-dim: #5a7090; --text-faint: #2d4060; --accent: #00d4ff; --accent2: #0099cc;
+  --green: #00e676; --green2: #00b055; --amber: #ffb300; --red: #ff4444; --purple: #a855f7;
+  --mono: 'JetBrains Mono', monospace; --display: 'Syne', sans-serif; --radius: 6px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; scroll-behavior: smooth; }
+body {
+  font-family: var(--mono);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,212,255,0.012) 2px, rgba(0,212,255,0.012) 4px);
+  pointer-events: none;
+  z-index: 0;
+}
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 2rem;
+  border-bottom: 1px solid var(--border);
+  background: rgba(8,12,20,0.95);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.logo-icon {
+  width: 32px; height: 32px;
+  border: 1.5px solid var(--accent);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.logo-icon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0,212,255,0.15), transparent);
+}
+.logo-icon span {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--accent);
+  position: relative;
+  z-index: 1;
+}
+.logo-text {
+  font-family: var(--display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: #e0eeff;
+  letter-spacing: -0.01em;
+}
+.logo-sub {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: 1px;
+}
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+.version-tag {
+  font-size: 0.65rem;
+  color: var(--accent);
+  border: 1px solid rgba(0,212,255,0.25);
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  letter-spacing: 0.08em;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 240px 1fr 320px;
+  min-height: calc(100vh - 57px);
+  position: relative;
+  z-index: 1;
+}
+.arch-sidebar {
+  border-right: 1px solid var(--border);
+  padding: 1.5rem 0;
+  position: sticky;
+  top: 57px;
+  height: calc(100vh - 57px);
+  overflow-y: auto;
+}
+.arch-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding: 0 1.25rem;
+  margin-bottom: 0.75rem;
+}
+.arch-layers {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 0.75rem;
+}
+.arch-layer {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  cursor: default;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+.arch-layer::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: transparent;
+  transition: background 0.3s;
+}
+.arch-layer.active {
+  background: rgba(0,212,255,0.06);
+  border-color: rgba(0,212,255,0.2);
+}
+.arch-layer.active::before {
+  background: var(--accent);
+}
+.arch-layer.done {
+  background: rgba(0,230,118,0.04);
+  border-color: rgba(0,230,118,0.15);
+}
+.arch-layer.done::before {
+  background: var(--green);
+}
+.layer-num {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--text-faint);
+  min-width: 1.5ch;
+  transition: color 0.3s;
+}
+.arch-layer.active .layer-num { color: var(--accent); }
+.arch-layer.done .layer-num { color: var(--green); }
+.layer-info { flex: 1; }
+.layer-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  transition: color 0.3s;
+  letter-spacing: 0.02em;
+}
+.arch-layer.active .layer-name { color: var(--accent); }
+.arch-layer.done .layer-name { color: var(--green); }
+.layer-desc {
+  font-size: 0.6rem;
+  color: var(--text-faint);
+  margin-top: 1px;
+  transition: color 0.3s;
+}
+.arch-layer.active .layer-desc { color: rgba(0,212,255,0.5); }
+.arch-layer.done .layer-desc { color: rgba(0,230,118,0.4); }
+.layer-status {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.layer-status.idle { color: var(--text-faint); }
+.layer-status.running { color: var(--accent); animation: blink 0.8s ease-in-out infinite; }
+.layer-status.done { color: var(--green); }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.arch-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 1rem 1.25rem;
+}
+.arch-op-section {
+  padding: 0 0.75rem;
+}
+.op-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+  margin-bottom: 2px;
+}
+.op-item.selected {
+  background: rgba(0,212,255,0.08);
+  border-color: rgba(0,212,255,0.25);
+}
+.op-item:hover:not(.selected) {
+  background: rgba(255,255,255,0.03);
+}
+.op-item.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+.op-icon {
+  width: 22px; height: 22px;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.op-icon.fw { background: rgba(0,212,255,0.1); color: var(--accent); }
+.op-icon.cloud { background: rgba(168,85,247,0.1); color: var(--purple); }
+.op-icon.comp { background: rgba(0,230,118,0.1); color: var(--green); }
+.op-icon.net { background: rgba(255,179,0,0.1); color: var(--amber); }
+.op-label { font-size: 0.72rem; color: var(--text-dim); }
+.op-badge {
+  font-size: 0.55rem;
+  background: rgba(255,179,0,0.15);
+  color: var(--amber);
+  padding: 0.1rem 0.35rem;
+  border-radius: 2px;
+  letter-spacing: 0.08em;
+  margin-left: auto;
+}
+.op-badge.live { background: rgba(0,230,118,0.12); color: var(--green); }
+.main {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  min-height: calc(100vh - 57px);
+}
+.op-header {
+  padding: 1.5rem 2rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+.op-breadcrumb {
+  font-size: 0.62rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 0.6rem;
+}
+.op-breadcrumb span { color: var(--accent); }
+.op-title {
+  font-family: var(--display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #e8f4ff;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.4rem;
+}
+.op-meta {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.op-meta-item { display: flex; align-items: center; gap: 0.35rem; }
+.op-meta-item .badge {
+  color: var(--accent);
+  background: rgba(0,212,255,0.08);
+  padding: 0.1rem 0.4rem;
+  border-radius: 2px;
+}
+.section-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding: 1.25rem 2rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+.fw-table-wrap {
+  padding: 0 2rem 1rem;
+  overflow-x: auto;
+}
+.fw-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.7rem;
+}
+.fw-table th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  color: var(--text-faint);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.fw-table td {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid rgba(30,45,69,0.5);
+  vertical-align: middle;
+  white-space: nowrap;
+  transition: background 0.3s;
+}
+.fw-table tr.highlight-remove td {
+  background: rgba(255,68,68,0.06);
+  border-bottom-color: rgba(255,68,68,0.15);
+}
+.fw-table tr.highlight-keep td {
+  background: rgba(0,230,118,0.03);
+}
+.fw-table tr.fading td {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.5s ease;
+}
+.asset-path, .ssl-name, .route-name {
+  font-weight: 600;
+  color: var(--text-dim);
+  font-size: 0.65rem;
+  font-family: var(--mono);
+}
+.status-badge {
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+.status-expired { background: rgba(255,68,68,0.1); color: var(--red); }
+.status-expiring { background: rgba(255,179,0,0.1); color: var(--amber); }
+.status-valid { background: rgba(0,230,118,0.1); color: var(--green); }
+.age-value {
+  font-weight: 700;
+  font-size: 0.65rem;
+}
+.age-value.stale { color: var(--red); }
+.age-value.fresh { color: var(--green); }
+.risk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.risk-critical { background: rgba(255,68,68,0.12); color: var(--red); border: 1px solid rgba(255,68,68,0.2); }
+.risk-high { background: rgba(255,140,0,0.12); color: #ff8c00; border: 1px solid rgba(255,140,0,0.2); }
+.risk-low { background: rgba(0,230,118,0.08); color: var(--green); border: 1px solid rgba(0,230,118,0.15); }
+.risk-medium { background: rgba(255,179,0,0.1); color: var(--amber); border: 1px solid rgba(255,179,0,0.2); }
+.action-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+}
+.action-renew { background: rgba(255,68,68,0.1); color: var(--red); }
+.action-keep { background: rgba(0,230,118,0.08); color: var(--green); }
+.action-review { background: rgba(255,179,0,0.1); color: var(--amber); }
+.action-pending { background: rgba(255,255,255,0.05); color: var(--text-faint); }
+.controls {
+  padding: 1.25rem 2rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: auto;
+  background: rgba(13,20,33,0.8);
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--radius);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  text-transform: uppercase;
+}
+.btn-primary {
+  background: var(--accent);
+  color: var(--bg);
+}
+.btn-primary:hover:not(:disabled) {
+  background: #33ddff;
+  box-shadow: 0 0 20px rgba(0,212,255,0.3);
+}
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.btn-danger {
+  background: rgba(255,68,68,0.12);
+  color: var(--red);
+  border: 1px solid rgba(255,68,68,0.25);
+}
+.btn-danger:hover:not(:disabled) {
+  background: rgba(255,68,68,0.2);
+  box-shadow: 0 0 15px rgba(255,68,68,0.15);
+}
+.btn-danger:disabled { opacity: 0.3; cursor: not-allowed; }
+.btn-ghost {
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--border2);
+}
+.btn-ghost:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+.control-stats {
+  margin-left: auto;
+  display: flex;
+  gap: 1.5rem;
+}
+.stat {
+  text-align: right;
+}
+.stat-val {
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: var(--display);
+  color: var(--text);
+}
+.stat-val.danger { color: var(--red); }
+.stat-val.success { color: var(--green); }
+.stat-label {
+  font-size: 0.58rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.exec-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  position: sticky;
+  top: 57px;
+  height: calc(100vh - 57px);
+  overflow: hidden;
+}
+.panel-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.panel-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+.panel-clear {
+  font-size: 0.6rem;
+  color: var(--text-faint);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: color 0.2s;
+}
+.panel-clear:hover { color: var(--text-dim); }
+.layer-trace {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 0;
+  flex-shrink: 0;
+}
+.trace-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  position: relative;
+}
+.trace-step::after {
+  content: '›';
+  position: absolute;
+  right: -3px;
+  top: 7px;
+  font-size: 0.7rem;
+  color: var(--text-faint);
+}
+.trace-step:last-child::after { display: none; }
+.trace-node {
+  width: 24px; height: 24px;
+  border-radius: 4px;
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: var(--text-faint);
+  transition: all 0.3s;
+  background: var(--card);
+}
+.trace-step.active .trace-node {
+  border-color: var(--accent);
+  background: rgba(0,212,255,0.1);
+  color: var(--accent);
+  box-shadow: 0 0 8px rgba(0,212,255,0.25);
+}
+.trace-step.done .trace-node {
+  border-color: var(--green);
+  background: rgba(0,230,118,0.08);
+  color: var(--green);
+}
+.trace-label {
+  font-size: 0.5rem;
+  color: var(--text-faint);
+  text-align: center;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+}
+.trace-step.active .trace-label { color: var(--accent); }
+.trace-step.done .trace-label { color: var(--green2); }
+.log-stream {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.log-stream::-webkit-scrollbar { width: 3px; }
+.log-stream::-webkit-scrollbar-track { background: transparent; }
+.log-stream::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+.log-entry {
+  padding: 0.5rem 0.6rem;
+  border-radius: 4px;
+  margin-bottom: 3px;
+  animation: fadeInLog 0.25s ease;
+  border-left: 2px solid transparent;
+}
+@keyframes fadeInLog {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.log-entry.sys { border-left-color: var(--border2); }
+.log-entry.orchestrator { border-left-color: var(--accent); background: rgba(0,212,255,0.03); }
+.log-entry.knowledge { border-left-color: var(--purple); background: rgba(168,85,247,0.03); }
+.log-entry.model { border-left-color: #60a5fa; background: rgba(96,165,250,0.03); }
+.log-entry.autonomy { border-left-color: var(--amber); background: rgba(255,179,0,0.03); }
+.log-entry.agent { border-left-color: var(--green); background: rgba(0,230,118,0.03); }
+.log-entry.skill { border-left-color: #f472b6; background: rgba(244,114,182,0.03); }
+.log-entry.success { border-left-color: var(--green); background: rgba(0,230,118,0.05); }
+.log-entry.error { border-left-color: var(--red); background: rgba(255,68,68,0.05); }
+.log-entry.warn { border-left-color: var(--amber); background: rgba(255,179,0,0.05); }
+.log-ts {
+  font-size: 0.55rem;
+  color: var(--text-faint);
+  margin-bottom: 1px;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.log-layer-tag {
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.05rem 0.35rem;
+  border-radius: 2px;
+}
+.tag-orch { background: rgba(0,212,255,0.12); color: var(--accent); }
+.tag-know { background: rgba(168,85,247,0.12); color: var(--purple); }
+.tag-model { background: rgba(96,165,250,0.12); color: #60a5fa; }
+.tag-auto { background: rgba(255,179,0,0.12); color: var(--amber); }
+.tag-agent { background: rgba(0,230,118,0.12); color: var(--green); }
+.tag-skill { background: rgba(244,114,182,0.12); color: #f472b6; }
+.tag-sys { background: rgba(255,255,255,0.06); color: var(--text-faint); }
+.log-msg {
+  font-size: 0.68rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+.log-entry.orchestrator .log-msg { color: rgba(0,212,255,0.9); }
+.log-entry.knowledge .log-msg { color: rgba(168,85,247,0.85); }
+.log-entry.model .log-msg { color: rgba(200,220,255,0.9); }
+.log-entry.autonomy .log-msg { color: rgba(255,179,0,0.9); }
+.log-entry.agent .log-msg { color: rgba(0,230,118,0.9); }
+.log-entry.skill .log-msg { color: rgba(244,114,182,0.9); }
+.log-entry.success .log-msg { color: var(--green); font-weight: 600; }
+.log-entry.error .log-msg { color: var(--red); }
+.ai-block {
+  background: rgba(96,165,250,0.04);
+  border: 1px solid rgba(96,165,250,0.15);
+  border-radius: 4px;
+  padding: 0.6rem 0.75rem;
+  margin: 4px 0;
+  animation: fadeInLog 0.3s ease;
+}
+.ai-block-header {
+  font-size: 0.55rem;
+  color: #60a5fa;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.ai-block-content {
+  font-size: 0.67rem;
+  color: var(--text);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.thinking-dots {
+  display: inline-flex;
+  gap: 3px;
+}
+.thinking-dots span {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: #60a5fa;
+  animation: dots 1.2s ease-in-out infinite;
+}
+.thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+.thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dots {
+  0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+  40% { opacity: 1; transform: scale(1); }
+}
+.result-summary {
+  padding: 0.75rem;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+.result-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.5rem 0.6rem;
+}
+.result-item-val {
+  font-family: var(--display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.result-item-val.r { color: var(--red); }
+.result-item-val.g { color: var(--green); }
+.result-item-val.a { color: var(--amber); }
+.result-item-label {
+  font-size: 0.56rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 1px;
+}
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4,8,16,0.85);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+.modal {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  width: 480px;
+  max-width: 90vw;
+  padding: 1.75rem;
+  box-shadow: 0 0 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,212,255,0.08);
+}
+.modal-icon {
+  width: 40px; height: 40px;
+  border-radius: 8px;
+  background: rgba(255,68,68,0.1);
+  border: 1px solid rgba(255,68,68,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+.modal-title {
+  font-family: var(--display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #e8f4ff;
+  margin-bottom: 0.5rem;
+}
+.modal-desc {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+}
+.modal-list {
+  background: rgba(255,68,68,0.04);
+  border: 1px solid rgba(255,68,68,0.1);
+  border-radius: 4px;
+  padding: 0.75rem;
+  margin-bottom: 1.25rem;
+  max-height: 150px;
+  overflow-y: auto;
+}
+.modal-rule-item {
+  font-size: 0.68rem;
+  color: var(--red);
+  padding: 0.25rem 0;
+  border-bottom: 1px solid rgba(255,68,68,0.08);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.modal-rule-item:last-child { border-bottom: none; }
+.modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+@media (max-width: 1100px) {
+  .layout { grid-template-columns: 200px 1fr 280px; }
+}
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; }
+  .arch-sidebar, .exec-panel { position: static; height: auto; }
+}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon"><span>AI</span></div>
+    <div><div class="logo-text">Azure Frontend AI Agent</div><div class="logo-sub">SSL/TLS · Demo</div></div>
+  </div>
+  <div class="header-status"><div class="status-pill"><div class="dot"></div> Live Demo Mode</div><div class="version-tag">SSL v1.0</div></div>
+</header>
+
+<div class="layout">
+  <aside class="arch-sidebar">
+    <div class="arch-label">Architecture Layers (Azure)</div>
+    <div class="arch-layers">
+      <div class="arch-layer" data-layer="signal"><div class="layer-num">S</div><div class="layer-info"><div class="layer-name">Signal</div><div class="layer-desc">Azure Monitor Alert · Webhook</div></div><div class="layer-status idle" id="ls-signal">●</div></div>
+      <div class="arch-layer" data-layer="orchestrator"><div class="layer-num">O</div><div class="layer-info"><div class="layer-name">Orchestrator</div><div class="layer-desc">Azure Functions (Durable)</div></div><div class="layer-status idle" id="ls-orchestrator">●</div></div>
+      <div class="arch-layer" data-layer="knowledge"><div class="layer-num">K</div><div class="layer-info"><div class="layer-name">Knowledge</div><div class="layer-desc">Azure AI Search · Runbooks</div></div><div class="layer-status idle" id="ls-knowledge">●</div></div>
+      <div class="arch-layer" data-layer="model"><div class="layer-num">F</div><div class="layer-info"><div class="layer-name">Foundation Model</div><div class="layer-desc">Azure OpenAI (GPT-4)</div></div><div class="layer-status idle" id="ls-model">●</div></div>
+      <div class="arch-layer" data-layer="autonomy"><div class="layer-num">A</div><div class="layer-info"><div class="layer-name">Autonomy</div><div class="layer-desc">Logic Apps · Blast Radius</div></div><div class="layer-status idle" id="ls-autonomy">●</div></div>
+      <div class="arch-layer" data-layer="agent"><div class="layer-num">Ag</div><div class="layer-info"><div class="layer-name">Agent</div><div class="layer-desc">SSL Agent</div></div><div class="layer-status idle" id="ls-agent">●</div></div>
+      <div class="arch-layer" data-layer="skill"><div class="layer-num">Sk</div><div class="layer-info"><div class="layer-name">Skill</div><div class="layer-desc">Azure CLI · Cert API</div></div><div class="layer-status idle" id="ls-skill">●</div></div>
+    </div>
+    <div class="arch-divider"></div>
+    <div class="arch-label">Operations</div>
+    <div class="arch-op-section">
+      <div class="op-item selected" data-op="ssl"><div class="op-icon fw">SSL</div><div><div class="op-label">SSL/TLS Misconfiguration</div></div><span class="op-badge live">Live</span></div>
+      <div class="op-item disabled"><div class="op-icon cloud">ROUTE</div><div><div class="op-label">Routing Issues</div></div><span class="op-badge">Soon</span></div>
+      <div class="op-item disabled"><div class="op-icon net">PERF</div><div><div class="op-label">Performance Analysis</div></div><span class="op-badge">Soon</span></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="op-header">
+      <div class="op-breadcrumb">AI Agent → <span>Azure Front Door</span> → SSL/TLS Health</div>
+      <div class="op-title">SSL Certificate Expiration & Misconfiguration</div>
+      <div class="op-meta">
+        <div class="op-meta-item">Front Door <span class="badge">contoso-frontdoor.azurefd.net</span></div>
+        <div class="op-meta-item">Certificate <span class="badge">*.contoso.com</span></div>
+        <div class="op-meta-item">Issuer <span class="badge">DigiCert</span></div>
+        <div class="op-meta-item">Expiration <span class="badge">2025-04-15 (expiring)</span></div>
+      </div>
+    </div>
+
+    <div class="section-label">SSL Certificates & TLS Configurations</div>
+
+    <div class="fw-table-wrap">
+      <table class="fw-table" id="sslTable">
+        <thead><tr><th>Domain</th><th>Certificate Name</th><th>Issuer</th><th>Expiration Date</th><th>Days Left</th><th>Status</th><th>Risk</th><th>Decision</th></tr></thead>
+        <tbody id="sslBody"></tbody>
+      </table>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="btnAnalyze" onclick="startAnalysis()">▶ Run AI Analysis</button>
+      <button class="btn btn-danger" id="btnExecute" onclick="openConfirm()" disabled>⚠ Renew Certificates</button>
+      <button class="btn btn-ghost" onclick="resetAll()">↺ Reset</button>
+      <div class="control-stats">
+        <div class="stat"><div class="stat-val danger" id="statRenew">0</div><div class="stat-label">To Renew</div></div>
+        <div class="stat"><div class="stat-val" id="statReview">0</div><div class="stat-label">Manual Review</div></div>
+        <div class="stat"><div class="stat-val success" id="statKeep">0</div><div class="stat-label">Valid</div></div>
+      </div>
+    </div>
+  </main>
+
+  <aside class="exec-panel">
+    <div class="panel-header"><div class="panel-title">⬡ Execution Trace</div><div class="panel-clear" onclick="clearLog()">Clear</div></div>
+    <div class="layer-trace" id="layerTrace">
+      <div class="trace-step" id="ts-signal"><div class="trace-node">SIG</div><div class="trace-label">Signal</div></div>
+      <div class="trace-step" id="ts-orchestrator"><div class="trace-node">ORC</div><div class="trace-label">Orch.</div></div>
+      <div class="trace-step" id="ts-knowledge"><div class="trace-node">KNW</div><div class="trace-label">Know.</div></div>
+      <div class="trace-step" id="ts-model"><div class="trace-node">LLM</div><div class="trace-label">Model</div></div>
+      <div class="trace-step" id="ts-autonomy"><div class="trace-node">AUT</div><div class="trace-label">Auto.</div></div>
+      <div class="trace-step" id="ts-agent"><div class="trace-node">AGT</div><div class="trace-label">Agent</div></div>
+      <div class="trace-step" id="ts-skill"><div class="trace-node">SKL</div><div class="trace-label">Skill</div></div>
+    </div>
+    <div class="log-stream" id="logStream">
+      <div class="log-entry sys"><div class="log-ts"><span class="log-layer-tag tag-sys">SYSTEM</span> ready</div><div class="log-msg">SSL Agent initialized. Monitoring certificates for contoso-frontdoor.</div></div>
+    </div>
+    <div class="result-summary" id="resultSummary" style="display:none;">
+      <div style="font-size:0.6rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-faint);margin-bottom:0.5rem;">Analysis Result</div>
+      <div class="result-grid">
+        <div class="result-item"><div class="result-item-val r" id="rRenew">0</div><div class="result-item-label">Expired/Expiring</div></div>
+        <div class="result-item"><div class="result-item-val a" id="rReview">0</div><div class="result-item-label">Manual Review</div></div>
+        <div class="result-item"><div class="result-item-val g" id="rKeep">0</div><div class="result-item-label">Valid ✓</div></div>
+        <div class="result-item"><div class="result-item-val" id="rRisk">LOW</div><div class="result-item-label">Exec. Risk Level</div></div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <div class="modal-icon">⚠</div>
+    <div class="modal-title">Confirm Certificate Renewal</div>
+    <div class="modal-desc">The Autonomy Layer has approved renewal of the following SSL certificates. This action will trigger Azure Key Vault certificate renewal and update Front Door bindings.</div>
+    <div class="modal-list" id="modalCertList"></div>
+    <div style="font-size:0.68rem;color:var(--text-dim);margin-bottom:1.25rem;padding:0.6rem;background:rgba(255,179,0,0.05);border:1px solid rgba(255,179,0,0.12);border-radius:4px;">⚡ Autonomy Gate: APPROVED · Blast radius: low (non‑production certificates auto‑renew)</div>
+    <div class="modal-actions"><button class="btn btn-ghost" onclick="closeConfirm()">Cancel</button><button class="btn btn-danger" onclick="executeRenewal()">Confirm Renewal</button></div>
+  </div>
+</div>
+
+<script>
+// SSL Certificates Data
+const CERTIFICATES = [
+  { domain: "*.contoso.com", name: "wildcard-contoso", issuer: "DigiCert", expiration: "2025-04-15", daysLeft: 5, status: "expiring", risk: "high", _expiring: true },
+  { domain: "api.contoso.com", name: "api-cert", issuer: "Let's Encrypt", expiration: "2025-10-01", daysLeft: 120, status: "valid", risk: "low", _expiring: false },
+  { domain: "admin.contoso.com", name: "admin-cert", issuer: "Self-signed", expiration: "2024-12-01", daysLeft: -45, status: "expired", risk: "critical", _expiring: true },
+  { domain: "cdn.contoso.com", name: "cdn-cert", issuer: "DigiCert", expiration: "2026-01-01", daysLeft: 275, status: "valid", risk: "low", _expiring: false },
+  { domain: "staging.contoso.com", name: "staging-cert", issuer: "Let's Encrypt", expiration: "2025-04-20", daysLeft: 10, status: "expiring", risk: "medium", _expiring: true }
+];
+
+let decisions = {};
+let isRunning = false;
+
+function renderTable() {
+  const tbody = document.getElementById('sslBody');
+  tbody.innerHTML = '';
+  CERTIFICATES.forEach(cert => {
+    const dec = decisions[cert.domain] || 'pending';
+    const row = document.createElement('tr');
+    row.id = `row-${cert.domain.replace(/[\.\*]/g, '-')}`;
+    if (dec === 'renew') row.classList.add('highlight-remove');
+    else if (dec === 'keep') row.classList.add('highlight-keep');
+
+    const statusClass = cert.status === 'expired' ? 'status-expired' : (cert.status === 'expiring' ? 'status-expiring' : 'status-valid');
+    const riskClass = `risk-${cert.risk}`;
+    let decHtml = '<span class="action-indicator action-pending">Pending</span>';
+    if (dec === 'renew') decHtml = '<span class="action-indicator action-renew">⟳ Renew</span>';
+    else if (dec === 'keep') decHtml = '<span class="action-indicator action-keep">✓ Keep</span>';
+    else if (dec === 'review') decHtml = '<span class="action-indicator action-review">⚑ Review</span>';
+
+    row.innerHTML = `
+      <td><span class="ssl-name">${cert.domain}</span></td>
+      <td>${cert.name}</td>
+      <td>${cert.issuer}</td>
+      <td>${cert.expiration}</td>
+      <td>${cert.daysLeft}</td>
+      <td><span class="status-badge ${statusClass}">${cert.status.toUpperCase()}</span></td>
+      <td><span class="risk-badge ${riskClass}">${cert.risk.toUpperCase()}</span></td>
+      <td>${decHtml}</td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+// Logging, layer helpers same as before (reuse functions from cache demo)
+function now() { return new Date().toLocaleTimeString('en-US', { hour12: false, hour:'2-digit', minute:'2-digit', second:'2-digit' }); }
+function log(type, layer, msg) { /* same as earlier */ const stream = document.getElementById('logStream'); const entry = document.createElement('div'); entry.className = `log-entry ${type}`; const tagMap = { orchestrator:'tag-orch', knowledge:'tag-know', model:'tag-model', autonomy:'tag-auto', agent:'tag-agent', skill:'tag-skill', sys:'tag-sys', success:'tag-sys', error:'tag-sys', warn:'tag-auto' }; entry.innerHTML = `<div class="log-ts"><span class="log-layer-tag ${tagMap[type]||'tag-sys'}">${layer}</span> ${now()}</div><div class="log-msg">${msg}</div>`; stream.appendChild(entry); stream.scrollTop = stream.scrollHeight; }
+function setLayer(name, state) { const layer = document.querySelector(`[data-layer="${name}"]`); if (layer) layer.className = `arch-layer ${state}`; const ls = document.getElementById(`ls-${name}`); if (ls) { ls.className = `layer-status ${state}`; ls.textContent = state === 'running' ? '◉' : state === 'done' ? '✓' : '●'; } const ts = document.getElementById(`ts-${name}`); if (ts) ts.className = `trace-step ${state}`; }
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+function clearLog() { document.getElementById('logStream').innerHTML = ''; }
+
+async function startAnalysis() {
+  if (isRunning) return;
+  isRunning = true;
+  decisions = {};
+  renderTable();
+  document.getElementById('btnAnalyze').disabled = true;
+  document.getElementById('btnExecute').disabled = true;
+  document.getElementById('resultSummary').style.display = 'none';
+  document.getElementById('statRenew').textContent = '0';
+  document.getElementById('statReview').textContent = '0';
+  document.getElementById('statKeep').textContent = '0';
+  clearLog();
+
+  // Simulate layers (similar to cache demo)
+  setLayer('signal', 'running'); log('sys', 'SIGNAL', 'Azure Monitor Alert: SSL certificate expiration warning for *.contoso.com'); await delay(600); setLayer('signal', 'done'); await delay(400);
+  setLayer('orchestrator', 'running'); log('orchestrator', 'ORCHESTRATOR', 'Intent: SSL_HEALTH · resource=contoso-frontdoor'); await delay(500); setLayer('orchestrator', 'done'); await delay(400);
+  setLayer('knowledge', 'running'); log('knowledge', 'KNOWLEDGE', 'RAG: SSL expiration runbooks, auto‑renewal policies'); await delay(700); setLayer('knowledge', 'done'); await delay(400);
+  setLayer('model', 'running'); log('model', 'LLM', 'Analyzing certificates against policy...'); await delay(1200);
+  // AI decision logic
+  const decisionsMap = {};
+  let renew=0, keep=0, review=0;
+  CERTIFICATES.forEach(c => {
+    if (c.status === 'expired') { decisionsMap[c.domain] = 'renew'; renew++; }
+    else if (c.status === 'expiring' && c.risk !== 'critical') { decisionsMap[c.domain] = 'renew'; renew++; }
+    else if (c.status === 'expiring' && c.risk === 'critical') { decisionsMap[c.domain] = 'review'; review++; }
+    else { decisionsMap[c.domain] = 'keep'; keep++; }
+  });
+  const summary = `${renew} certificates require renewal. ${review} need manual review (critical).`;
+  setLayer('model', 'done'); await delay(300);
+  log('model', 'LLM', `Analysis complete · Renew: ${renew} · Keep: ${keep} · Review: ${review}`); await delay(300);
+  setLayer('autonomy', 'running'); log('autonomy', 'AUTONOMY', 'Evaluating renewal risk...'); await delay(500); log('autonomy', 'AUTONOMY', `Gate APPROVED for ${renew} certificates`); setLayer('autonomy', 'done'); await delay(300);
+  setLayer('agent', 'running'); log('agent', 'SSL-AGENT', 'SSL Agent activated · Azure Key Vault integration'); await delay(500); setLayer('agent', 'done'); await delay(300);
+  setLayer('skill', 'running'); log('skill', 'SKILL', 'az keyvault certificate renew --name ...'); await delay(600); setLayer('skill', 'done'); await delay(300);
+
+  decisions = decisionsMap;
+  renderTable();
+  document.getElementById('statRenew').textContent = renew;
+  document.getElementById('statReview').textContent = review;
+  document.getElementById('statKeep').textContent = keep;
+  document.getElementById('rRenew').textContent = renew;
+  document.getElementById('rReview').textContent = review;
+  document.getElementById('rKeep').textContent = keep;
+  document.getElementById('rRisk').textContent = review > 0 ? "MEDIUM" : "LOW";
+  document.getElementById('resultSummary').style.display = 'block';
+  log('success', 'COMPLETE', `${renew} certificates queued for renewal.`);
+  if (renew > 0) document.getElementById('btnExecute').disabled = false;
+  document.getElementById('btnAnalyze').disabled = false;
+  isRunning = false;
+}
+
+function openConfirm() {
+  const toRenew = CERTIFICATES.filter(c => decisions[c.domain] === 'renew');
+  const list = document.getElementById('modalCertList');
+  list.innerHTML = toRenew.map(c => `<div class="modal-rule-item">⬡ <strong>${c.domain}</strong> · expires ${c.expiration} · Risk: ${c.risk.toUpperCase()}</div>`).join('');
+  document.getElementById('confirmModal').classList.add('open');
+}
+function closeConfirm() { document.getElementById('confirmModal').classList.remove('open'); }
+async function executeRenewal() {
+  closeConfirm();
+  const toRenew = CERTIFICATES.filter(c => decisions[c.domain] === 'renew');
+  document.getElementById('btnExecute').disabled = true;
+  log('skill', 'SKILL', `Initiating renewal for ${toRenew.length} certificates...`);
+  for (const cert of toRenew) {
+    await delay(600);
+    log('skill', 'SKILL', `RENEW: ${cert.domain}`);
+    const row = document.getElementById(`row-${cert.domain.replace(/[\.\*]/g, '-')}`);
+    if (row) { row.classList.add('fading'); await delay(500); row.remove(); }
+  }
+  log('success', 'COMPLETE', `✓ ${toRenew.length} certificates renewed.`);
+  document.getElementById('statRenew').textContent = '0';
+  document.getElementById('rRenew').textContent = '0';
+}
+function resetAll() {
+  if (isRunning) return;
+  decisions = {};
+  document.getElementById('btnAnalyze').disabled = false;
+  document.getElementById('btnExecute').disabled = true;
+  document.getElementById('resultSummary').style.display = 'none';
+  ['signal','orchestrator','knowledge','model','autonomy','agent','skill'].forEach(l => setLayer(l, ''));
+  clearLog();
+  log('sys', 'SYSTEM', 'SSL Agent reset. Monitoring certificates.');
+  renderTable();
+}
+renderTable();
+</script>
+</body>
+</html>

@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>DevSecOps Suite | CI/CD, IaC & Automation Security</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --accent: #ef4444;
+            --accent-dark: #dc2626;
+            --accent-glow: rgba(239, 68, 68, 0.2);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --devops: #0ea5e9;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.dark {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: var(--transition);
+            line-height: 1.5;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes scaleIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes flowLine {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(8px);
+            padding: 12px 0;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-icon {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .btn-icon:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            border-color: var(--accent);
+            background: var(--accent-glow);
+        }
+
+        .theme-toggle {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            color: var(--text-primary);
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--devops), var(--info));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+            gap: 28px;
+            margin: 40px 0;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .tool-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            animation: scaleIn 0.4s ease-out;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent);
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-primary) 100%);
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .card-header h3 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: var(--transition);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        button:not(.btn-icon):not(.theme-toggle) {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        button:hover:not(.btn-icon):not(.theme-toggle) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .result-area {
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--bg-primary);
+            border-radius: 16px;
+            border-left: 4px solid var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .result-area pre {
+            white-space: pre-wrap;
+            font-family: inherit;
+            margin: 0;
+        }
+
+        .pipeline-stage {
+            display: inline-block;
+            padding: 8px 12px;
+            margin: 4px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.75rem;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: var(--accent-glow);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-left: 8px;
+        }
+
+        .severity-high { color: var(--danger); font-weight: bold; }
+        .severity-medium { color: var(--warning); font-weight: bold; }
+        .severity-low { color: var(--success); }
+
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--accent);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: var(--transition);
+            z-index: 99;
+        }
+
+        .scroll-top.visible { opacity: 1; }
+
+        .site-footer {
+            margin-top: 60px;
+            border-top: 1px solid var(--border);
+            padding: 32px 0;
+            background: var(--bg-secondary);
+        }
+
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .ft-links { display: flex; gap: 24px; }
+        .ft-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .ft-links a:hover { color: var(--accent); }
+
+        @media (max-width: 768px) {
+            .tools-grid { grid-template-columns: 1fr; }
+            .footer-inner { flex-direction: column; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="container nav-container">
+            <div class="logo-area">
+                <a href="index.html" class="btn-icon" id="homeBtn">🏠 Home</a>
+                <button class="btn-icon" id="toolsHomeBtn">🛠️ Tools Home</button>
+                <h1>⚙️ DevSecOps & Infrastructure Suite</h1>
+            </div>
+            <button class="theme-toggle" id="themeToggle">🌙 Dark Mode</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="tools-grid" id="toolsGrid"></div>
+    </div>
+
+    <div class="scroll-top" id="scrollTop">↑</div>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-inner">
+                <span class="ft-name">Balamurugan Sivaraman</span>
+                <span class="ft-copy">© 2026 · DevSecOps Suite · CI/CD, IaC & Automation Security</span>
+                <div class="ft-links">
+                    <a href="https://www.linkedin.com/in/bala-murugan-s/" target="_blank">LinkedIn</a>
+                    <a href="https://bala-murugan-s.github.io" target="_blank">GitHub</a>
+                    <a href="https://wa.me/919003234312" target="_blank">WhatsApp</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Session Cache
+        const sessionCache = {
+            get: (key) => {
+                try {
+                    const item = sessionStorage.getItem(key);
+                    return item ? JSON.parse(item) : null;
+                } catch(e) { return null; }
+            },
+            set: (key, value) => {
+                sessionStorage.setItem(key, JSON.stringify(value));
+            }
+        };
+
+        // Helper functions
+        function generateSBOM(project, version, dependencies) {
+            const timestamp = new Date().toISOString();
+            return {
+                bomFormat: "CycloneDX",
+                specVersion: "1.4",
+                version: 1,
+                metadata: {
+                    timestamp: timestamp,
+                    component: {
+                        type: "application",
+                        name: project,
+                        version: version,
+                        bomRef: project
+                    }
+                },
+                components: dependencies.map((dep, i) => ({
+                    type: "library",
+                    name: dep.name,
+                    version: dep.version,
+                    bomRef: `${dep.name}@${dep.version}`,
+                    licenses: dep.license ? [{ license: { name: dep.license } }] : []
+                }))
+            };
+        }
+
+        function lintDockerfile(content) {
+            const issues = [];
+            const lines = content.split('\n');
+            
+            if (!content.match(/FROM/i)) issues.push({ severity: "HIGH", msg: "No FROM instruction - Dockerfile must start with a base image" });
+            if (content.match(/USER root/)) issues.push({ severity: "MEDIUM", msg: "Running as root - Use non-root user for security" });
+            if (!content.match(/WORKDIR/i)) issues.push({ severity: "LOW", msg: "No WORKDIR set - Consider setting a working directory" });
+            if (content.match(/COPY.*\.\//) && !content.match(/\nCOPY --chown=/)) issues.push({ severity: "MEDIUM", msg: "File permissions not explicitly set - Use COPY --chown=" });
+            if (content.match(/RUN npm install|pip install|apk add/) && !content.match(/--no-cache/)) issues.push({ severity: "LOW", msg: "Package manager without cache cleanup - Consider --no-cache or cleaning apt cache" });
+            if (content.match(/ENV.*PASSWORD|SECRET|TOKEN|KEY/i)) issues.push({ severity: "CRITICAL", msg: "Hardcoded secrets in Dockerfile - Use build args or secrets" });
+            if (content.match(/ADD .*\.tar\.gz|\.zip/) && !content.match(/COPY/)) issues.push({ severity: "MEDIUM", msg: "Using ADD for archives - Use COPY for clarity, ADD can have side effects" });
+            if (!content.match(/EXPOSE/i)) issues.push({ severity: "INFO", msg: "No EXPOSE instruction - Document which ports the container listens on" });
+            
+            return issues;
+        }
+
+        function buildToolHTML(tool) {
+            const toolsMap = {
+                pipeline: `<div class="tool-card"><div class="card-header"><h3>🚀 CI/CD Pipeline Visualizer <span class="badge">Security Stages</span></h3></div><div class="card-body"><div class="input-group"><label>Pipeline Name</label><input type="text" id="pipelineName" placeholder="production-deploy"><label style="margin-top:12px">Select Security Stages</label><select id="securityStages" multiple style="height: 120px;"><option value="SAST">SAST - Static Analysis</option><option value="SCA">SCA - Dependency Scan</option><option value="Container">Container Scan</option><option value="DAST">DAST - Dynamic Scan</option><option value="Infrastructure">Infra as Code Scan</option><option value="Secret">Secret Detection</option><option value="Artifact">Artifact Signing</option></select></div><button onclick="visualizePipeline()">Generate Pipeline Map</button><div class="result-area" id="pipelineResult"></div></div></div>`,
+                
+                sbom: `<div class="tool-card"><div class="card-header"><h3>📋 SBOM Generator <span class="badge">CycloneDX Format</span></h3></div><div class="card-body"><div class="input-group"><label>Project Name</label><input type="text" id="sbomProject" placeholder="my-app"><label>Version</label><input type="text" id="sbomVersion" placeholder="1.0.0"><label>Dependencies (name:version:license)</label><textarea id="sbomDeps" placeholder="react:18.2.0:MIT&#10;express:4.18.0:MIT&#10;lodash:4.17.21:MIT"></textarea></div><button onclick="generateSBOMFile()">Generate SBOM</button><div class="result-area" id="sbomResult"></div></div></div>`,
+                
+                dockerfile: `<div class="tool-card"><div class="card-header"><h3>🐳 Dockerfile Linter <span class="badge">Best Practices</span></h3></div><div class="card-body"><div class="input-group"><label>Paste Dockerfile Content</label><textarea id="dockerfileContent" placeholder="FROM node:18-alpine&#10;WORKDIR /app&#10;COPY package*.json ./&#10;RUN npm ci --only=production&#10;COPY . .&#10;USER node&#10;EXPOSE 3000&#10;CMD [&quot;node&quot;, &quot;server.js&quot;]"></textarea></div><button onclick="lintDockerfileContent()">Lint Dockerfile</button><div class="result-area" id="dockerResult"></div></div></div>`,
+                
+                githook: `<div class="tool-card"><div class="card-header"><h3>🔗 Git Hook Generator <span class="badge">Pre-commit Security</span></h3></div><div class="card-body"><div class="input-group"><label>Hook Type</label><select id="hookType"><option value="pre-commit">pre-commit</option><option value="pre-push">pre-push</option><option value="commit-msg">commit-msg</option></select><label>Checks to Include</label><select id="hookChecks" multiple style="height: 100px;"><option value="secret">Secret Detection</option><option value="lint">Code Linting</option><option value="format">Format Checking</option><option value="test">Unit Tests</option><option value="sbom">SBOM Update</option></select></div><button onclick="generateGitHook()">Generate Git Hook</button><div class="result-area" id="hookResult"></div></div></div>`,
+                
+                ansible: `<div class="tool-card"><div class="card-header"><h3>📜 Ansible Playbook Validator <span class="badge">Syntax & Best Practices</span></h3></div><div class="card-body"><div class="input-group"><label>Paste Ansible Playbook (YAML)</label><textarea id="ansiblePlaybook" placeholder="---&#10;- name: Install and configure web server&#10;  hosts: webservers&#10;  become: yes&#10;  tasks:&#10;    - name: Install nginx&#10;      apt:&#10;        name: nginx&#10;        state: present"></textarea></div><button onclick="validateAnsible()">Validate Playbook</button><div class="result-area" id="ansibleResult"></div></div></div>`,
+                
+                terraform: `<div class="tool-card"><div class="card-header"><h3>🏗️ Terraform Module Builder <span class="badge">Reusable Templates</span></h3></div><div class="card-body"><div class="input-group"><label>Module Name</label><input type="text" id="tfModuleName" placeholder="aws-vpc"><label>Provider</label><select id="tfProvider"><option value="aws">AWS</option><option value="azure">Azure</option><option value="gcp">GCP</option></select><label>Resources (comma-separated)</label><input type="text" id="tfResources" placeholder="vpc,subnet,security_group"></div><button onclick="buildTerraformModule()">Generate Module</button><div class="result-area" id="terraformResult"></div></div></div>`,
+                
+                k8s: `<div class="tool-card"><div class="card-header"><h3>☸️ K8s Manifest Validator <span class="badge">Security Context</span></h3></div><div class="card-body"><div class="input-group"><label>Paste Kubernetes Manifest (YAML)</label><textarea id="k8sManifest" placeholder="apiVersion: v1&#10;kind: Pod&#10;metadata:&#10;  name: nginx&#10;spec:&#10;  containers:&#10;  - name: nginx&#10;    image: nginx:latest&#10;    securityContext:&#10;      runAsNonRoot: true"></textarea></div><button onclick="validateK8sManifest()">Validate Manifest</button><div class="result-area" id="k8sResult"></div></div></div>`,
+                
+                signing: `<div class="tool-card"><div class="card-header"><h3>✍️ Artifact Signing Simulator <span class="badge">Cosign/Sigstore</span></h3></div><div class="card-body"><div class="input-group"><label>Artifact Name</label><input type="text" id="artifactName" placeholder="myapp:v1.0.0"><label>Signing Method</label><select id="signMethod"><option value="cosign">Cosign (Keyless)</option><option value="gpg">GPG Signing</option><option value="notary">Notary v2</option></select></div><button onclick="simulateSigning()">Simulate Signing</button><div class="result-area" id="signResult"></div></div></div>`,
+                
+                vault: `<div class="tool-card"><div class="card-header"><h3>🔐 Environment Vault Helper <span class="badge">Secret Management</span></h3></div><div class="card-body"><div class="input-group"><label>Environment</label><select id="vaultEnv"><option value="dev">Development</option><option value="staging">Staging</option><option value="prod">Production</option></select><label>Secrets (key:value)</label><textarea id="vaultSecrets" placeholder="DATABASE_URL:postgresql://localhost/db&#10;API_KEY:sk-test-12345&#10;JWT_SECRET:supersecret"></textarea></div><button onclick="generateVaultConfig()">Generate Vault Config</button><div class="result-area" id="vaultResult"></div></div></div>`,
+                
+                pipelineScan: `<div class="tool-card"><div class="card-header"><h3>🔍 Pipeline Security Scanner <span class="badge">CI/CD Misconfigurations</span></h3></div><div class="card-body"><div class="input-group"><label>Paste CI/CD Config (GitHub Actions/GitLab CI)</label><textarea id="cicdConfig" placeholder="name: Deploy&#10;on: push&#10;jobs:&#10;  deploy:&#10;    runs-on: ubuntu-latest&#10;    steps:&#10;      - uses: actions/checkout@v2&#10;      - run: npm test&#10;      - run: npm run deploy&#10;        env:&#10;          AWS_SECRET: \${{ secrets.AWS_SECRET }}"></textarea></div><button onclick="scanPipelineSecurity()">Scan Pipeline</button><div class="result-area" id="scanResult"></div></div></div>`
+            };
+            return toolsMap[tool.id] || '';
+        }
+
+        // Tool implementations
+        window.visualizePipeline = () => {
+            let name = document.getElementById("pipelineName").value;
+            let stages = Array.from(document.getElementById("securityStages").selectedOptions).map(opt => opt.value);
+            let result = `🚀 PIPELINE: ${name}\n${'='.repeat(50)}\n\n`;
+            result += `📦 SOURCE → BUILD → TEST → `;
+            stages.forEach(s => result += `[🔒 ${s}] → `);
+            result += `DEPLOY → MONITOR\n\n`;
+            result += `🔐 Security Integration Points:\n`;
+            stages.forEach(s => {
+                result += `  ✓ ${s}: Integrated at build/test stage\n`;
+            });
+            result += `\n💡 Best Practices:\n`;
+            result += `• Shift Left: Run SAST/SCA early in pipeline\n`;
+            result += `• Immutable Artifacts: Sign and verify\n`;
+            result += `• Least Privilege: Use OIDC for cloud auth\n`;
+            sessionCache.set('pipeline', { name, stages });
+            document.getElementById("pipelineResult").innerHTML = `<pre>${result}</pre>`;
+        };
+
+        window.generateSBOMFile = () => {
+            let project = document.getElementById("sbomProject").value;
+            let version = document.getElementById("sbomVersion").value;
+            let depsText = document.getElementById("sbomDeps").value;
+            let deps = depsText.split('\n').filter(l => l.trim()).map(line => {
+                let parts = line.split(':');
+                return { name: parts[0], version: parts[1] || '1.0.0', license: parts[2] || 'Unknown' };
+            });
+            let sbom = generateSBOM(project, version, deps);
+            let result = `📋 SOFTWARE BILL OF MATERIALS\n${'='.repeat(50)}\n`;
+            result += `Project: ${project} v${version}\n`;
+            result += `Generated: ${new Date().toISOString()}\n`;
+            result += `Components: ${deps.length}\n\n`;
+            result += JSON.stringify(sbom, null, 2);
+            sessionCache.set('sbom', sbom);
+            document.getElementById("sbomResult").innerHTML = `<pre>${result}</pre>`;
+        };
+
+        window.lintDockerfileContent = () => {
+            let content = document.getElementById("dockerfileContent").value;
+            let issues = lintDockerfile(content);
+            let result = `🐳 DOCKERFILE LINT RESULTS\n${'='.repeat(50)}\n\n`;
+            if (issues.length === 0) {
+                result += "✅ No issues found! Dockerfile follows best practices.\n";
+            } else {
+                result += `⚠️ Found ${issues.length} issue(s):\n\n`;
+                issues.forEach(issue => {
+                    result += `[${issue.severity}] ${issue.msg}\n`;
+                });
+            }
+            result += `\n💡 Recommendations:\n`;
+            result += `• Use specific tags (not 'latest')\n`;
+            result += `• Multi-stage builds for smaller images\n`;
+            result += `• .dockerignore to exclude secrets\n`;
+            document.getElementById("dockerResult").innerHTML = `<pre>${result}</pre>`;
+        };
+
+        window.generateGitHook = () => {
+            let hookType = document.getElementById("hookType").value;
+            let checks = Array.from(document.getElementById("hookChecks").selectedOptions).map(opt => opt.value);
+            let hook = `#!/bin/sh\n# ${hookType} hook generated by DevSecOps Suite\n\n`;
+            hook += `echo "Running ${hookType} security checks..."\n\n`;
+            
+            if (checks.includes('secret')) {
+                hook += `# Secret Detection\ngrep -r "API_KEY\\|SECRET\\|TOKEN\\|PASSWORD" --exclude-dir=.git . && {\n  echo "❌ Hardcoded secrets detected!"\n  exit 1\n}\n`;
+            }
+            if (checks.includes('lint')) {
+                hook += `# Code Linting\nnpm run lint || { echo "❌ Linting failed!"; exit 1; }\n`;
+            }
+            if (checks.includes('format')) {
+                hook += `# Format Check\nnpm run format:check || { echo "❌ Format check failed!"; exit 1; }\n`;
+            }
+            if (checks.includes('test')) {
+                hook += `# Unit Tests\nnpm test || { echo "❌ Tests failed!"; exit 1; }\n`;
+            }
+            hook += `\necho "✅ All checks passed!"\n`;
+            
+            sessionCache.set('githook', { hookType, checks });
+            document.getElementById("hookResult").innerHTML = `<pre>${hook}</pre>`;
+        };
+
+        window.validateAnsible = () => {
+            let playbook = document.getElementById("ansiblePlaybook").value;
+            let issues = [];
+            
+            if (!playbook.match(/---/)) issues.push("Missing YAML document start (---)");
+            if (!playbook.match(/hosts:/)) issues.push("No hosts specified - Playbook needs target hosts");
+            if (!playbook.match(/tasks:/)) issues.push("No tasks defined - Playbook is empty");
+            if (playbook.match(/become: yes/) && !playbook.match(/become_user:/)) issues.push("Using become without become_user - Consider specifying user");
+            if (playbook.match(/shell:/) && !playbook.match(/command:/)) issues.push("Using shell module - Prefer command module when possible");
+            
+            let result = `📜 ANSIBLE VALIDATION\n${'='.repeat(50)}\n\n`;
+            result += issues.length === 0 ? "✅ Playbook appears valid!\n\n" : `⚠️ Issues found:\n${issues.join('\n')}\n\n`;
+            result += `💡 Best Practices:\n`;
+            result += `• Use ansible-lint for comprehensive checking\n`;
+            result += `• Store secrets in ansible-vault\n`;
+            result += `• Use roles for reusability\n`;
+            document.getElementById("ansibleResult").innerHTML = `<pre>${result}</pre>`;
+        };
+
+        window.buildTerraformModule = () => {
+            let name = document.getElementById("tfModuleName").value;
+            let provider = document.getElementById("tfProvider").value;
+            let resources = document.getElementById("tfResources").value.split(',').map(r => r.trim());
+            
+            let module = `# Terraform Module: ${name}\n# Provider: ${provider}\n\n`;
+            module += `variable "name" {\n  description = "Name prefix for resources"\n  type = string\n}\n\n`;
+            module += `variable "tags" {\n  description = "Tags to apply"\n  type = map(string)\n  default = {}\n}\n\n`;
+            module += `# Main Resources\n`;
+            resources.forEach(res => {
+                module += `resource "${provider}_${res}" "this" {\n`;
+                module += `  name = var.name\n`;
+                module += `  tags = var.tags\n`;
+                module += `}\n\n`;
+            });
+            module += `# Outputs\noutput "resource_ids" {\n  value = {\n`;
+            resources.forEach(res => {
+                module += `    ${res} = ${provider}_${res}.this.id\n`;
+            });
+            module += `  }\n}\n`;
+            
+            sessionCache.set('terraform', { name, provider, resources });
+            document.getElementById("terraformResult").innerHTML = `<pre>${module}</pre>`;
+        };
+
+        window.validateK8sManifest = () => {
+            let manifest = document.getElementById("k8sManifest").value;
+            let issues = [];
+            
+            if (manifest.match(/image:.*latest/)) issues.push({ severity: "MEDIUM", msg: "Using 'latest' tag - Pin to specific versions" });
+            if (!manifest.match(/runAsNonRoot/) && manifest.match(/kind: Pod|Deployment/)) issues.push({ severity: "HIGH", msg: "Missing runAsNonRoot in securityContext" });
+            if (!manifest.match(/readOnlyRootFilesystem/) && manifest.match(/kind: Pod|Deployment/)) issues.push({ severity: "MEDIUM", msg: "Consider readOnlyRootFilesystem: true" });
+            if (manifest.match(/allowPrivilegeEscalation:\s*true/)) issues.push({ severity: "HIGH", msg: "allowPrivilegeEscalation enabled - Set to false" });
+            if (!manifest.match(/resources:/) && manifest.match(/kind: Pod|Deployment/)) issues.push({ severity: "MEDIUM", msg: "No resource limits/requests defined" });
+            if (manifest.match(/serviceAccountName: default/)) issues.push({ severity: "LOW", msg: "Using default service account - Create dedicated SA" });
+            
+            let result = `☸️ K8S MANIFEST VALIDATION\n${'='.repeat(50)}\n\n`;
+            if (issues.length === 0) {
+                result += "✅ Manifest follows security best practices!\n";
+            } else {
+                result += `⚠️ Found ${issues.length} security recommendations:\n\n`;
+                issues.forEach(issue => {
+                    result += `[${issue.severity}] ${issue.msg}\n`;
+                });
+            }
+            result += `\n💡 Pod Security Standards:\n• Restricted profile is the most secure\n• Use admission controllers (PSP, Kyverno)`;
+            document.getElementById("k8sResult").innerHTML = `<pre>${result}</pre>`;
+        };
+
+        window.simulateSigning = () => {
+            let artifact = document.getElementById("artifactName").value;
+            let method = document.getElementById("signMethod").value;
+            let signature = `-----BEGIN SIGNATURE-----\n${Array(40).fill('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789').map(s => s[Math.floor(Math.random() * s.length)]).join('')}\n-----END SIGNATURE-----`;
+            
+            let result = `✍️ ARTIFACT SIGNING SIMULATION\n${'='.repeat(50)}\n\n`;
+            result += `📦 Artifact: ${artifact}\n`;
+            result += `🔐 Method: ${method}\n\n`;
+            result += `🔑 Signing Process:\n`;
+            result += `1. Generate key pair (if using ${method})\n`;
+            result += `2. Calculate artifact digest (SHA-256)\n`;
+            result += `3. Sign digest with private key\n`;
+            result += `4. Attach signature/attestation\n\n`;
+            result += `📝 Generated Signature:\n${signature}\n\n`;
+            result += `✅ Verification: Use cosign verify ${artifact}\n`;
+            result += `💡 Benefits: Supply chain security, provenance, SBOM attestation`;
+            document.getElementById("signResult").innerHTML = `<pre>${result}</pre>`;
+        };
+
+        window.generateVaultConfig = () => {
+            let env = document.getElementById("vaultEnv").value;
+            let secretsText = document.getElementById("vaultSecrets").value;
+            let secrets = secretsText.split('\n').filter(l => l.trim()).map(line => {
+                let [key, value] = line.split(':');
+                return { key: key.trim(), value: value.trim() };
+            });
+            
+            let result = `🔐 HASHICORP VAULT CONFIG\n${'='.repeat(50)}\n\n`;
+            result += `Environment: ${env.toUpperCase()}\n\n`;
+            result += `# Enable KV engine\nvault secrets enable -path=${env} kv-v2\n\n`;
+            result += `# Write secrets\n`;
+            secrets.forEach(s => {
+                result += `vault kv put ${env}/${s.key} value="${s.value}"\n`;
+            });
+            result += `\n# Kubernetes Integration (for pods)\n`;
+            result += `vault write auth/kubernetes/config \\\n  kubernetes_host="https://kubernetes.default.svc"\n\n`;
+            result += `# Policy Template\npath "${env}/*" {\n  capabilities = ["read"]\n}\n\n`;
+            result += `💡 Best Practices:\n`;
+            result += `• Rotate secrets regularly\n`;
+            result += `• Use dynamic secrets when possible\n`;
+            result += `• Audit logging enabled\n`;
+            result += `• Secret injection via sidecar (vault-agent)`;
+            document.getElementById("vaultResult").innerHTML = `<pre>${result}</pre>`;
+        };
+
+        window.scanPipelineSecurity = () => {
+            let config = document.getElementById("cicdConfig").value;
+            let issues = [];
+            
+            if (config.match(/secrets\./i) && !config.match(/secrets:\s*(inherit|inherit:)/i)) issues.push({ severity: "MEDIUM", msg: "Secrets may be exposed to forked PRs - Use 'secrets: inherit' carefully" });
+            if (config.match(/AWS_SECRET|AWS_ACCESS_KEY/i) && !config.match(/OIDC|role-to-assume/i)) issues.push({ severity: "HIGH", msg: "AWS credentials in secrets - Use OIDC federation instead" });
+            if (config.match(/sudo|root/i) && config.match(/runs-on:.*self-hosted/i)) issues.push({ severity: "HIGH", msg: "Self-hosted runner with privileged access - Security risk" });
+            if (!config.match(/codeql|security|trivy|snyk/i)) issues.push({ severity: "MEDIUM", msg: "No security scanning jobs detected" });
+            if (config.match(/npm publish|docker push/i) && !config.match(/if:.*(main|master|release)/i)) issues.push({ severity: "HIGH", msg: "Publishing may trigger on any branch - Add branch restrictions" });
+            if (config.match(/pull_request_target/i)) issues.push({ severity: "CRITICAL", msg: "pull_request_target can expose secrets - Use with caution" });
+            
+            let result = `🔍 PIPELINE SECURITY SCAN\n${'='.repeat(50)}\n\n`;
+            if (issues.length === 0) {
+                result += "✅ No obvious security misconfigurations found!\n";
+            } else {
+                result += `⚠️ Found ${issues.length} security issue(s):\n\n`;
+                issues.forEach(issue => {
+                    result += `[${issue.severity}] ${issue.msg}\n`;
+                });
+            }
+            result += `\n💡 Security Hardening Checklist:\n`;
+            result += `✓ Use OIDC for cloud authentication\n`;
+            result += `✓ Pin actions to commit SHAs\n`;
+            result += `✓ Limit permissions with 'permissions:'\n`;
+            result += `✓ Run SAST/SCA in CI\n`;
+            result += `✓ Sign artifacts and SBOMs\n`;
+            result += `✓ Use ephemeral runners for sensitive jobs`;
+            document.getElementById("scanResult").innerHTML = `<pre>${result}</pre>`;
+        };
+
+        const tools = [
+            "pipeline", "sbom", "dockerfile", "githook", "ansible",
+            "terraform", "k8s", "signing", "vault", "pipelineScan"
+        ];
+        
+        function renderTools() {
+            const grid = document.getElementById("toolsGrid");
+            grid.innerHTML = tools.map(id => buildToolHTML({ id })).join('');
+        }
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function toolsHomeAction() {
+            scrollToTop();
+            const grid = document.getElementById("toolsGrid");
+            grid.style.animation = 'none';
+            setTimeout(() => grid.style.animation = 'fadeInUp 0.6s ease-out', 10);
+        }
+
+        const themeToggle = document.getElementById("themeToggle");
+        themeToggle.addEventListener("click", () => {
+            document.body.classList.toggle("dark");
+            themeToggle.innerText = document.body.classList.contains("dark") ? "☀️ Light Mode" : "🌙 Dark Mode";
+        });
+
+        document.getElementById("homeBtn").addEventListener("click", (e) => {
+            e.preventDefault();
+            window.location.href = window.location.pathname.replace(/devsecops.*\.html/, '') + 'index.html';
+        });
+        document.getElementById("toolsHomeBtn").addEventListener("click", toolsHomeAction);
+
+        const scrollTopBtn = document.getElementById("scrollTop");
+        window.addEventListener("scroll", () => {
+            scrollTopBtn.classList.toggle("visible", window.pageYOffset > 300);
+        });
+        scrollTopBtn.addEventListener("click", scrollToTop);
+
+        renderTools();
+    </script>
+</body>
+</html>

@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>AI NEXUS SPHERE | Knowledge Vault — Security Intelligence & Insight</title>
+  <!-- Google Fonts + Font Awesome + Animate.css -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <!-- GSAP for background kinetic effects -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root[data-theme="dark"] {
+      --bg-deep: #03050a;
+      --bg-surface: rgba(10, 15, 27, 0.65);
+      --bg-card: rgba(16, 22, 40, 0.75);
+      --bg-card-hover: rgba(25, 32, 55, 0.85);
+      --border-glow: rgba(139, 92, 246, 0.25);
+      --border-light: rgba(255, 255, 255, 0.06);
+      --text-primary: #f0f3fc;
+      --text-secondary: #9ca3cf;
+      --text-muted: #5e6a8c;
+      --accent-primary: #8b5cf6;
+      --accent-secondary: #06b6d4;
+      --accent-tertiary: #ec489a;
+      --accent-success: #10b981;
+      --accent-warning: #f59e0b;
+      --glass-blur: blur(16px);
+      --shadow-xl: 0 25px 45px -12px rgba(0, 0, 0, 0.5);
+      --glow-primary: 0 0 20px rgba(139, 92, 246, 0.2);
+    }
+
+    :root[data-theme="light"] {
+      --bg-deep: #f5f7ff;
+      --bg-surface: rgba(255, 255, 255, 0.7);
+      --bg-card: rgba(255, 255, 255, 0.85);
+      --bg-card-hover: #ffffff;
+      --border-glow: rgba(139, 92, 246, 0.3);
+      --border-light: rgba(0, 0, 0, 0.06);
+      --text-primary: #0b1120;
+      --text-secondary: #334155;
+      --text-muted: #64748b;
+      --accent-primary: #7c3aed;
+      --accent-secondary: #0891b2;
+      --accent-tertiary: #db2777;
+      --accent-success: #059669;
+      --accent-warning: #d97706;
+      --shadow-xl: 0 20px 35px -10px rgba(0, 0, 0, 0.08);
+      --glow-primary: 0 0 30px rgba(124, 58, 237, 0.08);
+    }
+
+    body {
+      background: var(--bg-deep);
+      color: var(--text-primary);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Kinetic animated background particles */
+    .kinetic-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(70px);
+      opacity: 0.3;
+      animation: floatOrb 18s infinite alternate ease-in-out;
+    }
+    .orb-1 { width: 50vw; height: 50vw; background: #8b5cf6; top: -20vh; right: -10vw; animation-duration: 22s; }
+    .orb-2 { width: 40vw; height: 40vw; background: #06b6d4; bottom: -15vh; left: -10vw; animation-duration: 19s; animation-delay: -5s; }
+    .orb-3 { width: 35vw; height: 35vw; background: #ec489a; top: 40%; right: 20%; animation-duration: 25s; opacity: 0.2; }
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(5%, 8%) scale(1.08); }
+    }
+
+    /* Glass header */
+    .glass-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: var(--glass-blur);
+      background: rgba(var(--bg-deep-rgb), 0.65);
+      border-bottom: 1px solid var(--border-light);
+      padding: 0 2rem;
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      box-shadow: var(--glow-primary);
+    }
+    .logo-text {
+      font-weight: 800;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fff, var(--accent-secondary));
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+    .nav-link {
+      font-family: 'Space Grotesk', monospace;
+      font-size: 0.75rem;
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      border: 1px solid var(--border-light);
+      text-decoration: none;
+      color: var(--text-secondary);
+      transition: 0.2s;
+    }
+    .nav-link:hover {
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+      background: rgba(139, 92, 246, 0.08);
+    }
+    .theme-toggle {
+      width: 46px;
+      height: 26px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      border-radius: 30px;
+      cursor: pointer;
+      position: relative;
+      transition: 0.2s;
+    }
+    .theme-toggle::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: var(--accent-primary);
+      border-radius: 50%;
+      top: 2px;
+      left: 3px;
+      transition: transform 0.3s;
+    }
+    [data-theme="light"] .theme-toggle::after { transform: translateX(20px); }
+
+    /* Main container */
+    .knowledge-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 2rem 2rem 4rem;
+      position: relative;
+      z-index: 5;
+    }
+
+    /* Hero with animated text */
+    .hero-section {
+      text-align: center;
+      margin-bottom: 4rem;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(139, 92, 246, 0.12);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      padding: 0.4rem 1.2rem;
+      border-radius: 40px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--accent-primary);
+      margin-bottom: 1.5rem;
+      backdrop-filter: blur(4px);
+    }
+    .hero-title {
+      font-size: clamp(2.5rem, 7vw, 4.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, var(--text-primary), var(--accent-secondary), var(--accent-tertiary));
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      margin-bottom: 1rem;
+    }
+    .hero-desc {
+      color: var(--text-secondary);
+      max-width: 620px;
+      margin: 0 auto;
+      font-size: 1.05rem;
+    }
+    .stats-badge {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+    .stat-chip {
+      background: var(--bg-card);
+      backdrop-filter: blur(8px);
+      padding: 0.4rem 1rem;
+      border-radius: 50px;
+      border: 1px solid var(--border-light);
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+
+    /* Category filter chips */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.8rem;
+      margin: 2rem 0 2.5rem;
+    }
+    .filter-chip {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-light);
+      padding: 0.5rem 1.3rem;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      backdrop-filter: blur(4px);
+    }
+    .filter-chip.active, .filter-chip:hover {
+      background: var(--accent-primary);
+      color: #fff;
+      border-color: var(--accent-primary);
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    }
+
+    /* Knowledge Grid - Staggered glass cards */
+    .knowledge-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 2rem;
+    }
+    .knowledge-card {
+      background: var(--bg-card);
+      backdrop-filter: var(--glass-blur);
+      border: 1px solid var(--border-light);
+      border-radius: 32px;
+      overflow: hidden;
+      transition: all 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.2);
+      opacity: 0;
+      transform: translateY(30px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+    .knowledge-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--accent-primary);
+      box-shadow: var(--shadow-xl), var(--glow-primary);
+    }
+    .card-media {
+      height: 140px;
+      background: linear-gradient(145deg, var(--bg-card-hover), rgba(139, 92, 246, 0.1));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .card-category {
+      position: absolute;
+      top: 1rem;
+      left: 1rem;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(8px);
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: white;
+    }
+    .card-content {
+      padding: 1.5rem;
+    }
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      line-height: 1.3;
+    }
+    .card-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.45;
+      margin-bottom: 1rem;
+    }
+    .card-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border-light);
+      padding-top: 1rem;
+      gap: 0.75rem;
+    }
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: transparent;
+      border: 1px solid var(--border-light);
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+    .action-btn.preview {
+      border-color: var(--accent-secondary);
+      color: var(--accent-secondary);
+    }
+    .action-btn.preview:hover {
+      background: rgba(6, 182, 212, 0.15);
+      transform: translateY(-2px);
+    }
+    .action-btn.launch {
+      background: var(--accent-primary);
+      color: white;
+      border: none;
+    }
+    .action-btn.launch:hover {
+      filter: brightness(1.08);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+    }
+    .card-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+    }
+
+    /* Modal for preview (no external routing) */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(16px);
+      z-index: 1000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .modal-content {
+      max-width: 750px;
+      width: 100%;
+      max-height: 85vh;
+      background: var(--bg-card);
+      border: 1px solid var(--border-light);
+      border-radius: 32px;
+      overflow-y: auto;
+      padding: 2rem;
+      position: relative;
+      animation: modalFadeIn 0.3s ease;
+    }
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .modal-close {
+      position: absolute;
+      top: 1rem;
+      right: 1.5rem;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: 0.2s;
+    }
+    .modal-close:hover { color: var(--accent-primary); }
+    .modal-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+    .modal-body {
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    .modal-tag {
+      display: inline-block;
+      background: rgba(139, 92, 246, 0.15);
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      margin-bottom: 1rem;
+    }
+    .modal-launch-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-top: 1.5rem;
+      background: var(--accent-primary);
+      color: white;
+      padding: 0.6rem 1.3rem;
+      border-radius: 40px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-light);
+      margin-top: 3rem;
+    }
+    @media (max-width: 720px) {
+      .knowledge-container { padding: 1rem; }
+      .filter-bar { gap: 0.5rem; }
+      .filter-chip { padding: 0.4rem 1rem; font-size: 0.7rem; }
+      .knowledge-grid { grid-template-columns: 1fr; }
+    }
+
+    /* Back to HOME button in the Tools home page*/
+    .back-home-btn {
+    margin-left: 16px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text-primary);
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+    font-size: 14px;
+    transition: 0.3s;
+    }
+
+    .back-home-btn:hover {
+      background: rgba(255,255,255,0.15);
+    }
+  </style>
+</head>
+<body>
+<div class="kinetic-bg">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<header class="glass-header">
+  <div class="logo">
+    <div class="logo-icon"><i class="fas fa-brain"></i></div>
+    <span class="logo-text">AI Nexus Sphere — Knowledge Vault</span>
+  </div>
+  <div class="nav-links">
+    <a href="#" class="nav-link"><i class="fas fa-compass"></i> Explore</a>
+    <a href="/index.html" class="back-home-btn"><i class="fas fa-home"></i> Back To Home</a>
+    <div class="theme-toggle" id="themeToggle"></div>
+  </div>
+</header>
+
+<main class="knowledge-container">
+  <div class="hero-section animate__animated animate__fadeInUp">
+    <div class="hero-badge animate__animated animate__pulse animate__infinite"><i class="fas fa-database"></i> curated intelligence · 200+ assets</div>
+    <h1 class="hero-title">Security Knowledge Vault</h1>
+    <p class="hero-desc">Curated blogs, SOPs, blueprints, references, and deep-dives — built for security architects, engineers, and leaders.</p>
+    <div class="stats-badge">
+      <span class="stat-chip"><i class="fas fa-newspaper"></i> 45+ Blogs</span>
+      <span class="stat-chip"><i class="fas fa-clipboard-list"></i> 32 SOPs</span>
+      <span class="stat-chip"><i class="fas fa-book"></i> 28 References</span>
+      <span class="stat-chip"><i class="fas fa-chalkboard-user"></i> 15 Playbooks</span>
+    </div>
+  </div>
+
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-chip active" data-filter="all">All</button>
+    <button class="filter-chip" data-filter="blog">📄 Blogs & Articles</button>
+    <button class="filter-chip" data-filter="sop">📋 SOPs / Best Practices</button>
+    <button class="filter-chip" data-filter="reference">📚 References & Cheatsheets</button>
+    <button class="filter-chip" data-filter="playbook">⚡ Incident Playbooks</button>
+    <button class="filter-chip" data-filter="whitepaper">📑 Whitepapers & Research</button>
+    <button class="filter-chip" data-filter="training">🎓 Training & Labs</button>
+    <button class="filter-chip" data-filter="product-demo">🧪 Product Demos</button>
+  </div>
+
+  <div class="knowledge-grid" id="knowledgeGrid"></div>
+</main>
+
+<footer>
+  <i class="fas fa-shield-alt"></i> Nexus Knowledge Vault — Continuously updated · Peer reviewed · Community driven
+</footer>
+
+<div id="modalRoot" class="modal-overlay">
+  <div class="modal-content">
+    <span class="modal-close" id="closeModalBtn">&times;</span>
+    <div id="modalDynamic"></div>
+  </div>
+</div>
+
+<script>
+  // KNOWLEDGE DATABASE with external link support (dedicated pages)
+  const knowledgeEntries = [
+    // BLOGS & ARTICLES (external dedicated pages)
+    { id: 1, title: "Zero Trust Architecture: Beyond the Buzzword", desc: "Deep dive into NIST SP 800-207 implementation patterns.", category: "blog", icon: "📘", preview: "Full article: Zero Trust requires micro-segmentation, identity-aware proxies, and continuous verification. This guide covers real-world deployment strategies for SASE and ZTNA.", readTime: "8 min", tags: ["ZTNA", "SASE"], externalUrl: "/knowledge/zero-trust-architecture.html", isExternal: true },
+    { id: 2, title: "Kubernetes Security Benchmark (NSA/CISA)", desc: "Hardening guide for K8s clusters — pod security, admission controllers.", category: "blog", icon: "🐳", preview: "Complete walkthrough of NSA/CISA Kubernetes hardening guide. Includes RBAC, secrets management, network policies, and runtime security.", readTime: "12 min", tags: ["K8s", "Hardening"], externalUrl: "/knowledge/k8s-security-benchmark.html", isExternal: true },
+    { id: 3, title: "The Rise of AI-Powered SOC", desc: "How LLMs are transforming alert triage and threat hunting.", category: "blog", icon: "🤖", preview: "Explore practical use cases of AI in security operations: automated summarization, playbook generation, and anomaly detection.", readTime: "6 min", tags: ["AI", "SOC"], externalUrl: "/knowledge/ai-soc-transformation.html", isExternal: true },
+    // SOPs / BEST PRACTICES (dedicated pages)
+    { id: 5, title: "Incident Response Playbook: Ransomware", desc: "Step-by-step SOP for ransomware containment and recovery.", category: "sop", icon: "🚨", preview: "Detailed playbook: isolation steps, backup restoration, legal hold, and post-mortem templates. Aligned with NIST 800-61.", readTime: "15 min", tags: ["IR", "Ransomware"], externalUrl: "/knowledge/sop-ransomware-ir.html", isExternal: true },
+    { id: 6, title: "Firewall Change Management SOP", desc: "Standard operating procedure for change windows.", category: "sop", icon: "🔥", preview: "Pre/post validation, rollback plan, peer review, and automation hooks for Palo Alto/Fortinet.", readTime: "7 min", tags: ["Firewall", "Change Control"], externalUrl: "/knowledge/sop-firewall-change.html", isExternal: true },
+    { id: 7, title: "Cloud IAM Least Privilege Blueprint", desc: "AWS/Azure/GCP role engineering best practices.", category: "sop", icon: "☁️", preview: "Actionable guide to build least privilege roles, permission boundaries, and access analysis tools.", readTime: "9 min", tags: ["IAM", "Cloud Security"], externalUrl: "/knowledge/iam-least-privilege.html", isExternal: true },
+    // REFERENCES & CHEATSHEETS
+    { id: 8, title: "CLI Reference: Palo Alto, Fortinet, Cisco", desc: "Quick command snippets for daily firewall operations.", category: "reference", icon: "⌨️", preview: "Curated CLI commands: session monitoring, HA status, VPN diag, ACL modifications. PDF-ready format.", readTime: "5 min", tags: ["CLI", "Firewall"], externalUrl: "/knowledge/cli-firewall-reference.html", isExternal: true },
+    { id: 9, title: "Terraform Security Modules Registry", desc: "Reusable IaC modules for VPC, NSG, SASE tunnels.", category: "reference", icon: "🏗️", preview: "Collection of battle-tested Terraform modules with security defaults. Includes examples for AWS, Azure, GCP.", readTime: "4 min", tags: ["IaC", "Terraform"], externalUrl: "/knowledge/terraform-security-modules.html", isExternal: true },
+    { id: 10, title: "KQL & SPL Query Cheatsheet", desc: "Common SIEM queries for threat hunting.", category: "reference", icon: "📊", preview: "50+ KQL and SPL patterns for Sentinel & Splunk: lateral movement, data exfiltration, privilege escalation.", readTime: "6 min", tags: ["SIEM", "KQL", "SPL"], externalUrl: "/knowledge/kql-spl-cheatsheet.html", isExternal: true },
+    // PLAYBOOKS
+    { id: 11, title: "Cloud Compromise Investigation Playbook", desc: "AWS/Azure incident response steps.", category: "playbook", icon: "☁️🚨", preview: "Step-by-step: CloudTrail analysis, IAM role review, containment in multi-cloud environment.", readTime: "11 min", tags: ["Cloud IR", "Forensics"], externalUrl: "/knowledge/playbook-cloud-ir.html", isExternal: true },
+    { id: 12, title: "Supply Chain Security Playbook", desc: "SBOM, dependency scanning, and vendor risk.", category: "playbook", icon: "🔗", preview: "Operationalize SLSA framework, detect malicious packages, and incident response for open source compromises.", readTime: "13 min", tags: ["Supply Chain", "SBOM"], externalUrl: "/knowledge/playbook-supply-chain.html", isExternal: true },
+    // WHITEPAPERS
+    { id: 13, title: "Post-Quantum Cryptography in Enterprise", desc: "Transition strategies for network security.", category: "whitepaper", icon: "🔮", preview: "Analysis of NIST PQC standards and impact on VPN, TLS, and code signing.", readTime: "20 min", tags: ["Cryptography", "Future"], externalUrl: "/knowledge/whitepaper-pqc.html", isExternal: true },
+    { id: 14, title: "CISO Guide to AI Governance", desc: "Managing risks of LLM and generative AI.", category: "whitepaper", icon: "🧠", preview: "Framework for AI model inventory, data leakage prevention, and third-party AI risk assessment.", readTime: "18 min", tags: ["AI Security", "Governance"], externalUrl: "/knowledge/whitepaper-ai-governance.html", isExternal: true },
+    { id: 15, title: "Enterprise AI Architecture", desc: "Multi-Branch SecOps Cloud Architecture", category: "whitepaper", icon: "🤖", preview: "Multi-Branch SecOps Cloud Architecture", readTime: "30 min", tags: ["AI Security", "Governance", "AI Agent", "Automation"], externalUrl: "/knowledge/whitepapers/enterprise-ai-architecture.html", isExternal: true },
+    { id: 16, title: "Enterprise infrastructure AI Control Plane", desc: "A framework for AI-driven infrastructure automation — from orchestration theory to real-world implementation reality", category: "whitepaper", icon: "🤖", preview: "Enterprise infrastructure AI Control Plane", readTime: "30 min", tags: ["AI Security", "Governance", "AI Agent", "Automation", "Firewall", "Palo-Alto"], externalUrl: "/knowledge/whitepapers/enterprise-ai-control-plane.html", isExternal: true },
+    // TRAINING & LABS
+    { id: 17, title: "Detection Engineering Workshop", desc: "Build sigma rules and KQL alerts.", category: "training", icon: "🎓", preview: "Hands-on lab: create detection rules from ATT&CK techniques, test with simulation data.", readTime: "45 min", tags: ["Detection", "Workshop"], externalUrl: "/knowledge/lab-detection-engineering.html", isExternal: true },
+    { id: 18, title: "Zero Trust Lab: Zscaler + Azure", desc: "Step-by-step guide to deploy ZTNA.", category: "training", icon: "🧪", preview: "Complete lab environment: configure ZPA, app connectors, and policy engine.", readTime: "60 min", tags: ["ZTNA", "Hands-on"], externalUrl: "/knowledge/lab-ztna-zscaler.html", isExternal: true },
+    { id: 19, title: "AI Firewall Agent Demo", desc: "Automate to remove Unused Rules from Firewall.", category: "training", icon: "🧪", preview: "Unused Firewall Rule Cleanup", readTime: "15 min", tags: ["Firewall", "Palo-Alto", "Hands-on"], externalUrl: "/knowledge/training/AI-Firewall-Agent-Demo.html", isExternal: true },
+    { id: 20, title: "Azure Frontend Cache Deletion Agent Demo", desc: "Automate clearing and invalidating cached content from Azure Frontend.", category: "training", icon: "🧪", preview: "Azure Cache Cleanup Automation", readTime: "15 min", tags: ["Azure", "Frontend", "Cache", "Hands-on"], externalUrl: "/knowledge/training/Azure-Frontend-Cache-Deletion-Agent-Demo.html", isExternal: true },
+    { id: 21, title: "Azure Frontend SSL Analyzer Agent Demo", desc: "Analyze and monitor SSL configurations for Azure Frontend endpoints.", category: "training", icon: "🧪", preview: "Azure SSL Configuration Analysis", readTime: "15 min", tags: ["Azure", "SSL", "Security", "Hands-on"], externalUrl: "/knowledge/training/Azure-Frontend-SSL-Analyzer-Agent-Demo.html", isExternal: true },
+    { id: 22, title: "F5 AI Agent Demo — LTM Pool Recovery", desc: "Automate detection and recovery of failed LTM pools in F5 environments.", category: "training", icon: "🧪", preview: "F5 LTM Pool Recovery Automation", readTime: "15 min", tags: ["F5", "LTM", "Load Balancer", "Recovery", "Hands-on"], externalUrl: "/knowledge/training/F5-AI-Agent-Demo-LTM-Pool-Recovery.html", isExternal: true },
+    // PRODUCT DEMOS
+    { id: 23, title: "sdwan-ai-dashboard Demo", desc: "Interactive demo of the SD-WAN AI dashboard.", category: "product-demo", icon: "🧪", preview: "SD-WAN AI Dashboard Demo", readTime: "15 min", tags: ["SD-WAN", "AI", "Dashboard", "Hands-on"], externalUrl: "https://github.com/bala-murugan-s/bala-murugan-s.github.io/tree/main/knowledge/git-set-file/sdwan-ai-ops-dashboard", isExternal: true },
+    { id: 24, title: "firewall-dashboard Demo", desc: "Setup for firewall dashboard.", category: "product-demo", icon: "🧪", preview: "Firewall Dashboard Demo", readTime: "15 min", tags: ["Firewall", "Palo-Alto", "Dashboard", "Hands-on"], externalUrl: "https://github.com/bala-murugan-s/bala-murugan-s.github.io/tree/main/knowledge/git-set-file/firewall-multi-vendor-with-go", isExternal: true },
+    { id: 25, title: "network-diagnostic-tool Demo", desc: "Interactive demo of the network diagnostic tool.", category: "product-demo", icon: "🧪", preview: "Network Diagnostic Tool Demo", readTime: "15 min", tags: ["Network", "Diagnostic", "Hands-on", "Go", "Single-Click-App"], externalUrl: "https://github.com/bala-murugan-s/bala-murugan-s.github.io/tree/main/knowledge/git-set-file/network-diagnostic-dashboard", isExternal: true },
+    { id: 26, title: "network-diag-tool Demo", desc: "Setup of network diagnostic tool.", category: "product-demo", icon: "🧪", preview: "Network Diag Tool Demo", readTime: "15 min", tags: ["Network", "Diagnostic", "Hands-on", "Go", "Single-Click-App"], externalUrl: "https://github.com/bala-murugan-s/bala-murugan-s.github.io/tree/main/knowledge/git-set-file/netdiag", isExternal: true },
+    // Additional internal preview-only asset (example where you might not need external link)
+    { id: 27, title: "Incident Commander Checklist", desc: "Quick reference for IR leads during active incidents.", category: "reference", icon: "✅", preview: "Checklist: identification, containment, eradication, recovery, and post-incident activities. Printable format.", readTime: "3 min", tags: ["Incident Response"], externalUrl: "/knowledge/incident-commander-checklist.html", isExternal: true }
+  ];
+
+  const categoryMap = {
+    blog: { label: "Blogs & Articles", icon: "📄" },
+    sop: { label: "SOPs / Best Practices", icon: "📋" },
+    reference: { label: "References & Cheatsheets", icon: "📚" },
+    playbook: { label: "Incident Playbooks", icon: "⚡" },
+    whitepaper: { label: "Whitepapers", icon: "📑" },
+    training: { label: "Training & Labs", icon: "🎓" },
+    "product-demo": { label: "Product Demos", icon: "🧪" }
+  };
+
+  function renderCards(filter = "all") {
+    const grid = document.getElementById("knowledgeGrid");
+    const filtered = filter === "all" ? knowledgeEntries : knowledgeEntries.filter(entry => entry.category === filter);
+    if (!grid) return;
+    grid.innerHTML = filtered.map(entry => `
+      <div class="knowledge-card animate__animated animate__fadeInUp" data-id="${entry.id}" data-category="${entry.category}" style="animation-delay: ${Math.random() * 0.1}s">
+        <div class="card-media">
+          <span style="font-size: 3.2rem;">${entry.icon}</span>
+          <span class="card-category">${categoryMap[entry.category]?.label || entry.category}</span>
+        </div>
+        <div class="card-content">
+          <div class="card-title">${escapeHtml(entry.title)}</div>
+          <div class="card-desc">${escapeHtml(entry.desc.substring(0, 110))}${entry.desc.length > 110 ? '…' : ''}</div>
+          <div class="card-meta">
+            <span><i class="far fa-clock"></i> ${entry.readTime}</span>
+            <span><i class="fas fa-tag"></i> ${entry.tags.slice(0,2).join(', ')}</span>
+          </div>
+          <div class="card-actions">
+            <button class="action-btn preview" data-preview-id="${entry.id}"><i class="fas fa-eye"></i> Quick Preview</button>
+            <a href="${entry.externalUrl}" target="_blank" class="action-btn launch"><i class="fas fa-external-link-alt"></i> Launch Page →</a>
+          </div>
+        </div>
+      </div>
+    `).join('');
+
+    // Attach preview event listeners
+    document.querySelectorAll('.action-btn.preview').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const card = btn.closest('.knowledge-card');
+        const id = parseInt(card.getAttribute('data-id'));
+        const entry = knowledgeEntries.find(e => e.id === id);
+        if (entry) openPreviewModal(entry);
+      });
+    });
+  }
+
+  function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){ if(m === '&') return '&amp;'; if(m === '<') return '&lt;'; if(m === '>') return '&gt;'; return m;}); }
+
+  // Preview modal (internal preview only, no external routing, but shows preview and a launch button)
+  const modalOverlay = document.getElementById("modalRoot");
+  const modalDynamic = document.getElementById("modalDynamic");
+
+  function openPreviewModal(entry) {
+    if (!modalOverlay || !modalDynamic) return;
+    const categoryLabel = categoryMap[entry.category]?.label || entry.category;
+    modalDynamic.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 1rem;">
+        <span class="modal-tag"><i class="fas fa-tag"></i> ${categoryLabel}</span>
+        <span class="modal-tag"><i class="far fa-clock"></i> ${entry.readTime}</span>
+      </div>
+      <div class="modal-title">${escapeHtml(entry.title)}</div>
+      <div class="modal-body">
+        <p>${escapeHtml(entry.preview)}</p>
+        <hr style="margin: 1.5rem 0; border-color: var(--border-light);">
+        <p><strong>📌 Tags:</strong> ${entry.tags?.map(t => `#${t}`).join(' · ') || 'Security best practices'}</p>
+        <div style="margin-top: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+          <a href="${entry.externalUrl}" target="_blank" class="modal-launch-btn"><i class="fas fa-external-link-alt"></i> Read Full Article →</a>
+          <button id="closeModalFromInside" class="action-btn preview" style="background: transparent; border:1px solid var(--border-light);">Close Preview</button>
+        </div>
+      </div>
+    `;
+    modalOverlay.style.display = "flex";
+    document.body.style.overflow = "hidden";
+    document.getElementById("closeModalFromInside")?.addEventListener("click", closeModal);
+  }
+
+  function closeModal() {
+    if (modalOverlay) {
+      modalOverlay.style.display = "none";
+      document.body.style.overflow = "auto";
+    }
+  }
+
+  // Filter logic + animations
+  let activeFilter = "all";
+  const filterChips = document.querySelectorAll(".filter-chip");
+  filterChips.forEach(chip => {
+    chip.addEventListener("click", () => {
+      activeFilter = chip.getAttribute("data-filter");
+      filterChips.forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      renderCards(activeFilter);
+      gsap.fromTo(".knowledge-card", { opacity: 0, y: 40 }, { opacity: 1, y: 0, stagger: 0.06, duration: 0.6, ease: "back.out(0.4)" });
+    });
+  });
+
+  // Theme toggle
+  const toggleBtn = document.getElementById('themeToggle');
+  function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('knowledge_theme', theme);
+  }
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      setTheme(current === 'dark' ? 'light' : 'dark');
+    });
+  }
+  const savedTheme = localStorage.getItem('knowledge_theme') || 'dark';
+  setTheme(savedTheme);
+
+  // Modal close events
+  document.getElementById("closeModalBtn")?.addEventListener("click", closeModal);
+  modalOverlay?.addEventListener("click", (e) => { if (e.target === modalOverlay) closeModal(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && modalOverlay?.style.display === "flex") closeModal(); });
+
+  // Initial render with GSAP stagger
+  renderCards("all");
+  gsap.fromTo(".knowledge-card", { opacity: 0, y: 40 }, { opacity: 1, y: 0, stagger: 0.07, duration: 0.7, delay: 0.2, ease: "power2.out" });
+  gsap.from(".hero-badge", { opacity: 0, y: -20, duration: 0.8, delay: 0.1 });
+  gsap.from(".hero-title", { opacity: 0, scale: 0.98, duration: 0.9, delay: 0.2, ease: "elastic.out(1, 0.5)" });
+  gsap.from(".hero-desc", { opacity: 0, y: 20, duration: 0.8, delay: 0.35 });
+  gsap.from(".stats-badge .stat-chip", { opacity: 0, x: -10, stagger: 0.1, duration: 0.5, delay: 0.5 });
+</script>
+</body>
+</html>

@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palo Alto CLI Commands - Balamurugan S</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .controls {
+            padding: 30px 40px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .category-filter {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .filter-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .stats {
+            padding: 20px 40px;
+            background: #e3f2fd;
+            border-bottom: 2px solid #bbdefb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stats-item {
+            font-weight: 600;
+            color: #1976d2;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .category-section {
+            margin-bottom: 50px;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .category-icon {
+            font-size: 2em;
+        }
+
+        .category-title {
+            font-size: 1.8em;
+            color: #667eea;
+            font-weight: 700;
+        }
+
+        .command-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .command-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            border-left: 5px solid #667eea;
+            transition: all 0.3s;
+        }
+
+        .command-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .command-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .command-title {
+            font-size: 1.3em;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .command-syntax {
+            background: #2d3748;
+            color: #68d391;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: #764ba2;
+        }
+
+        .command-description {
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        .command-output {
+            background: #1a202c;
+            color: #e2e8f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+        }
+
+        .output-label {
+            color: #fbd38d;
+            font-weight: 600;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .no-results h3 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        footer {
+            background: #2d3748;
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+
+        footer a {
+            color: #68d391;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #667eea;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .back-to-top:hover {
+            background: #764ba2;
+            transform: translateY(-5px);
+        }
+
+        .back-to-top.show {
+            display: flex;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .controls {
+                padding: 20px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .category-title {
+                font-size: 1.4em;
+            }
+
+            .command-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔥 100 Palo Alto CLI Commands</h1>
+            <p>Complete reference guide with descriptions & sample outputs</p>
+        </header>
+
+        <div class="controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Search commands, descriptions, or output...">
+            </div>
+            <div class="category-filter">
+                <button class="filter-btn active" data-category="all">All (100)</button>
+                <button class="filter-btn" data-category="system">System (20)</button>
+                <button class="filter-btn" data-category="license">License (10)</button>
+                <button class="filter-btn" data-category="network">Network (15)</button>
+                <button class="filter-btn" data-category="security">Security (12)</button>
+                <button class="filter-btn" data-category="logs">Logs (13)</button>
+                <button class="filter-btn" data-category="ha">HA (10)</button>
+                <button class="filter-btn" data-category="user">User-ID (10)</button>
+                <button class="filter-btn" data-category="performance">Performance (10)</button>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stats-item">Total Commands: <span id="totalCommands">100</span></div>
+            <div class="stats-item">Visible: <span id="visibleCommands">100</span></div>
+        </div>
+
+        <div class="content" id="commandsContent">
+            <!-- SYSTEM & GENERAL HEALTH -->
+            <div class="category-section" data-category="system">
+                <div class="category-header">
+                    <span class="category-icon">⚙️</span>
+                    <h2 class="category-title">SYSTEM & GENERAL HEALTH</h2>
+                </div>
+                <div class="command-grid">
+                    <div class="command-card">
+                        <span class="command-number">1</span>
+                        <h3 class="command-title">Check system info</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show system info
+                        </div>
+                        <p class="command-description">Shows IPv6 neighbor discovery table.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">41</span>
+                        <h3 class="command-title">Show LLDP neighbors</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show lldp neighbors
+                        </div>
+                        <p class="command-description">Displays LLDP neighbor information.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">42</span>
+                        <h3 class="command-title">Show CDP neighbors</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show cdp neighbors
+                        </div>
+                        <p class="command-description">Shows CDP neighbor details.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">43</span>
+                        <h3 class="command-title">Check zone list</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show zone
+                        </div>
+                        <p class="command-description">Lists all configured zones.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">44</span>
+                        <h3 class="command-title">Show VLANs</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show vlan all
+                        </div>
+                        <p class="command-description">Displays all VLAN configurations.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">45</span>
+                        <h3 class="command-title">Show virtual routers</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show routing route
+                        </div>
+                        <p class="command-description">Shows virtual router configurations.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECURITY POLICY & NAT -->
+            <div class="category-section" data-category="security">
+                <div class="category-header">
+                    <span class="category-icon">🔒</span>
+                    <h2 class="category-title">SECURITY POLICY & NAT</h2>
+                </div>
+                <div class="command-grid">
+                    <div class="command-card">
+                        <span class="command-number">46</span>
+                        <h3 class="command-title">Show security rules</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show running security-policy
+                        </div>
+                        <p class="command-description">Displays running security policy rules.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">47</span>
+                        <h3 class="command-title">Show hit count of rules</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show rule-hit-count vsys1
+                        </div>
+                        <p class="command-description">Shows policy rule hit counters.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">48</span>
+                        <h3 class="command-title">Show NAT rules</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show running nat-policy
+                        </div>
+                        <p class="command-description">Displays NAT policy rules.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">49</span>
+                        <h3 class="command-title">Test policy match</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            test security-policy-match from trust to untrust protocol 6 source 10.1.1.1 destination 8.8.8.8 destination-port 443
+                        </div>
+                        <p class="command-description">Tests which security policy rule matches traffic.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">50</span>
+                        <h3 class="command-title">Test NAT rule</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            test nat-policy-match source 10.1.1.5 destination 8.8.8.8 protocol 6 destination-port 443
+                        </div>
+                        <p class="command-description">Tests which NAT rule matches traffic.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">51</span>
+                        <h3 class="command-title">Show address objects</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show address all
+                        </div>
+                        <p class="command-description">Lists all address objects.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">52</span>
+                        <h3 class="command-title">Show application objects</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show application
+                        </div>
+                        <p class="command-description">Displays application objects.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">53</span>
+                        <h3 class="command-title">Show service objects</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show service all
+                        </div>
+                        <p class="command-description">Lists all service objects.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">54</span>
+                        <h3 class="command-title">Check profiles</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show profiles antivirus
+                        </div>
+                        <p class="command-description">Shows antivirus profile configurations.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">55</span>
+                        <h3 class="command-title">Show security zones</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show zones
+                        </div>
+                        <p class="command-description">Displays security zone configurations.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">56</span>
+                        <h3 class="command-title">View DoS protection</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show dos-protection-rule
+                        </div>
+                        <p class="command-description">Shows DoS protection rules.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">57</span>
+                        <h3 class="command-title">View threat content versions</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show system info | match threat
+                        </div>
+                        <p class="command-description">Displays threat content version.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LOGS & TRAFFIC ANALYSIS -->
+            <div class="category-section" data-category="logs">
+                <div class="category-header">
+                    <span class="category-icon">📊</span>
+                    <h2 class="category-title">LOGS & TRAFFIC ANALYSIS</h2>
+                </div>
+                <div class="command-grid">
+                    <div class="command-card">
+                        <span class="command-number">58</span>
+                        <h3 class="command-title">Show traffic logs</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show log traffic
+                        </div>
+                        <p class="command-description">Displays traffic logs.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">59</span>
+                        <h3 class="command-title">Show threat logs</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show log threat
+                        </div>
+                        <p class="command-description">Shows detected threat logs.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">60</span>
+                        <h3 class="command-title">Show URL logs</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show log url
+                        </div>
+                        <p class="command-description">Displays URL filtering logs.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">61</span>
+                        <h3 class="command-title">Show system logs</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show log system
+                        </div>
+                        <p class="command-description">Shows system event logs.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">62</span>
+                        <h3 class="command-title">Show config logs</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show log config
+                        </div>
+                        <p class="command-description">Displays configuration change logs.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">63</span>
+                        <h3 class="command-title">View session browser</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show session all
+                        </div>
+                        <p class="command-description">Shows all active sessions.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">64</span>
+                        <h3 class="command-title">Show sessions for a specific IP</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show session all filter source 10.1.1.10
+                        </div>
+                        <p class="command-description">Filters sessions by source IP address.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">65</span>
+                        <h3 class="command-title">Show top applications</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show session info | match app
+                        </div>
+                        <p class="command-description">Displays top applications by session count.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">66</span>
+                        <h3 class="command-title">Show current connections</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show session meter
+                        </div>
+                        <p class="command-description">Shows real-time session metrics.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">67</span>
+                        <h3 class="command-title">View blocked traffic</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show log traffic direction equal backward
+                        </div>
+                        <p class="command-description">Displays blocked traffic logs.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">68</span>
+                        <h3 class="command-title">Trace packet</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            debug dataplane packet-diag set log feature flow basic
+                        </div>
+                        <p class="command-description">Enables packet flow tracing.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">69</span>
+                        <h3 class="command-title">Packet capture start</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            debug dataplane packet-capture on
+                        </div>
+                        <p class="command-description">Starts packet capture on dataplane.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">70</span>
+                        <h3 class="command-title">View pcap files</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show capture packet all
+                        </div>
+                        <p class="command-description">Lists all packet capture files.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HIGH AVAILABILITY -->
+            <div class="category-section" data-category="ha">
+                <div class="category-header">
+                    <span class="category-icon">🔄</span>
+                    <h2 class="category-title">HIGH AVAILABILITY (HA)</h2>
+                </div>
+                <div class="command-grid">
+                    <div class="command-card">
+                        <span class="command-number">71</span>
+                        <h3 class="command-title">Show HA state</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show high-availability state
+                        </div>
+                        <p class="command-description">Displays current HA state and peer status.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">72</span>
+                        <h3 class="command-title">Show HA links</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show high-availability link-monitoring
+                        </div>
+                        <p class="command-description">Shows HA link monitoring status.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">73</span>
+                        <h3 class="command-title">Show HA path monitoring</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show high-availability path-monitoring
+                        </div>
+                        <p class="command-description">Displays HA path monitoring details.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">74</span>
+                        <h3 class="command-title">Show HA configuration</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show high-availability configuration
+                        </div>
+                        <p class="command-description">Shows HA configuration settings.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">75</span>
+                        <h3 class="command-title">Trigger failover</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            request high-availability state functional primary
+                        </div>
+                        <p class="command-description">Forces device to become active/primary.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">76</span>
+                        <h3 class="command-title">Suspend local firewall</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            request high-availability state suspend
+                        </div>
+                        <p class="command-description">Suspends local firewall from HA.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">77</span>
+                        <h3 class="command-title">Bring firewall back</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            request high-availability state functional
+                        </div>
+                        <p class="command-description">Returns firewall to functional HA state.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">78</span>
+                        <h3 class="command-title">Sync configs</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            request high-availability sync-to-remote running-config
+                        </div>
+                        <p class="command-description">Synchronizes configuration to HA peer.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">79</span>
+                        <h3 class="command-title">Show HA stats</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show high-availability statistics
+                        </div>
+                        <p class="command-description">Displays HA statistics.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">80</span>
+                        <h3 class="command-title">Show HA timers</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show high-availability timers
+                        </div>
+                        <p class="command-description">Shows HA timer configurations.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- USER-ID & AUTH -->
+            <div class="category-section" data-category="user">
+                <div class="category-header">
+                    <span class="category-icon">👤</span>
+                    <h2 class="category-title">USER-ID & AUTHENTICATION</h2>
+                </div>
+                <div class="command-grid">
+                    <div class="command-card">
+                        <span class="command-number">81</span>
+                        <h3 class="command-title">Show user identification</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show user ip-user-mapping all
+                        </div>
+                        <p class="command-description">Displays IP-to-user mappings.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">82</span>
+                        <h3 class="command-title">Show User-ID agent</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show user user-id-agent state all
+                        </div>
+                        <p class="command-description">Shows User-ID agent connection status.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">83</span>
+                        <h3 class="command-title">Test authentication</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            test authentication authentication-profile &lt;profile&gt; username &lt;user&gt; password
+                        </div>
+                        <p class="command-description">Tests user authentication against profile.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">84</span>
+                        <h3 class="command-title">Show group mapping</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show user group-mapping state all
+                        </div>
+                        <p class="command-description">Displays user group mappings.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">85</span>
+                        <h3 class="command-title">Show captive portal</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show user captive-portal statistics
+                        </div>
+                        <p class="command-description">Shows captive portal statistics.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">86</span>
+                        <h3 class="command-title">Clear user mapping</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            clear user-cache all
+                        </div>
+                        <p class="command-description">Clears all user-ID cache.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">87</span>
+                        <h3 class="command-title">Check GlobalProtect users</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show global-protect-gateway current-user
+                        </div>
+                        <p class="command-description">Shows currently connected GlobalProtect users.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">88</span>
+                        <h3 class="command-title">Show GP stats</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show global-protect-gateway statistics
+                        </div>
+                        <p class="command-description">Displays GlobalProtect gateway statistics.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">89</span>
+                        <h3 class="command-title">GP portal config</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show global-protect-portal config
+                        </div>
+                        <p class="command-description">Shows GlobalProtect portal configuration.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">90</span>
+                        <h3 class="command-title">GP gateway config</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show global-protect-gateway config
+                        </div>
+                        <p class="command-description">Displays GlobalProtect gateway configuration.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UTILIZATION, PERFORMANCE & HARDWARE -->
+            <div class="category-section" data-category="performance">
+                <div class="category-header">
+                    <span class="category-icon">⚡</span>
+                    <h2 class="category-title">UTILIZATION, PERFORMANCE & HARDWARE</h2>
+                </div>
+                <div class="command-grid">
+                    <div class="command-card">
+                        <span class="command-number">91</span>
+                        <h3 class="command-title">Show session count</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show session info
+                        </div>
+                        <p class="command-description">Displays current session count and limits.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">92</span>
+                        <h3 class="command-title">Show throughput</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show system statistics session
+                        </div>
+                        <p class="command-description">Shows throughput statistics.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">93</span>
+                        <h3 class="command-title">Show DP CPU</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show running resource-monitor ingress-backlogs
+                        </div>
+                        <p class="command-description">Displays dataplane CPU utilization.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">94</span>
+                        <h3 class="command-title">Hardware details</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show system environmentals
+                        </div>
+                        <p class="command-description">Shows hardware environmental details.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">95</span>
+                        <h3 class="command-title">Thermal information</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show system environmentals thermal
+                        </div>
+                        <p class="command-description">Displays temperature sensor readings.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">96</span>
+                        <h3 class="command-title">Fan speed</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show system environmentals fans
+                        </div>
+                        <p class="command-description">Shows fan speed and status.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">97</span>
+                        <h3 class="command-title">LED status</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show system state | match led
+                        </div>
+                        <p class="command-description">Displays LED status indicators.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">98</span>
+                        <h3 class="command-title">System logs for crash</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show system logdb-quota
+                        </div>
+                        <p class="command-description">Shows system log database quota.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">99</span>
+                        <h3 class="command-title">Restart management server</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            debug software restart process mgmtsrvr
+                        </div>
+                        <p class="command-description">Restarts the management server process.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">100</span>
+                        <h3 class="command-title">Restart log receiver</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            debug software restart process log-receiver
+                        </div>
+                        <p class="command-description">Restarts the log receiver process.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="no-results" id="noResults" style="display: none;">
+                <h3>🔍 No commands found</h3>
+                <p>Try adjusting your search or filter criteria</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>Created by <a href="https://bala-murugan-s.github.io" target="_blank">Balamurugan S</a> | Network & Security Professional</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">100 Palo Alto CLI Commands Reference Guide</p>
+        </footer>
+    </div>
+
+    <div class="back-to-top" id="backToTop">↑</div>
+
+    <script>
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const commandCards = document.querySelectorAll('.command-card');
+        const categorySections = document.querySelectorAll('.category-section');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const backToTop = document.getElementById('backToTop');
+        const noResults = document.getElementById('noResults');
+        const visibleCommandsSpan = document.getElementById('visibleCommands');
+
+        let activeCategory = 'all';
+
+        // Copy command functionality
+        function copyCommand(btn) {
+            const commandText = btn.parentElement.textContent.replace('Copy', '').trim();
+            navigator.clipboard.writeText(commandText).then(() => {
+                btn.textContent = 'Copied!';
+                btn.style.background = '#48bb78';
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.style.background = '#667eea';
+                }, 2000);
+            });
+        }
+
+        // Search function
+        function performSearch() {
+            const searchTerm = searchInput.value.toLowerCase();
+            let visibleCount = 0;
+            let hasVisibleCards = false;
+
+            categorySections.forEach(section => {
+                const category = section.dataset.category;
+                const cards = section.querySelectorAll('.command-card');
+                let sectionHasVisible = false;
+
+                cards.forEach(card => {
+                    const title = card.querySelector('.command-title').textContent.toLowerCase();
+                    const description = card.querySelector('.command-description').textContent.toLowerCase();
+                    const syntax = card.querySelector('.command-syntax').textContent.toLowerCase();
+                    const output = card.querySelector('.command-output') ? 
+                        card.querySelector('.command-output').textContent.toLowerCase() : '';
+
+                    const matchesSearch = !searchTerm || 
+                        title.includes(searchTerm) || 
+                        description.includes(searchTerm) || 
+                        syntax.includes(searchTerm) || 
+                        output.includes(searchTerm);
+
+                    const matchesCategory = activeCategory === 'all' || category === activeCategory;
+
+                    if (matchesSearch && matchesCategory) {
+                        card.style.display = 'block';
+                        sectionHasVisible = true;
+                        visibleCount++;
+                        hasVisibleCards = true;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+
+                // Show/hide section based on visible cards
+                if (sectionHasVisible && (activeCategory === 'all' || category === activeCategory)) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+
+            // Update visible count
+            visibleCommandsSpan.textContent = visibleCount;
+
+            // Show/hide no results message
+            if (!hasVisibleCards) {
+                noResults.style.display = 'block';
+            } else {
+                noResults.style.display = 'none';
+            }
+        }
+
+        // Category filter
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activeCategory = btn.dataset.category;
+                performSearch();
+            });
+        });
+
+        // Search input listener
+        searchInput.addEventListener('input', performSearch);
+
+        // Back to top button
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Keyboard shortcut for search (Ctrl/Cmd + K)
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                searchInput.focus();
+            }
+        });
+
+        // Initial load animation
+        window.addEventListener('load', () => {
+            commandCards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.3s ease';
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 50);
+                }, index * 10);
+            });
+        });
+    </script>
+</body>
+</html>command-description">Shows hostname, model, PAN-OS, uptime.</p>
+                        <div class="command-output">
+                            <span class="output-label">Output:</span>
+hostname: PA-VM
+sw-version: 10.2.5
+model: PA-VM
+uptime: 5 days
+                        </div>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">2</span>
+                        <h3 class="command-title">Check uptime</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show system uptime
+                        </div>
+                        <p class="command-description">Displays system uptime.</p>
+                        <div class="command-output">
+                            <span class="output-label">Output:</span>
+System has been up for: 5 days 03:11:22
+                        </div>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">3</span>
+                        <h3 class="command-title">Check CPU</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show system resources
+                        </div>
+                        <p class="command-description">Displays CPU utilization statistics.</p>
+                        <div class="command-output">
+                            <span class="output-label">Output:</span>
+%Cpu(s): 18%us 2%sy 0%ni 80%id
+                        </div>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">4</span>
+                        <h3 class="command-title">Check memory</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show system resources | match Mem
+                        </div>
+                        <p class="command-description">Displays memory usage statistics.</p>
+                        <div class="command-output">
+                            <span class="output-label">Output:</span>
+Mem: 8192M used 45.3%
+                        </div>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">5</span>
+                        <h3 class="command-title">Show processes</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show system software status
+                        </div>
+                        <p class="command-description">Shows running system processes.</p>
+                        <div class="command-output">
+                            <span class="output-label">Output:</span>
+mgmtsrvr: running
+                        </div>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">6</span>
+                        <h3 class="command-title">List current logged-in admins</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show admins
+                        </div>
+                        <p class="command-description">Shows currently logged-in administrators.</p>
+                        <div class="command-output">
+                            <span class="output-label">Output:</span>
+admin from 10.1.1.2 via Web
+                        </div>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">7</span>
+                        <h3 class="command-title">Check all jobs</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show jobs all
+                        </div>
+                        <p class="command-description">Lists all system jobs.</p>
+                        <div class="command-output">
+                            <span class="output-label">Output:</span>
+ID Type Status Completed
+                        </div>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">8</span>
+                        <h3 class="command-title">Check running background jobs</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show jobs processed
+                        </div>
+                        <p class="command-description">Shows processed background jobs.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">9</span>
+                        <h3 class="command-title">Check scheduled tasks</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show system scheduled-scripts
+                        </div>
+                        <p class="command-description">Lists scheduled system scripts.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">10</span>
+                        <h3 class="command-title">Reboot system</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            request restart system
+                        </div>
+                        <p class="command-description">Restarts the firewall system.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">11</span>
+                        <h3 class="command-title">Check disk usage</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show system disk-space
+                        </div>
+                        <p class="command-description">Displays disk space utilization.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">12</span>
+                        <h3 class="command-title">View current sessions summary</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show session info
+                        </div>
+                        <p class="command-description">Shows session information summary.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">13</span>
+                        <h3 class="command-title">View routing process status</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show routing protocol bgp summary
+                        </div>
+                        <p class="command-description">Displays BGP routing protocol summary.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">14</span>
+                        <h3 class="command-title">Check FQDN refresh status</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show dns-proxy fqdn all
+                        </div>
+                        <p class="command-description">Shows DNS proxy FQDN status.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">15</span>
+                        <h3 class="command-title">Check connectivity</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            ping host 8.8.8.8
+                        </div>
+                        <p class="command-description">Tests network connectivity to a host.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">16</span>
+                        <h3 class="command-title">Test DNS</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            test dns-proxy fqdn www.google.com
+                        </div>
+                        <p class="command-description">Tests DNS resolution for a FQDN.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">17</span>
+                        <h3 class="command-title">Show global counters</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show counter global
+                        </div>
+                        <p class="command-description">Displays global packet counters.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">18</span>
+                        <h3 class="command-title">View dropped packets</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show counter global filter severity drop
+                        </div>
+                        <p class="command-description">Shows dropped packet statistics.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">19</span>
+                        <h3 class="command-title">Analyze dataplane health</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show running resource-monitor
+                        </div>
+                        <p class="command-description">Shows dataplane resource utilization.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">20</span>
+                        <h3 class="command-title">Check SSL/TLS services</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show system services
+                        </div>
+                        <p class="command-description">Displays system services status.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LICENSE & SUBSCRIPTION -->
+            <div class="category-section" data-category="license">
+                <div class="category-header">
+                    <span class="category-icon">📜</span>
+                    <h2 class="category-title">LICENSE & SUBSCRIPTION</h2>
+                </div>
+                <div class="command-grid">
+                    <div class="command-card">
+                        <span class="command-number">21</span>
+                        <h3 class="command-title">Show licenses</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show licenses
+                        </div>
+                        <p class="command-description">Displays all installed licenses.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">22</span>
+                        <h3 class="command-title">Re-download licenses</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            request license fetch
+                        </div>
+                        <p class="command-description">Fetches licenses from license server.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">23</span>
+                        <h3 class="command-title">Activate license manually</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            request license install file &lt;filename&gt;
+                        </div>
+                        <p class="command-description">Installs a license from file.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">24</span>
+                        <h3 class="command-title">Retrieve support info</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show system support-info
+                        </div>
+                        <p class="command-description">Shows support and warranty information.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">25</span>
+                        <h3 class="command-title">Check content version</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show system info | match content
+                        </div>
+                        <p class="command-description">Displays current content version.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">26</span>
+                        <h3 class="command-title">Force content update</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            request content upgrade check
+                        </div>
+                        <p class="command-description">Checks for content updates.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">27</span>
+                        <h3 class="command-title">Download latest content</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            request content upgrade download latest
+                        </div>
+                        <p class="command-description">Downloads the latest content version.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">28</span>
+                        <h3 class="command-title">Install content</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            request content upgrade install version latest
+                        </div>
+                        <p class="command-description">Installs the latest content version.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">29</span>
+                        <h3 class="command-title">Show device certificate</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show device-certificate status
+                        </div>
+                        <p class="command-description">Displays device certificate status.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">30</span>
+                        <h3 class="command-title">Validate device certificate</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            request device-certificate check
+                        </div>
+                        <p class="command-description">Validates device certificate.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NETWORK & INTERFACE DEBUG -->
+            <div class="category-section" data-category="network">
+                <div class="category-header">
+                    <span class="category-icon">🌐</span>
+                    <h2 class="category-title">NETWORK & INTERFACE DEBUG</h2>
+                </div>
+                <div class="command-grid">
+                    <div class="command-card">
+                        <span class="command-number">31</span>
+                        <h3 class="command-title">Show interface list</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show interface all
+                        </div>
+                        <p class="command-description">Displays all network interfaces.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">32</span>
+                        <h3 class="command-title">Show interface management</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show interface management
+                        </div>
+                        <p class="command-description">Shows management interface details.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">33</span>
+                        <h3 class="command-title">Show physical interface stats</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show counter interface &lt;interface&gt;
+                        </div>
+                        <p class="command-description">Displays interface packet counters.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">34</span>
+                        <h3 class="command-title">Show ARP table</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show arp all
+                        </div>
+                        <p class="command-description">Displays ARP cache table.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">35</span>
+                        <h3 class="command-title">Clear ARP</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            clear arp all
+                        </div>
+                        <p class="command-description">Clears the ARP cache.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">36</span>
+                        <h3 class="command-title">Show route table</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show routing route
+                        </div>
+                        <p class="command-description">Displays routing table.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">37</span>
+                        <h3 class="command-title">Show BGP</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show routing protocol bgp summary
+                        </div>
+                        <p class="command-description">Shows BGP neighbor summary.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">38</span>
+                        <h3 class="command-title">Show OSPF</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show routing protocol ospf neighbor
+                        </div>
+                        <p class="command-description">Displays OSPF neighbor information.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">39</span>
+                        <h3 class="command-title">Test path</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            test routing fib-lookup ip 8.8.8.8
+                        </div>
+                        <p class="command-description">Tests routing path lookup.</p>
+                    </div>
+
+                    <div class="command-card">
+                        <span class="command-number">40</span>
+                        <h3 class="command-title">Show IPv6 neighbors</h3>
+                        <div class="command-syntax">
+                            <button class="copy-btn" onclick="copyCommand(this)">Copy</button>
+                            show ipv6 neighbors
+                        </div>
+                        <p class="

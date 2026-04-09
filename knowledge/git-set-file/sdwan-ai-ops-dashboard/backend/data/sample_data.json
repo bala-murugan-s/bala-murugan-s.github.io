@@ -1,0 +1,152 @@
+{
+  "devices": [
+    {
+      "id": "dev-001",
+      "hostname": "sdwan-edge-nyc-01",
+      "ip": "10.0.1.1",
+      "site": "New York HQ",
+      "model": "Cisco Catalyst 8300",
+      "software_version": "17.9.3a",
+      "status": "up",
+      "uptime_hours": 720,
+      "cpu_percent": 34,
+      "memory_percent": 61,
+      "reboot_count_7d": 0,
+      "last_reboot": "2024-11-01T02:00:00Z",
+      "tunnel_count": 12,
+      "wan_links": [
+        {"name": "MPLS-Primary", "status": "up", "latency_ms": 8, "loss_percent": 0.0, "bw_mbps": 500},
+        {"name": "Internet-Backup", "status": "up", "latency_ms": 22, "loss_percent": 0.1, "bw_mbps": 1000}
+      ]
+    },
+    {
+      "id": "dev-002",
+      "hostname": "sdwan-edge-lax-01",
+      "ip": "10.0.2.1",
+      "site": "Los Angeles Branch",
+      "model": "Cisco Catalyst 8200",
+      "software_version": "17.9.3a",
+      "status": "up",
+      "uptime_hours": 168,
+      "cpu_percent": 58,
+      "memory_percent": 74,
+      "reboot_count_7d": 4,
+      "last_reboot": "2024-12-10T14:23:00Z",
+      "tunnel_count": 8,
+      "wan_links": [
+        {"name": "MPLS-Primary", "status": "up", "latency_ms": 12, "loss_percent": 0.2, "bw_mbps": 200},
+        {"name": "LTE-Backup", "status": "degraded", "latency_ms": 85, "loss_percent": 2.4, "bw_mbps": 50}
+      ]
+    },
+    {
+      "id": "dev-003",
+      "hostname": "sdwan-edge-chi-01",
+      "ip": "10.0.3.1",
+      "site": "Chicago Branch",
+      "model": "Cisco Catalyst 8200",
+      "software_version": "17.8.1a",
+      "status": "down",
+      "uptime_hours": 0,
+      "cpu_percent": 0,
+      "memory_percent": 0,
+      "reboot_count_7d": 7,
+      "last_reboot": "2024-12-12T09:45:00Z",
+      "tunnel_count": 0,
+      "wan_links": [
+        {"name": "MPLS-Primary", "status": "down", "latency_ms": 0, "loss_percent": 100.0, "bw_mbps": 200},
+        {"name": "Internet-Backup", "status": "down", "latency_ms": 0, "loss_percent": 100.0, "bw_mbps": 500}
+      ]
+    },
+    {
+      "id": "dev-004",
+      "hostname": "sdwan-edge-dfw-01",
+      "ip": "10.0.4.1",
+      "site": "Dallas Data Center",
+      "model": "Cisco Catalyst 8500",
+      "software_version": "17.9.3a",
+      "status": "up",
+      "uptime_hours": 2160,
+      "cpu_percent": 22,
+      "memory_percent": 45,
+      "reboot_count_7d": 0,
+      "last_reboot": "2024-09-15T00:00:00Z",
+      "tunnel_count": 24,
+      "wan_links": [
+        {"name": "MPLS-Primary", "status": "up", "latency_ms": 5, "loss_percent": 0.0, "bw_mbps": 1000},
+        {"name": "MPLS-Secondary", "status": "up", "latency_ms": 6, "loss_percent": 0.0, "bw_mbps": 1000},
+        {"name": "Internet-Backup", "status": "up", "latency_ms": 15, "loss_percent": 0.0, "bw_mbps": 2000}
+      ]
+    },
+    {
+      "id": "dev-005",
+      "hostname": "sdwan-edge-mia-01",
+      "ip": "10.0.5.1",
+      "site": "Miami Branch",
+      "model": "Cisco Catalyst 8200",
+      "software_version": "17.9.1b",
+      "status": "warning",
+      "uptime_hours": 48,
+      "cpu_percent": 88,
+      "memory_percent": 91,
+      "reboot_count_7d": 2,
+      "last_reboot": "2024-12-10T06:12:00Z",
+      "tunnel_count": 6,
+      "wan_links": [
+        {"name": "Internet-Primary", "status": "up", "latency_ms": 18, "loss_percent": 0.8, "bw_mbps": 300},
+        {"name": "LTE-Backup", "status": "up", "latency_ms": 55, "loss_percent": 1.2, "bw_mbps": 50}
+      ]
+    },
+    {
+      "id": "dev-006",
+      "hostname": "sdwan-edge-sea-01",
+      "ip": "10.0.6.1",
+      "site": "Seattle Branch",
+      "model": "Cisco Catalyst 8300",
+      "software_version": "17.9.3a",
+      "status": "up",
+      "uptime_hours": 504,
+      "cpu_percent": 41,
+      "memory_percent": 53,
+      "reboot_count_7d": 1,
+      "last_reboot": "2024-12-08T22:00:00Z",
+      "tunnel_count": 10,
+      "wan_links": [
+        {"name": "MPLS-Primary", "status": "up", "latency_ms": 10, "loss_percent": 0.0, "bw_mbps": 500},
+        {"name": "Internet-Backup", "status": "up", "latency_ms": 28, "loss_percent": 0.3, "bw_mbps": 500}
+      ]
+    }
+  ],
+  "policies": [
+    {"id": "pol-001", "name": "Voice-QoS-Priority", "type": "QoS", "applied_devices": 6, "last_used": "2024-12-12T10:00:00Z", "active": true},
+    {"id": "pol-002", "name": "Guest-WiFi-Isolation", "type": "Security", "applied_devices": 4, "last_used": "2024-12-11T08:30:00Z", "active": true},
+    {"id": "pol-003", "name": "Legacy-MPLS-Failover", "type": "Routing", "applied_devices": 0, "last_used": "2024-09-01T00:00:00Z", "active": false},
+    {"id": "pol-004", "name": "Video-Conf-SaaS-Direct", "type": "App-Aware", "applied_devices": 6, "last_used": "2024-12-12T11:00:00Z", "active": true},
+    {"id": "pol-005", "name": "Branch-to-DC-Encrypt", "type": "Security", "applied_devices": 5, "last_used": "2024-12-12T09:00:00Z", "active": true},
+    {"id": "pol-006", "name": "Old-Backup-Route-Test", "type": "Routing", "applied_devices": 0, "last_used": "2024-10-15T00:00:00Z", "active": false},
+    {"id": "pol-007", "name": "Bandwidth-Throttle-IoT", "type": "QoS", "applied_devices": 3, "last_used": "2024-12-10T14:00:00Z", "active": true}
+  ],
+  "templates": [
+    {"id": "tmpl-001", "name": "Branch-Standard-v3", "type": "Device", "applied_count": 4, "version": "3.2", "last_modified": "2024-11-20T00:00:00Z"},
+    {"id": "tmpl-002", "name": "DC-Core-v2", "type": "Device", "applied_count": 1, "version": "2.1", "last_modified": "2024-10-05T00:00:00Z"},
+    {"id": "tmpl-003", "name": "QoS-Enterprise-Policy", "type": "Feature", "applied_count": 6, "version": "1.8", "last_modified": "2024-12-01T00:00:00Z"},
+    {"id": "tmpl-004", "name": "Security-Baseline", "type": "Feature", "applied_count": 6, "version": "2.0", "last_modified": "2024-11-15T00:00:00Z"},
+    {"id": "tmpl-005", "name": "Legacy-Branch-v1", "type": "Device", "applied_count": 0, "version": "1.0", "last_modified": "2023-06-10T00:00:00Z"}
+  ],
+  "logs": [
+    {"id": "log-001", "timestamp": "2024-12-12T11:45:00Z", "device_id": "dev-003", "hostname": "sdwan-edge-chi-01", "event_type": "device_down", "severity": "critical", "message": "Device unreachable - all WAN links down", "user": "system"},
+    {"id": "log-002", "timestamp": "2024-12-12T09:45:00Z", "device_id": "dev-003", "hostname": "sdwan-edge-chi-01", "event_type": "reboot", "severity": "high", "message": "Device rebooted unexpectedly (7th time in 7 days)", "user": "system"},
+    {"id": "log-003", "timestamp": "2024-12-12T08:30:00Z", "device_id": "dev-005", "hostname": "sdwan-edge-mia-01", "event_type": "high_cpu", "severity": "high", "message": "CPU utilization exceeded 85% threshold", "user": "system"},
+    {"id": "log-004", "timestamp": "2024-12-11T16:20:00Z", "device_id": "dev-002", "hostname": "sdwan-edge-lax-01", "event_type": "config_change", "severity": "medium", "message": "Policy 'Voice-QoS-Priority' modified", "user": "admin@corp.com"},
+    {"id": "log-005", "timestamp": "2024-12-11T14:00:00Z", "device_id": "dev-002", "hostname": "sdwan-edge-lax-01", "event_type": "reboot", "severity": "medium", "message": "Device rebooted after config push", "user": "system"},
+    {"id": "log-006", "timestamp": "2024-12-10T22:10:00Z", "device_id": "dev-001", "hostname": "sdwan-edge-nyc-01", "event_type": "template_push", "severity": "low", "message": "Template 'Branch-Standard-v3' successfully applied", "user": "netops@corp.com"},
+    {"id": "log-007", "timestamp": "2024-12-10T18:45:00Z", "device_id": "dev-006", "hostname": "sdwan-edge-sea-01", "event_type": "reboot", "severity": "low", "message": "Scheduled maintenance reboot completed", "user": "system"},
+    {"id": "log-008", "timestamp": "2024-12-10T14:23:00Z", "device_id": "dev-002", "hostname": "sdwan-edge-lax-01", "event_type": "reboot", "severity": "medium", "message": "WAN failover triggered reboot sequence", "user": "system"},
+    {"id": "log-009", "timestamp": "2024-12-09T10:00:00Z", "device_id": "dev-004", "hostname": "sdwan-edge-dfw-01", "event_type": "config_change", "severity": "low", "message": "Bandwidth policy updated for new SaaS endpoints", "user": "admin@corp.com"},
+    {"id": "log-010", "timestamp": "2024-12-08T09:15:00Z", "device_id": "dev-005", "hostname": "sdwan-edge-mia-01", "event_type": "reboot", "severity": "medium", "message": "Memory pressure caused process restart", "user": "system"}
+  ],
+  "licenses": [
+    {"type": "SD-WAN Advantage", "total": 10, "used": 6, "expiry": "2025-12-31"},
+    {"type": "Security Bundle", "total": 8, "used": 6, "expiry": "2025-06-30"},
+    {"type": "DNA Advantage", "total": 10, "used": 6, "expiry": "2025-12-31"}
+  ]
+}

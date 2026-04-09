@@ -1,0 +1,128 @@
+/* ============================================
+   SD-WAN AI Ops Dashboard — Global Styles
+   Aesthetic: Dark industrial / tactical ops
+   ============================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-void: #080c10;
+  --bg-deep: #0d1117;
+  --bg-surface: #131920;
+  --bg-raised: #1a2230;
+  --bg-hover: #1e2a3a;
+
+  --border-dim: #1e2d3d;
+  --border-base: #243447;
+  --border-bright: #2e4560;
+
+  --text-primary: #c8d8e8;
+  --text-secondary: #7a9ab5;
+  --text-dim: #4a6278;
+  --text-mono: #a0c4e0;
+
+  --accent-cyan: #00d4ff;
+  --accent-cyan-dim: #00a8cc44;
+  --accent-green: #00e676;
+  --accent-green-dim: #00e67622;
+  --accent-amber: #ffab00;
+  --accent-amber-dim: #ffab0022;
+  --accent-red: #ff3d5a;
+  --accent-red-dim: #ff3d5a22;
+  --accent-purple: #b388ff;
+
+  --status-up: #00e676;
+  --status-down: #ff3d5a;
+  --status-warning: #ffab00;
+  --status-degraded: #ff8c00;
+  --status-info: #00d4ff;
+
+  --font-display: 'Syne', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  --shadow-glow-cyan: 0 0 20px rgba(0, 212, 255, 0.15);
+  --shadow-glow-red: 0 0 20px rgba(255, 61, 90, 0.2);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+html, body {
+  height: 100%;
+  background: var(--bg-void);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ——— Scrollbar ——— */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-deep); }
+::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+
+/* ——— Typography ——— */
+h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.02em; }
+
+/* ——— Buttons ——— */
+button {
+  cursor: pointer;
+  font-family: var(--font-mono);
+  border: none;
+  transition: all 0.2s ease;
+}
+
+/* ——— Animations ——— */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ——— Utility classes ——— */
+.animate-fade-in { animation: fade-in-up 0.4s ease forwards; }
+.font-mono { font-family: var(--font-mono); }
+.font-display { font-family: var(--font-display); }
+.text-cyan { color: var(--accent-cyan); }
+.text-green { color: var(--accent-green); }
+.text-red { color: var(--accent-red); }
+.text-amber { color: var(--accent-amber); }
+.text-dim { color: var(--text-dim); }
+.text-secondary { color: var(--text-secondary); }

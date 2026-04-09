@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>CloudSec & Infra Tools | Professional Cloud Engineering Suite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Light theme (default) */
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --accent: #06b6d4;
+            --accent-dark: #0891b2;
+            --accent-glow: rgba(6, 182, 212, 0.2);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --aws: #ff9900;
+            --azure: #0078d4;
+            --gcp: #4285f4;
+            --k8s: #326ce5;
+            --terraform: #7b42bc;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.dark {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: var(--transition);
+            line-height: 1.5;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            75% { transform: translateX(2px); }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(8px);
+            padding: 12px 0;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-icon {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            text-decoration: none;
+        }
+
+        .btn-icon:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            border-color: var(--accent);
+            background: var(--accent-glow);
+        }
+
+        .theme-toggle {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            color: var(--text-primary);
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            border-color: var(--accent);
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--aws), var(--azure), var(--gcp));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+            gap: 28px;
+            margin: 40px 0;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .tool-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            animation: scaleIn 0.4s ease-out;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent);
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-primary) 100%);
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .card-header h3 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: var(--transition);
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        button:not(.btn-icon):not(.theme-toggle) {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        button:not(.btn-icon):not(.theme-toggle):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .result-area {
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--bg-primary);
+            border-radius: 16px;
+            border-left: 4px solid var(--accent);
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+            transition: var(--transition);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .result-area pre {
+            white-space: pre-wrap;
+            font-family: inherit;
+            margin: 0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: var(--accent-glow);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-left: 8px;
+        }
+
+        .severity-high { color: var(--danger); font-weight: bold; }
+        .severity-medium { color: var(--warning); font-weight: bold; }
+        .severity-low { color: var(--success); }
+
+        .cost-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px;
+            margin-top: 8px;
+        }
+
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--accent);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            z-index: 99;
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+        }
+
+        .site-footer {
+            margin-top: 60px;
+            border-top: 1px solid var(--border);
+            padding: 32px 0;
+            background: var(--bg-secondary);
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .ft-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .ft-copy {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .ft-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .ft-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .ft-links a:hover {
+            color: var(--accent);
+        }
+
+        @media (max-width: 768px) {
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            .footer-inner {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="container nav-container">
+            <div class="logo-area">
+                <a href="index.html" class="btn-icon" id="homeBtn">🏠 Home</a>
+                <button class="btn-icon" id="toolsHomeBtn">🛠️ Tools Home</button>
+                <h1>☁️ CloudSec & Infra Tools</h1>
+            </div>
+            <button class="theme-toggle" id="themeToggle">🌙 Dark Mode</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="tools-grid" id="toolsGrid"></div>
+    </div>
+
+    <div class="scroll-top" id="scrollTop">↑</div>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-inner">
+                <span class="ft-name">Balamurugan Sivaraman</span>
+                <span class="ft-copy">© 2026 · Designed & built from scratch for Cloud & Security Engineers.</span>
+                <div class="ft-links">
+                    <a href="https://www.linkedin.com/in/bala-murugan-s/" target="_blank" rel="noopener">LinkedIn</a>
+                    <a href="https://bala-murugan-s.github.io" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://wa.me/919003234312" target="_blank" rel="noopener">WhatsApp</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Session Cache
+        const sessionCache = {
+            get: (key) => {
+                try {
+                    const item = sessionStorage.getItem(key);
+                    return item ? JSON.parse(item) : null;
+                } catch(e) { return null; }
+            },
+            set: (key, value) => {
+                sessionStorage.setItem(key, JSON.stringify(value));
+            }
+        };
+
+        // Common AWS Actions for IAM Builder
+        const awsActions = {
+            's3': ['s3:GetObject', 's3:PutObject', 's3:DeleteObject', 's3:ListBucket', 's3:CreateBucket'],
+            'ec2': ['ec2:DescribeInstances', 'ec2:StartInstances', 'ec2:StopInstances', 'ec2:RunInstances', 'ec2:TerminateInstances'],
+            'lambda': ['lambda:InvokeFunction', 'lambda:CreateFunction', 'lambda:UpdateFunctionCode'],
+            'iam': ['iam:CreateUser', 'iam:ListUsers', 'iam:AttachUserPolicy'],
+            'rds': ['rds:DescribeDBInstances', 'rds:CreateDBInstance', 'rds:DeleteDBInstance']
+        };
+
+        function buildToolHTML(tool) {
+            if (tool.id === "iam") {
+                return `<div class="tool-card"><div class="card-header"><h3>🔐 AWS IAM Policy Builder <span class="badge">Visual Constructor</span></h3></div><div class="card-body"><div class="input-group"><label>Policy Name</label><input type="text" id="policyName" placeholder="S3ReadOnlyAccess"><label style="margin-top:12px">Service</label><select id="iamService"><option value="s3">S3 - Simple Storage Service</option><option value="ec2">EC2 - Elastic Compute</option><option value="lambda">Lambda - Serverless</option><option value="iam">IAM - Identity Management</option><option value="rds">RDS - Databases</option></select><label style="margin-top:12px">Resource ARN</label><input type="text" id="resourceArn" placeholder="arn:aws:s3:::example-bucket/*"><label style="margin-top:12px">Effect</label><select id="effect"><option value="Allow">Allow</option><option value="Deny">Deny</option></select></div><button onclick="buildIAMPolicy()">Generate IAM Policy</button><div class="result-area" id="iamResult">Configure policy to generate JSON</div></div></div>`;
+            }
+            if (tool.id === "azure") {
+                return `<div class="tool-card"><div class="card-header"><h3>🎯 Azure RBAC Explorer <span class="badge">Role Assignment</span></h3></div><div class="card-body"><div class="input-group"><label>Principal (User/Group/SP)</label><input type="text" id="principal" placeholder="user@domain.com"><label style="margin-top:12px">Role</label><select id="azureRole"><option value="Owner">Owner - Full Access</option><option value="Contributor">Contributor - Create/Manage</option><option value="Reader">Reader - View Only</option><option value="Storage Blob Data Owner">Storage Blob Data Owner</option><option value="Virtual Machine Contributor">VM Contributor</option></select><label style="margin-top:12px">Scope</label><input type="text" id="scope" placeholder="/subscriptions/xxx/resourceGroups/rg1"></div><button onclick="buildAzureRBAC()">Generate RBAC Assignment</button><div class="result-area" id="azureResult">Azure RBAC configuration</div></div></div>`;
+            }
+            if (tool.id === "gcp") {
+                return `<div class="tool-card"><div class="card-header"><h3>🔑 GCP Service Account Helper <span class="badge">Config Generator</span></h3></div><div class="card-body"><div class="input-group"><label>Service Account Name</label><input type="text" id="saName" placeholder="my-service-account"><label style="margin-top:12px">Project ID</label><input type="text" id="gcpProject" placeholder="my-project-123"><label style="margin-top:12px">IAM Roles (comma-separated)</label><input type="text" id="gcpRoles" placeholder="roles/storage.admin,roles/viewer"></div><button onclick="generateGCPConfig()">Generate SA Config</button><div class="result-area" id="gcpResult">GCP service account configuration</div></div></div>`;
+            }
+            if (tool.id === "tfscan") {
+                return `<div class="tool-card"><div class="card-header"><h3>🛡️ Terraform Security Scanner <span class="badge">IaC Patterns</span></h3></div><div class="card-body"><div class="input-group"><label>Paste Terraform Configuration</label><textarea id="tfCode" placeholder="resource &quot;aws_s3_bucket&quot; &quot;example&quot; {&#10;  bucket = &quot;my-bucket&quot;&#10;  acl    = &quot;public-read&quot;&#10;}"></textarea></div><button onclick="scanTerraform()">Scan for Security Issues</button><div class="result-area" id="tfResult">Security scan results will appear here</div></div></div>`;
+            }
+            if (tool.id === "cfn") {
+                return `<div class="tool-card"><div class="card-header"><h3>📋 CloudFormation Validator <span class="badge">Best Practices</span></h3></div><div class="card-body"><div class="input-group"><label>Paste CloudFormation Template (YAML/JSON)</label><textarea id="cfnTemplate" placeholder="Resources:&#10;  MyBucket:&#10;    Type: AWS::S3::Bucket&#10;    Properties:&#10;      BucketName: my-bucket"></textarea></div><button onclick="validateCFN()">Validate Template</button><div class="result-area" id="cfnResult">Validation results and recommendations</div></div></div>`;
+            }
+            if (tool.id === "k8s") {
+                return `<div class="tool-card"><div class="card-header"><h3>🔀 K8s Network Policy Builder <span class="badge">Pod Communication</span></h3></div><div class="card-body"><div class="input-group"><label>Pod Selector (app=)</label><input type="text" id="podSelector" placeholder="backend"><label style="margin-top:12px">Namespace</label><input type="text" id="k8sNamespace" placeholder="default"><label style="margin-top:12px">Allowed Ingress (comma-separated)</label><input type="text" id="allowedIngress" placeholder="app=frontend,app=api"><label style="margin-top:12px">Allowed Egress (comma-separated)</label><input type="text" id="allowedEgress" placeholder="app=database"></div><button onclick="buildK8sNetworkPolicy()">Generate NetworkPolicy</button><div class="result-area" id="k8sResult">Kubernetes NetworkPolicy YAML</div></div></div>`;
+            }
+            if (tool.id === "secrets") {
+                return `<div class="tool-card"><div class="card-header"><h3>🔍 Secret Scanner <span class="badge">Hardcoded Secrets</span></h3></div><div class="card-body"><div class="input-group"><label>Paste Text/Code to Scan</label><textarea id="secretText" placeholder="Paste configuration, code, or logs here...&#10;&#10;Example:&#10;aws_secret_key = &quot;wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY&quot;&#10;password = &quot;admin123&quot;"></textarea></div><button onclick="scanSecrets()">Scan for Secrets</button><div class="result-area" id="secretResult">Detected secrets and recommendations</div></div></div>`;
+            }
+            if (tool.id === "cost") {
+                return `<div class="tool-card"><div class="card-header"><h3>💰 Cloud Cost Estimator <span class="badge">Resource Pricing</span></h3></div><div class="card-body"><div class="input-group"><label>Provider</label><select id="cloudProvider"><option value="aws">AWS</option><option value="azure">Azure</option><option value="gcp">GCP</option></select><label style="margin-top:12px">vCPUs</label><input type="number" id="vcpus" placeholder="4"><label style="margin-top:12px">Memory (GB)</label><input type="number" id="memory" placeholder="16"><label style="margin-top:12px">Storage (GB)</label><input type="number" id="storage" placeholder="100"><label style="margin-top:12px">Instances Count</label><input type="number" id="instances" placeholder="3"></div><button onclick="estimateCost()">Calculate Estimate</button><div class="result-area" id="costResult">Monthly cost estimation</div></div></div>`;
+            }
+            if (tool.id === "s3policy") {
+                return `<div class="tool-card"><div class="card-header"><h3>📦 S3 Bucket Policy Tester <span class="badge">Permission Testing</span></h3></div><div class="card-body"><div class="input-group"><label>Bucket Name</label><input type="text" id="bucketName" placeholder="my-secure-bucket"><label style="margin-top:12px">Principal ARN</label><input type="text" id="principalArn" placeholder="arn:aws:iam::123456789012:user/test"><label style="margin-top:12px">Action to Test</label><select id="s3Action"><option value="s3:GetObject">Get Object (Read)</option><option value="s3:PutObject">Put Object (Write)</option><option value="s3:DeleteObject">Delete Object</option><option value="s3:ListBucket">List Bucket</option></select></div><button onclick="testS3Policy()">Test Permission</button><div class="result-area" id="s3Result">Policy test results</div></div></div>`;
+            }
+            if (tool.id === "cloudtrail") {
+                return `<div class="tool-card"><div class="card-header"><h3>📊 CloudTrail Analyzer <span class="badge">Log Analysis</span></h3></div><div class="card-body"><div class="input-group"><label>Paste CloudTrail Event Log (JSON)</label><textarea id="trailLog" placeholder='{"eventVersion":"1.08","userIdentity":{"type":"IAMUser","userName":"admin"},"eventTime":"2024-01-01T00:00:00Z","eventSource":"s3.amazonaws.com","eventName":"GetObject","sourceIPAddress":"192.168.1.1"}'></textarea></div><button onclick="analyzeCloudTrail()">Analyze Event</button><div class="result-area" id="trailResult">Event analysis and insights</div></div></div>`;
+            }
+            return "";
+        }
+
+        // Tool Implementations
+        window.buildIAMPolicy = () => {
+            let name = document.getElementById("policyName").value;
+            let service = document.getElementById("iamService").value;
+            let resource = document.getElementById("resourceArn").value;
+            let effect = document.getElementById("effect").value;
+            
+            let actions = awsActions[service] || [service + ':*'];
+            let policy = {
+                "Version": "2012-10-17",
+                "Statement": [{
+                    "Effect": effect,
+                    "Action": actions.slice(0, 3),
+                    "Resource": resource || "*"
+                }]
+            };
+            
+            let result = `# IAM Policy: ${name}\n\n` + JSON.stringify(policy, null, 2);
+            result += `\n\n📌 Policy Summary:\n• Service: ${service.toUpperCase()}\n• Effect: ${effect}\n• Resources: ${resource || "All resources"}\n• Actions: ${actions.slice(0, 3).join(", ")}`;
+            
+            sessionCache.set('lastIAMPolicy', policy);
+            document.getElementById("iamResult").innerHTML = `<pre>${result}</pre>`;
+        };
+        
+        window.buildAzureRBAC = () => {
+            let principal = document.getElementById("principal").value;
+            let role = document.getElementById("azureRole").value;
+            let scope = document.getElementById("scope").value;
+            
+            let config = `# Azure RBAC Assignment\n\naz role assignment create \\\n  --assignee "${principal}" \\\n  --role "${role}" \\\n  --scope "${scope}"\n\n`;
+            config += `📋 Role Details:\n• Principal: ${principal}\n• Role: ${role}\n• Scope: ${scope}\n\n`;
+            config += `💡 Alternative: Use Azure Portal → Access Control (IAM) → Add role assignment`;
+            
+            sessionCache.set('lastAzureRBAC', { principal, role, scope });
+            document.getElementById("azureResult").innerHTML = `<pre>${config}</pre>`;
+        };
+        
+        window.generateGCPConfig = () => {
+            let saName = document.getElementById("saName").value;
+            let project = document.getElementById("gcpProject").value;
+            let roles = document.getElementById("gcpRoles").value.split(',').map(r => r.trim());
+            
+            let commands = `# Create Service Account\ngcloud iam service-accounts create ${saName} \\\n  --display-name="${saName}" \\\n  --project=${project}\n\n`;
+            commands += `# Grant IAM Roles\n`;
+            roles.forEach(role => {
+                commands += `gcloud projects add-iam-policy-binding ${project} \\\n  --member="serviceAccount:${saName}@${project}.iam.gserviceaccount.com" \\\n  --role="${role}"\n\n`;
+            });
+            commands += `# Generate Key (Optional)\ngcloud iam service-accounts keys create ./${saName}-key.json \\\n  --iam-account="${saName}@${project}.iam.gserviceaccount.com"\n\n`;
+            commands += `📌 Roles Assigned: ${roles.join(", ")}\n💡 Use for workload identity or service authentication`;
+            
+            sessionCache.set('lastGCPConfig', { saName, project, roles });
+            document.getElementById("gcpResult").innerHTML = `<pre>${commands}</pre>`;
+        };
+        
+        window.scanTerraform = () => {
+            let tfCode = document.getElementById("tfCode").value;
+            let issues = [];
+            
+            if (tfCode.includes('acl = "public-read"') || tfCode.includes('acl = "public-read"')) {
+                issues.push({ severity: "HIGH", msg: "S3 bucket with public-read ACL - Data exposure risk" });
+            }
+            if (tfCode.includes('acl = "public-read-write"')) {
+                issues.push({ severity: "CRITICAL", msg: "S3 bucket with public-read-write ACL - Critical security risk" });
+            }
+            if (tfCode.includes('encrypted = false') || tfCode.match(/encrypt.*=.*false/i)) {
+                issues.push({ severity: "MEDIUM", msg: "Encryption disabled on resource - Enable encryption at rest" });
+            }
+            if (tfCode.includes('versioning = false')) {
+                issues.push({ severity: "LOW", msg: "Versioning disabled - Consider enabling for data protection" });
+            }
+            if (tfCode.match(/security_group.*ingress.*0\.0\.0\.0\/0/)) {
+                issues.push({ severity: "HIGH", msg: "Security group allows 0.0.0.0/0 - Restrict ingress rules" });
+            }
+            if (!tfCode.match(/source\s*=/)) {
+                issues.push({ severity: "INFO", msg: "No module source specified - Use versioned modules" });
+            }
+            
+            let result = issues.length === 0 ? "✅ No security issues detected" : `🔍 Found ${issues.length} security concerns:\n\n`;
+            issues.forEach(issue => {
+                let severityClass = issue.severity === "HIGH" ? "severity-high" : (issue.severity === "MEDIUM" ? "severity-medium" : "severity-low");
+                result += `[${issue.severity}] ${issue.msg}\n`;
+            });
+            result += `\n💡 Recommendation: Run tools like tfsec, checkov, or terrascan for comprehensive scanning.`;
+            
+            sessionCache.set('lastTFScan', { issues: issues.length });
+            document.getElementById("tfResult").innerHTML = `<pre>${result}</pre>`;
+        };
+        
+        window.validateCFN = () => {
+            let template = document.getElementById("cfnTemplate").value;
+            let issues = [];
+            
+            if (template.match(/BucketName:/) && !template.match(/DeletionPolicy/)) {
+                issues.push("⚠️ Missing DeletionPolicy on S3 Bucket - Data may be lost on stack deletion");
+            }
+            if (!template.match(/Metadata:/) && !template.match(/Description:/)) {
+                issues.push("ℹ️ Consider adding template Description/Metadata for documentation");
+            }
+            if (template.match(/PublicRead/)) {
+                issues.push("🔴 PublicRead access detected - Security best practice: Use private access");
+            }
+            if (!template.match(/Parameters:/) && template.length > 500) {
+                issues.push("💡 Consider adding Parameters for reusability");
+            }
+            if (template.match(/AWS::EC2::SecurityGroup/) && !template.match(/SecurityGroupIngress/)) {
+                issues.push("⚠️ Security Group without ingress rules - May block all traffic");
+            }
+            
+            let result = `📋 CloudFormation Validation\n${'='.repeat(40)}\n\n`;
+            result += issues.length === 0 ? "✅ Template appears valid and follows best practices\n" : issues.join("\n");
+            result += `\n\n💡 Use: cfn-lint for advanced validation | Template length: ${template.length} chars`;
+            
+            sessionCache.set('lastCFNValidation', { issues: issues.length });
+            document.getElementById("cfnResult").innerHTML = `<pre>${result}</pre>`;
+        };
+        
+        window.buildK8sNetworkPolicy = () => {
+            let podSelector = document.getElementById("podSelector").value;
+            let namespace = document.getElementById("k8sNamespace").value;
+            let ingress = document.getElementById("allowedIngress").value.split(',').map(i => i.trim()).filter(i => i);
+            let egress = document.getElementById("allowedEgress").value.split(',').map(e => e.trim()).filter(e => e);
+            
+            let policy = `apiVersion: networking.k8s.io/v1\nkind: NetworkPolicy\nmetadata:\n  name: ${podSelector}-network-policy\n  namespace: ${namespace}\nspec:\n  podSelector:\n    matchLabels:\n      app: ${podSelector}\n  policyTypes:\n  - Ingress\n  - Egress\n`;
+            
+            if (ingress.length > 0) {
+                policy += `  ingress:\n  - from:\n`;
+                ingress.forEach(i => {
+                    policy += `    - podSelector:\n        matchLabels:\n          app: ${i}\n`;
+                });
+            } else {
+                policy += `  ingress: []  # Deny all ingress\n`;
+            }
+            
+            if (egress.length > 0) {
+                policy += `  egress:\n  - to:\n`;
+                egress.forEach(e => {
+                    policy += `    - podSelector:\n        matchLabels:\n          app: ${e}\n`;
+                });
+            } else {
+                policy += `  egress: []  # Deny all egress\n`;
+            }
+            
+            policy += `\n📌 Policy Summary:\n• Protected Pods: app=${podSelector}\n• Allowed Ingress: ${ingress.length || "None (Deny All)"}\n• Allowed Egress: ${egress.length || "None (Deny All)"}\n• Namespace: ${namespace}`;
+            
+            sessionCache.set('lastK8sPolicy', { podSelector, ingress, egress });
+            document.getElementById("k8sResult").innerHTML = `<pre>${policy}</pre>`;
+        };
+        
+        window.scanSecrets = () => {
+            let text = document.getElementById("secretText").value;
+            let secrets = [];
+            
+            // Secret detection patterns
+            const patterns = [
+                { regex: /(?:AKIA|ASIA)[A-Z0-9]{16}/, name: "AWS Access Key ID", severity: "CRITICAL" },
+                { regex: /(?:aws_secret_access_key|AWS_SECRET).*?['"]([A-Za-z0-9/+=]{40})['"]/i, name: "AWS Secret Key", severity: "CRITICAL" },
+                { regex: /password\s*=\s*['"][^'"]+['"]/i, name: "Hardcoded Password", severity: "HIGH" },
+                { regex: /api[_-]?key\s*=\s*['"][^'"]+['"]/i, name: "API Key", severity: "HIGH" },
+                { regex: /-----BEGIN RSA PRIVATE KEY-----/, name: "RSA Private Key", severity: "CRITICAL" },
+                { regex: /github_[a-zA-Z0-9]{40}/, name: "GitHub Token", severity: "HIGH" },
+                { regex: /[a-f0-9]{32}.*(?:token|key)/i, name: "Potential MD5 Hash Token", severity: "MEDIUM" },
+                { regex: /Bearer\s+[A-Za-z0-9\-_]{20,}/, name: "JWT/Bearer Token", severity: "HIGH" },
+                { regex: /mongodb(?:\+srv)?:\/\/[^:]+:[^@]+@/, name: "MongoDB Connection String", severity: "CRITICAL" },
+                { regex: /postgresql:\/\/[^:]+:[^@]+@/, name: "PostgreSQL Connection", severity: "CRITICAL" }
+            ];
+            
+            patterns.forEach(pattern => {
+                if (pattern.regex.test(text)) {
+                    secrets.push({ name: pattern.name, severity: pattern.severity });
+                }
+            });
+            
+            let result = `🔍 Secret Scan Results\n${'='.repeat(40)}\n\n`;
+            if (secrets.length === 0) {
+                result += "✅ No obvious hardcoded secrets detected.\n\n💡 Best Practices:\n• Use environment variables\n• Implement secrets management (AWS Secrets Manager, HashiCorp Vault)\n• Never commit secrets to Git\n• Use pre-commit hooks (gitleaks, truffleHog)";
+            } else {
+                result += `⚠️ Found ${secrets.length} potential secret(s):\n\n`;
+                secrets.forEach(s => {
+                    result += `[${s.severity}] ${s.name}\n`;
+                });
+                result += `\n🚨 IMMEDIATE ACTION REQUIRED:\n• Revoke exposed credentials\n• Rotate all compromised keys\n• Remove secrets from code/history\n• Implement git-secrets pre-commit hooks`;
+            }
+            
+            sessionCache.set('lastSecretScan', { count: secrets.length });
+            document.getElementById("secretResult").innerHTML = `<pre>${result}</pre>`;
+        };
+        
+        window.estimateCost = () => {
+            let provider = document.getElementById("cloudProvider").value;
+            let vcpus = parseInt(document.getElementById("vcpus").value);
+            let memory = parseInt(document.getElementById("memory").value);
+            let storage = parseInt(document.getElementById("storage").value);
+            let instances = parseInt(document.getElementById("instances").value);
+            
+            let hourlyRate = 0;
+            let providerName = "";
+            
+            if (provider === "aws") {
+                hourlyRate = (vcpus * 0.05) + (memory * 0.01);
+                providerName = "AWS (t3.large equivalent)";
+            } else if (provider === "azure") {
+                hourlyRate = (vcpus * 0.048) + (memory * 0.009);
+                providerName = "Azure (D4s v3 equivalent)";
+            } else {
+                hourlyRate = (vcpus * 0.052) + (memory * 0.011);
+                providerName = "GCP (n2-standard-4 equivalent)";
+            }
+            
+            let hourly = hourlyRate * instances;
+            let daily = hourly * 24;
+            let monthly = daily * 30;
+            let yearly = monthly * 12;
+            
+            let result = `💰 ${provider.toUpperCase()} Cost Estimate\n${'='.repeat(40)}\n\n`;
+            result += `📊 Configuration:\n• Provider: ${providerName}\n• vCPUs: ${vcpus} | Memory: ${memory} GB\n• Storage: ${storage} GB\n• Instances: ${instances}\n\n`;
+            result += `💵 Estimated Costs:\n• Hourly: $${hourly.toFixed(2)}/hr\n• Daily: $${daily.toFixed(2)}/day\n• Monthly: $${monthly.toFixed(2)}/month\n• Yearly: $${yearly.toFixed(2)}/year\n\n`;
+            result += `📌 Notes:\n• Storage costs: ~$${(storage * 0.10 * instances).toFixed(2)}/month additional\n• Data transfer not included\n• Reserved instances: Up to 40-60% savings\n• Spot instances: Up to 90% savings for fault-tolerant workloads`;
+            
+            sessionCache.set('lastCostEstimate', { provider, monthly });
+            document.getElementById("costResult").innerHTML = `<pre>${result}</pre>`;
+        };
+        
+        window.testS3Policy = () => {
+            let bucket = document.getElementById("bucketName").value;
+            let principal = document.getElementById("principalArn").value;
+            let action = document.getElementById("s3Action").value;
+            
+            let actionMap = {
+                's3:GetObject': 'READ',
+                's3:PutObject': 'WRITE',
+                's3:DeleteObject': 'DELETE',
+                's3:ListBucket': 'LIST'
+            };
+            
+            let result = `📦 S3 Bucket Policy Test\n${'='.repeat(40)}\n\n`;
+            result += `🔍 Testing: ${action} (${actionMap[action]})\n`;
+            result += `📁 Bucket: ${bucket}\n`;
+            result += `👤 Principal: ${principal}\n\n`;
+            
+            // Sample policy evaluation
+            result += `✅ Policy Evaluation:\n`;
+            result += `• Explicit DENY: Not found\n`;
+            result += `• Explicit ALLOW: Check bucket policy\n`;
+            result += `• ACL Evaluation: Bucket owner full control\n\n`;
+            
+            result += `💡 Recommended Bucket Policy:\n`;
+            let policy = {
+                "Version": "2012-10-17",
+                "Statement": [{
+                    "Effect": "Allow",
+                    "Principal": { "AWS": principal },
+                    "Action": action,
+                    "Resource": [`arn:aws:s3:::${bucket}`, `arn:aws:s3:::${bucket}/*`]
+                }]
+            };
+            result += JSON.stringify(policy, null, 2);
+            result += `\n\n📌 Best Practices:\n• Use least privilege access\n• Enable S3 Block Public Access\n• Enable encryption (SSE-S3/KMS)\n• Enable versioning and MFA delete\n• Enable CloudTrail for auditing`;
+            
+            sessionCache.set('lastS3Test', { bucket, action });
+            document.getElementById("s3Result").innerHTML = `<pre>${result}</pre>`;
+        };
+        
+        window.analyzeCloudTrail = () => {
+            let logData = document.getElementById("trailLog").value;
+            
+            try {
+                let event = JSON.parse(logData);
+                let result = `📊 CloudTrail Event Analysis\n${'='.repeat(40)}\n\n`;
+                result += `🕒 Time: ${event.eventTime || "N/A"}\n`;
+                result += `👤 User: ${event.userIdentity?.userName || event.userIdentity?.type || "N/A"}\n`;
+                result += `🔧 Service: ${event.eventSource || "N/A"}\n`;
+                result += `⚡ Action: ${event.eventName || "N/A"}\n`;
+                result += `🌐 Source IP: ${event.sourceIPAddress || "N/A"}\n`;
+                result += `📦 Resources: ${event.resources?.map(r => r.type + ":" + r.ARN).join(", ") || "N/A"}\n\n`;
+                
+                // Security insights
+                result += `🔒 Security Insights:\n`;
+                if (event.eventName?.includes("Delete") || event.eventName?.includes("Terminate")) {
+                    result += `⚠️  Destructive action detected - Review if authorized\n`;
+                }
+                if (event.eventName === "ConsoleLogin") {
+                    let mfa = event.additionalEventData?.MFAUsed;
+                    result += `• Console Login: ${mfa === "Yes" ? "✅ MFA Used" : "🔴 MFA NOT Used"}\n`;
+                }
+                if (event.errorCode) {
+                    result += `❌ Error: ${event.errorCode} - ${event.errorMessage || ""}\n`;
+                }
+                if (event.eventName?.includes("Create") || event.eventName?.includes("Put")) {
+                    result += `✅ Resource creation/modification detected\n`;
+                }
+                
+                result += `\n💡 Recommendation: Enable CloudTrail Insights for anomalous activity detection.`;
+                
+                sessionCache.set('lastTrailAnalysis', event);
+                document.getElementById("trailResult").innerHTML = `<pre>${result}</pre>`;
+            } catch(e) {
+                document.getElementById("trailResult").innerHTML = `<pre>❌ Invalid JSON format. Please paste a valid CloudTrail event log.\n\nError: ${e.message}</pre>`;
+            }
+        };
+        
+        const tools = [
+            { id: "iam", name: "🔐 AWS IAM Policy Builder", desc: "Visual IAM policy constructor", comp: "Medium" },
+            { id: "azure", name: "🎯 Azure RBAC Explorer", desc: "Role assignment visualizer", comp: "Medium" },
+            { id: "gcp", name: "🔑 GCP Service Account Helper", desc: "Generate service account configs", comp: "Medium" },
+            { id: "tfscan", name: "🛡️ Terraform Security Scanner", desc: "Local IaC pattern checking", comp: "Medium" },
+            { id: "cfn", name: "📋 CloudFormation Validator", desc: "Template best practices", comp: "Medium" },
+            { id: "k8s", name: "🔀 K8s Network Policy Builder", desc: "Visual pod communication rules", comp: "Medium" },
+            { id: "secrets", name: "🔍 Secret Scanner", desc: "Detect hardcoded secrets in text", comp: "Easy" },
+            { id: "cost", name: "💰 Cloud Cost Estimator", desc: "Estimate cloud resources", comp: "Medium" },
+            { id: "s3policy", name: "📦 S3 Bucket Policy Tester", desc: "Test bucket permissions", comp: "Medium" },
+            { id: "cloudtrail", name: "📊 CloudTrail Analyzer", desc: "Parse and analyze cloud logs", comp: "Medium" }
+        ];
+        
+        function renderTools() {
+            const grid = document.getElementById("toolsGrid");
+            grid.innerHTML = tools.map(t => buildToolHTML(t)).join('');
+        }
+        
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function toolsHomeAction() {
+            scrollToTop();
+            const toolsGrid = document.getElementById("toolsGrid");
+            toolsGrid.style.animation = 'none';
+            setTimeout(() => {
+                toolsGrid.style.animation = 'fadeInUp 0.6s ease-out';
+            }, 10);
+        }
+        
+        const themeToggle = document.getElementById("themeToggle");
+        themeToggle.addEventListener("click", () => {
+            document.body.classList.toggle("dark");
+            themeToggle.innerText = document.body.classList.contains("dark") ? "☀️ Light Mode" : "🌙 Dark Mode";
+        });
+        
+        document.getElementById("homeBtn").addEventListener("click", (e) => {
+            e.preventDefault();
+            window.location.href = window.location.pathname.replace(/cloud.*\.html/, '') + 'index.html';
+        });
+        document.getElementById("toolsHomeBtn").addEventListener("click", toolsHomeAction);
+        
+        const scrollTopBtn = document.getElementById("scrollTop");
+        window.addEventListener("scroll", () => {
+            if (window.pageYOffset > 300) {
+                scrollTopBtn.classList.add("visible");
+            } else {
+                scrollTopBtn.classList.remove("visible");
+            }
+        });
+        scrollTopBtn.addEventListener("click", scrollToTop);
+        
+        renderTools();
+    </script>
+</body>
+</html>

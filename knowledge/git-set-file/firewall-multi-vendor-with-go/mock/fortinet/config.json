@@ -1,0 +1,59 @@
+{
+    "policies": [
+        {
+            "name": "LAN to WAN",
+            "from": "internal",
+            "to": "external",
+            "source": "10.0.0.0/8",
+            "destination": "all",
+            "service": "ALL",
+            "action": "accept",
+            "disabled": false,
+            "unused": false
+        },
+        {
+            "name": "Block Malicious Sites",
+            "from": "any",
+            "to": "any",
+            "source": "all",
+            "destination": "malicious-ips",
+            "service": "ALL",
+            "action": "deny",
+            "disabled": false,
+            "unused": false
+        },
+        {
+            "name": "Allow DNS",
+            "from": "internal",
+            "to": "external",
+            "source": "10.0.0.0/8",
+            "destination": "all",
+            "service": "DNS",
+            "action": "accept",
+            "disabled": false,
+            "unused": true
+        }
+    ],
+    "natRules": [
+        {
+            "name": "Source NAT",
+            "from": "internal",
+            "to": "external",
+            "source": "10.0.0.0/8",
+            "destination": "all",
+            "service": "ALL",
+            "translatedAddress": "interface-ip"
+        }
+    ],
+    "objects": [
+        {
+            "name": "internal-subnets",
+            "type": "ip-range",
+            "members": [
+                "10.0.0.0/8",
+                "172.16.0.0/12",
+                "192.168.0.0/16"
+            ]
+        }
+    ]
+}

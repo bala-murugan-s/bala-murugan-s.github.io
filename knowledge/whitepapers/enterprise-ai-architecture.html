@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enterprise SecOps Architecture — Full Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0d11;
+  --surface: #111520;
+  --surface2: #161c28;
+  --border: #1e2a3a;
+  --accent: #00e5ff;
+  --accent2: #f97316;
+  --accent3: #a78bfa;
+  --accent4: #34d399;
+  --text: #c8d8e8;
+  --text-dim: #5a7080;
+  --text-bright: #eaf4ff;
+  --danger: #f43f5e;
+  --warn: #fbbf24;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'IBM Plex Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+/* ── HEADER ── */
+header {
+  background: linear-gradient(135deg, #0a0d11 0%, #0d1a2e 60%, #0a1520 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 48px 60px 40px;
+  position: relative;
+  overflow: hidden;
+}
+header::before {
+  content: '';
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(0,229,255,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+header::after {
+  content: '';
+  position: absolute;
+  bottom: -40px; left: 200px;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(249,115,22,0.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+.header-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+header h1 {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 52px;
+  letter-spacing: 3px;
+  color: var(--text-bright);
+  line-height: 1.1;
+  margin-bottom: 16px;
+}
+header h1 span { color: var(--accent); }
+.header-sub {
+  font-size: 15px;
+  color: var(--text-dim);
+  max-width: 700px;
+  margin-bottom: 28px;
+}
+.badges { display: flex; flex-wrap: wrap; gap: 8px; }
+.badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  border-radius: 2px;
+  border: 1px solid;
+}
+.badge-blue  { border-color: var(--accent);  color: var(--accent);  background: rgba(0,229,255,0.06); }
+.badge-org   { border-color: var(--accent2); color: var(--accent2); background: rgba(249,115,22,0.06); }
+.badge-pur   { border-color: var(--accent3); color: var(--accent3); background: rgba(167,139,250,0.06); }
+.badge-grn   { border-color: var(--accent4); color: var(--accent4); background: rgba(52,211,153,0.06); }
+.badge-red   { border-color: var(--danger);  color: var(--danger);  background: rgba(244,63,94,0.06); }
+
+/* ── LAYOUT ── */
+.container { max-width: 1200px; margin: 0 auto; padding: 0 40px 80px; }
+
+/* ── NAV ── */
+nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 60px;
+  position: sticky; top: 0; z-index: 100;
+}
+nav ul { display: flex; flex-wrap: wrap; gap: 0; list-style: none; }
+nav ul li a {
+  display: block;
+  padding: 14px 16px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--text-dim);
+  text-decoration: none;
+  letter-spacing: 1px;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+nav ul li a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ── SECTIONS ── */
+section { margin-top: 60px; }
+.section-header {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.section-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 40px;
+  color: var(--border);
+  line-height: 1;
+  min-width: 48px;
+}
+.section-title { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 2px; color: var(--text-bright); }
+.section-icon { font-size: 22px; }
+
+/* ── CARDS ── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 24px 28px;
+  margin-bottom: 20px;
+}
+.card-title {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--accent);
+  text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.card h3 { font-size: 16px; color: var(--text-bright); margin-bottom: 10px; font-weight: 600; }
+.card p { color: var(--text); margin-bottom: 8px; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+
+/* ── CODE BLOCKS ── */
+pre {
+  background: #070b0f;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 4px;
+  padding: 20px 24px;
+  overflow-x: auto;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  line-height: 1.8;
+  color: #a8c4d8;
+  margin: 16px 0;
+}
+pre.orange { border-left-color: var(--accent2); }
+pre.purple { border-left-color: var(--accent3); }
+pre.green  { border-left-color: var(--accent4); }
+pre.red    { border-left-color: var(--danger); }
+
+.hl-key    { color: #7dd3fc; }
+.hl-val    { color: #a3e635; }
+.hl-str    { color: #fbbf24; }
+.hl-cmt    { color: #374860; font-style: italic; }
+.hl-kw     { color: var(--accent3); }
+.hl-fn     { color: var(--accent); }
+.hl-num    { color: var(--accent2); }
+
+/* ── ARCHITECTURE DIAGRAM ── */
+.arch-diagram {
+  background: #070b0f;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 32px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  line-height: 2;
+  overflow-x: auto;
+}
+.arch-layer {
+  border: 1px solid;
+  border-radius: 3px;
+  padding: 10px 16px;
+  margin: 4px 0;
+  position: relative;
+}
+.layer-users   { border-color: #2563eb; background: rgba(37,99,235,0.08);  color: #93c5fd; }
+.layer-sdwan   { border-color: #7c3aed; background: rgba(124,58,237,0.08); color: #c4b5fd; }
+.layer-fw      { border-color: #dc2626; background: rgba(220,38,38,0.08);  color: #fca5a5; }
+.layer-cloud   { border-color: #0891b2; background: rgba(8,145,178,0.08);  color: #67e8f9; }
+.layer-k8s     { border-color: #059669; background: rgba(5,150,105,0.08);  color: #6ee7b7; }
+.layer-obs     { border-color: #d97706; background: rgba(217,119,6,0.08);  color: #fcd34d; }
+.layer-ai      { border-color: #db2777; background: rgba(219,39,119,0.08); color: #f9a8d4; }
+.layer-label {
+  font-size: 10px;
+  letter-spacing: 2px;
+  opacity: 0.6;
+  margin-right: 12px;
+}
+.arrow { text-align: center; color: var(--text-dim); font-size: 18px; line-height: 1.4; }
+
+/* ── FLOW STEPS ── */
+.flow-steps { display: flex; flex-direction: column; gap: 0; }
+.flow-step {
+  display: flex; align-items: flex-start; gap: 16px;
+  padding: 16px 0;
+  border-left: 2px solid var(--border);
+  padding-left: 24px;
+  position: relative;
+  margin-left: 16px;
+}
+.flow-step::before {
+  content: attr(data-step);
+  position: absolute;
+  left: -14px;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--surface2);
+  border: 2px solid var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  color: var(--accent);
+  font-weight: 600;
+  display: grid; place-items: center;
+}
+.flow-step:last-child { border-left-color: transparent; }
+.step-title { font-weight: 600; color: var(--text-bright); margin-bottom: 4px; }
+.step-body { color: var(--text); font-size: 13px; }
+.step-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  padding: 2px 7px;
+  background: rgba(0,229,255,0.08);
+  border: 1px solid rgba(0,229,255,0.2);
+  color: var(--accent);
+  border-radius: 2px;
+  margin-right: 6px;
+}
+
+/* ── TABLES ── */
+table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+th {
+  background: var(--surface2);
+  color: var(--accent);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: top;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(255,255,255,0.02); }
+td code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--accent2);
+}
+
+/* ── CALLOUTS ── */
+.callout {
+  border-left: 3px solid;
+  padding: 14px 18px;
+  border-radius: 0 4px 4px 0;
+  margin: 16px 0;
+  font-size: 13px;
+}
+.callout-info  { border-color: var(--accent);  background: rgba(0,229,255,0.05);  color: #9dd8e8; }
+.callout-warn  { border-color: var(--warn);    background: rgba(251,191,36,0.05); color: #d4b06a; }
+.callout-tip   { border-color: var(--accent4); background: rgba(52,211,153,0.05); color: #86c9ae; }
+.callout-crit  { border-color: var(--danger);  background: rgba(244,63,94,0.05);  color: #d4828e; }
+.callout strong { display: block; margin-bottom: 4px; color: inherit; filter: brightness(1.4); }
+
+/* ── METRIC COMPARE ── */
+.compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+.compare-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 20px;
+}
+.compare-card.before { border-top: 3px solid var(--danger); }
+.compare-card.after  { border-top: 3px solid var(--accent4); }
+.compare-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 2px;
+  margin-bottom: 14px;
+}
+.before .compare-label { color: var(--danger); }
+.after  .compare-label { color: var(--accent4); }
+.metric { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.metric:last-child { border: none; }
+.metric-name { color: var(--text-dim); }
+.metric-val { font-family: 'IBM Plex Mono', monospace; font-weight: 600; }
+.before .metric-val { color: #f87171; }
+.after  .metric-val { color: var(--accent4); }
+
+/* ── FOLDER TREE ── */
+.folder-tree {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  background: #070b0f;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 24px;
+  line-height: 2;
+  color: #8aabb8;
+}
+.f-dir  { color: var(--accent); }
+.f-file { color: #6b8a9a; }
+.f-cmt  { color: var(--text-dim); font-style: italic; }
+
+/* ── INLINE CODE ── */
+code {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  background: rgba(0,229,255,0.07);
+  border: 1px solid rgba(0,229,255,0.15);
+  color: var(--accent);
+  padding: 1px 6px;
+  border-radius: 3px;
+}
+
+/* ── DIVIDER ── */
+.divider {
+  height: 1px;
+  background: linear-gradient(90deg, var(--accent) 0%, var(--border) 60%, transparent 100%);
+  margin: 48px 0 0;
+  opacity: 0.4;
+}
+
+/* ── VENDOR PILLS ── */
+.vendors { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.vendor {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+}
+
+ul.list { padding-left: 20px; margin: 10px 0; }
+ul.list li { margin-bottom: 6px; color: var(--text); }
+ul.list li strong { color: var(--text-bright); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-tag">// Enterprise Architecture Blueprint · v1.0 · 2026</div>
+  <h1>Multi-Branch <span>SecOps</span><br>Cloud Architecture</h1>
+  <p class="header-sub">
+    A production-grade enterprise design integrating SD-WAN, NGFW, Kubernetes, DevSecOps pipelines, 
+    Splunk SIEM, and AI-driven autonomous remediation — end to end.
+  </p>
+  <div class="badges">
+    <span class="badge badge-blue">NETWORKING</span>
+    <span class="badge badge-pur">SD-WAN</span>
+    <span class="badge badge-red">NGFW / SECURITY</span>
+    <span class="badge badge-org">DEVSECOPS</span>
+    <span class="badge badge-grn">KUBERNETES</span>
+    <span class="badge badge-blue">SPLUNK SIEM</span>
+    <span class="badge badge-pur">AI AGENT</span>
+    <span class="badge badge-org">AUTOMATION</span>
+  </div>
+</header>
+
+<nav>
+  <ul>
+    <li><a href="#scenario">01 Scenario</a></li>
+    <li><a href="#arch">02 Architecture</a></li>
+    <li><a href="#traffic">03 Traffic Flow</a></li>
+    <li><a href="#terraform">04 Terraform</a></li>
+    <li><a href="#ansible">05 Ansible</a></li>
+    <li><a href="#k8s">06 Kubernetes</a></li>
+    <li><a href="#firewall">07 Firewall</a></li>
+    <li><a href="#sdwan">08 SD-WAN</a></li>
+    <li><a href="#splunk">09 Splunk</a></li>
+    <li><a href="#ai">10 AI Agent</a></li>
+    <li><a href="#automation">11 Automation</a></li>
+    <li><a href="#usecase">12 Use Case</a></li>
+    <li><a href="#results">13 Results</a></li>
+    <li><a href="#analysis">14 Analysis</a></li>
+    <li><a href="#bonus">15 Bonus</a></li>
+  </ul>
+</nav>
+
+<div class="container">
+
+<!-- ════════════════════════════════════ 01 SCENARIO ════════════════════════════════════ -->
+<section id="scenario">
+  <div class="section-header">
+    <div class="section-num">01</div>
+    <div>
+      <div class="section-title">🧠 Scenario Description</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Business Context</div>
+      <h3>GlobalFinServ Corp</h3>
+      <p><strong>Industry:</strong> Financial Services (Banking &amp; Trading Platform)</p>
+      <p><strong>Scale:</strong> 8,500 employees · 42 branch offices across 12 countries</p>
+      <p><strong>Users:</strong> Traders, analysts, back-office, remote workers, third-party partners</p>
+      <p><strong>Cloud:</strong> AWS primary (us-east-1, eu-west-1) · Azure DR (secondary)</p>
+      <p><strong>Compliance:</strong> PCI-DSS, SOX, GDPR, ISO 27001</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Problem Statement</div>
+      <h3>Pain Points Before This Architecture</h3>
+      <ul class="list">
+        <li>Branch-to-cloud latency averaging <strong>320ms</strong> for trading app</li>
+        <li>Manual firewall rule changes taking <strong>3–5 days</strong> via change tickets</li>
+        <li>No unified visibility — 14 disparate log sources, no correlation</li>
+        <li>Mean Time to Detect (MTTD) incidents: <strong>72 hours</strong></li>
+        <li>No automated remediation — all responses manual and inconsistent</li>
+        <li>Branch WAN failures causing <strong>full outages</strong> (no failover)</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">High-Level Solution Overview</div>
+    <p>Deploy a <strong>unified, policy-driven architecture</strong> where:</p>
+    <ul class="list" style="margin-top:10px;">
+      <li><strong>SD-WAN</strong> provides intelligent path selection across MPLS + DIA + LTE at every branch, with sub-second failover and SLA-based routing per application class</li>
+      <li><strong>NGFW</strong> (Palo Alto Prisma Access or Fortinet FortiGate) enforces zero-trust segmentation at every hop — branch, internet edge, and cloud perimeter</li>
+      <li><strong>Kubernetes (EKS)</strong> hosts the trading platform, risk engine, and internal APIs with strict network policies, OPA admission control, and Falco runtime security</li>
+      <li><strong>Terraform + Ansible</strong> codify all infrastructure and configuration as IaC, deployed via GitOps pipelines (GitLab CI)</li>
+      <li><strong>Splunk Enterprise Security</strong> ingests logs from every layer — 40GB+/day — with real-time correlation rules and threat intelligence feeds</li>
+      <li><strong>AI Agent (Claude-powered)</strong> continuously analyzes Splunk alerts, cross-correlates network/security/app telemetry, and triggers Ansible runbooks or Terraform changes autonomously</li>
+    </ul>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════ 02 ARCHITECTURE ════════════════════════════════════ -->
+<section id="arch">
+  <div class="section-header">
+    <div class="section-num">02</div>
+    <div><div class="section-title">🏗️ Architecture Design</div></div>
+  </div>
+
+  <div class="arch-diagram">
+    <div style="text-align:center; color:#4a6070; font-size:10px; letter-spacing:3px; margin-bottom:20px;">GLOBALFINSERV CORP — ENTERPRISE ARCHITECTURE BLUEPRINT</div>
+
+    <div class="arch-layer layer-users">
+      <span class="layer-label">USERS</span>
+      🧑‍💼 Branch Employees (42 sites)   🏠 Remote Workers (VPN/ZTNA)   🤝 Partner/API Clients
+    </div>
+    <div class="arrow">│</div>
+
+    <div class="arch-layer layer-sdwan" style="padding:14px 16px;">
+      <span class="layer-label">UNDERLAY</span>
+      ┌─────────────────────────────────────────────────────────┐
+      │  MPLS (Primary · 100Mbps)  │  DIA/Broadband (Secondary) │  4G/LTE (Tertiary)  │
+      └─────────────────────────────────────────────────────────┘
+      <br>
+      <span class="layer-label">SD-WAN OVERLAY</span>
+      Branch vCPE (Cisco Catalyst SD-WAN / Fortinet SD-WAN)
+      App-aware routing · BFD health probes · QoS policies · IPsec mesh tunnels
+    </div>
+    <div class="arrow">│</div>
+
+    <div class="arch-layer layer-fw">
+      <span class="layer-label">SECURITY EDGE</span>
+      🔥 Regional NGFW Clusters (Active/Active)
+      Palo Alto PA-5450 | Zone: branch-dmz → cloud-access
+      SSL Inspection · App-ID · Threat Prevention · DNS Security · CASB
+    </div>
+    <div class="arrow">│</div>
+
+    <div class="arch-layer layer-cloud">
+      <span class="layer-label">CLOUD NETWORK</span>
+      AWS VPC (us-east-1)   ┊  Transit Gateway  ┊  VPC Peering  ┊  Private Link
+      Subnets: public/10.0.1.0/24 · app/10.0.10.0/24 · data/10.0.20.0/24 · mgmt/10.0.100.0/24
+      Route53 Private Hosted Zone · ALB (HTTPS 443) · WAF · Shield Advanced
+    </div>
+    <div class="arrow">│</div>
+
+    <div class="arch-layer layer-k8s">
+      <span class="layer-label">APP LAYER</span>
+      ☸️  Amazon EKS Cluster (Multi-AZ)
+      NS: trading-app · NS: risk-engine · NS: api-gateway · NS: auth-service
+      Calico CNI Network Policies · OPA Gatekeeper · Falco Runtime Security
+      Istio Service Mesh (mTLS) · HPA / KEDA autoscaling
+    </div>
+    <div class="arrow">│</div>
+
+    <div class="arch-layer layer-obs">
+      <span class="layer-label">OBSERVABILITY</span>
+      📊 Splunk Enterprise Security (SIEM)
+      Inputs: SD-WAN syslog · FW logs (CEF) · K8s audit · App APM · NetFlow · DNS
+      Correlation rules · Threat Intel (MITRE ATT&CK) · Risk-based alerting · SOAR
+    </div>
+    <div class="arrow">│</div>
+
+    <div class="arch-layer layer-ai">
+      <span class="layer-label">AI + AUTOMATION</span>
+      🤖 AI Agent (Claude API / LangChain) — reads Splunk alerts, correlates telemetry
+      Event bus (Kafka) → Ansible AWX → Terraform Cloud → GitLab CI/CD
+      Auto-remediation: block IP · re-route traffic · scale pods · rotate creds
+    </div>
+  </div>
+
+  <div style="margin-top:28px;" class="grid-3">
+    <div class="card">
+      <div class="card-title">Layer 1 — Underlay</div>
+      <p>Physical connectivity per branch: MPLS (guaranteed SLA), DIA broadband (cost-optimized), LTE (emergency failover). BFD probes every 300ms detect link degradation before BGP converges.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Layer 2 — SD-WAN Overlay</div>
+      <p>IPsec full-mesh tunnels between branch vCPEs and regional hub. App-aware routing steers trading traffic to MPLS, web browsing to DIA, voice to QoS-prioritized path. SLA ≤ 10ms jitter, ≤ 0.1% loss.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Layer 3 — Security</div>
+      <p>NGFW enforces micro-segmentation: branches land in <code>branch-untrust</code> zone, traverse inspection, reach <code>cloud-app</code> zone only on approved policy matches. All TLS 1.3 traffic inspected.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Layer 4 — Cloud VPC</div>
+      <p>Hub-and-spoke VPC design via Transit Gateway. Route tables enforce that data-subnet (10.0.20.0/24) is only reachable from app-subnet. No public IPs on workload nodes. Egress via NAT Gateway.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Layer 5 — Kubernetes</div>
+      <p>EKS worker nodes in private subnets across 3 AZs. Istio sidecars enforce mTLS for all service-to-service. Falco detects container escapes in real time. OPA blocks privileged pod creation.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Layer 6 — AI + Automation</div>
+      <p>Splunk triggers webhook → Kafka topic → AI Agent. Agent queries context, constructs diagnosis, selects runbook. AWX executes Ansible or triggers Terraform Plan → Apply pipeline with human-in-loop gate for critical changes.</p>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════ 03 TRAFFIC FLOW ════════════════════════════════════ -->
+<section id="traffic">
+  <div class="section-header">
+    <div class="section-num">03</div>
+    <div><div class="section-title">🔄 End-to-End Traffic Flow</div></div>
+  </div>
+
+  <div class="callout callout-info">
+    <strong>Scenario: Trader at NYC branch accessing the EKS-hosted trading platform</strong>
+    Source: 192.168.10.45 (branch VLAN 10 — Trading) → Destination: trading-app.internal.globalfinserv.com
+  </div>
+
+  <div class="flow-steps">
+    <div class="flow-step" data-step="1">
+      <div>
+        <div class="step-title"><span class="step-tag">CLIENT</span> DNS Resolution</div>
+        <div class="step-body">Trader's workstation queries branch DNS server → forwards to SD-WAN edge DNS proxy → Route53 private hosted zone resolves <code>trading-app.internal</code> to ALB private IP 10.0.1.100. Response cached at branch resolver TTL 60s.</div>
+      </div>
+    </div>
+    <div class="flow-step" data-step="2">
+      <div>
+        <div class="step-title"><span class="step-tag">BRANCH</span> SD-WAN Path Selection</div>
+        <div class="step-body">SD-WAN engine classifies traffic as DSCP EF (trading app — App-ID match on port 443 + SNI <code>trading-app.internal</code>). Policy: steer to MPLS tunnel (link quality: 4ms RTT, 0% loss). IPsec ESP packet encapsulated, forwarded to regional hub POP.</div>
+      </div>
+    </div>
+    <div class="flow-step" data-step="3">
+      <div>
+        <div class="step-title"><span class="step-tag">IPsec</span> Tunnel Traversal</div>
+        <div class="step-body">Packet exits branch as: Outer IP: 203.0.113.10 (branch WAN) → 198.51.100.50 (hub IPsec endpoint). Inner payload: 192.168.10.45:54321 → 10.0.1.100:443 (TLS). IKEv2 SA rekeyed every 8 hours. Tunnel MTU 1400 (accounting for ESP overhead).</div>
+      </div>
+    </div>
+    <div class="flow-step" data-step="4">
+      <div>
+        <div class="step-title"><span class="step-tag">NGFW</span> Security Inspection</div>
+        <div class="step-body">Hub decapsulates IPsec. Packet hits NGFW PA-5450. Zone check: <code>branch-trust</code> → <code>cloud-app</code>. Policy rule <code>RULE-42</code> matches (src-zone, dst-zone, app=ssl, user=trader-group, dst=trading-platform-address-object). SSL Forward Proxy decrypts TLS 1.3 → scans payload → Threat Prevention profile checks for exploits. Re-encrypts, forwards.</div>
+      </div>
+    </div>
+    <div class="flow-step" data-step="5">
+      <div>
+        <div class="step-title"><span class="step-tag">VPC</span> Cloud Ingress</div>
+        <div class="step-body">Packet enters VPC via Transit Gateway attachment. Route table: 192.168.0.0/16 (branch supernet) → NGFW ENI. After inspection, 10.0.1.0/24 (public subnet) receives packet at ALB. ALB terminates TLS (ACM cert), performs health-checked routing to EKS NodePort service.</div>
+      </div>
+    </div>
+    <div class="flow-step" data-step="6">
+      <div>
+        <div class="step-title"><span class="step-tag">KUBERNETES</span> Pod Routing</div>
+        <div class="step-body">ALB routes to NodePort 30443 on worker node. kube-proxy NATs to ClusterIP 172.20.10.50:8443 (trading-app service). Calico enforces NetworkPolicy: only pods in namespace <code>trading-app</code> with label <code>role: api</code> may receive ingress on port 8443. Istio sidecar validates mTLS SPIFFE identity. Pod handles request.</div>
+      </div>
+    </div>
+    <div class="flow-step" data-step="7">
+      <div>
+        <div class="step-title"><span class="step-tag">LOG</span> Telemetry Generation</div>
+        <div class="step-body">At every hop: SD-WAN generates NetFlow/IPFIX → Splunk HF. NGFW generates traffic log (CEF format) → Splunk HF. ALB access log → S3 → Splunk S3 input. K8s audit log → Splunk Connect for K8s (Helm chart). All indexed in Splunk within 15 seconds of event.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════ 04 TERRAFORM ════════════════════════════════════ -->
+<section id="terraform">
+  <div class="section-header">
+    <div class="section-num">04</div>
+    <div><div class="section-title">⚙️ Terraform Implementation</div></div>
+  </div>
+
+  <div class="callout callout-tip">
+    <strong>Structure:</strong> Modular design using Terraform workspaces. Each module is independently testable. Remote state in S3 + DynamoDB locking. All secrets via Vault/AWS Secrets Manager — never hardcoded.
+  </div>
+
+  <div class="card">
+    <div class="card-title">Project Structure</div>
+<pre>
+<span class="hl-fn">terraform/</span>
+├── <span class="hl-key">main.tf</span>               <span class="hl-cmt"># Root module — calls child modules</span>
+├── <span class="hl-key">variables.tf</span>          <span class="hl-cmt"># Input variable declarations</span>
+├── <span class="hl-key">outputs.tf</span>            <span class="hl-cmt"># Root outputs (VPC ID, EKS endpoint, etc.)</span>
+├── <span class="hl-key">backend.tf</span>            <span class="hl-cmt"># S3 remote state + DynamoDB lock</span>
+├── <span class="hl-key">terraform.tfvars</span>      <span class="hl-cmt"># Environment-specific values (gitignored for secrets)</span>
+├── <span class="hl-fn">modules/</span>
+│   ├── <span class="hl-fn">network/</span>
+│   │   ├── main.tf          <span class="hl-cmt"># VPC, subnets, IGW, TGW, route tables</span>
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   ├── <span class="hl-fn">firewall/</span>
+│   │   ├── main.tf          <span class="hl-cmt"># Security groups, NACLs, WAF, FW rules via API</span>
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   ├── <span class="hl-fn">kubernetes/</span>
+│   │   ├── main.tf          <span class="hl-cmt"># EKS cluster, node groups, add-ons</span>
+│   │   ├── variables.tf
+│   │   └── outputs.tf
+│   └── <span class="hl-fn">observability/</span>
+│       ├── main.tf          <span class="hl-cmt"># Splunk HF EC2, CloudWatch, S3 log buckets</span>
+│       ├── variables.tf
+│       └── outputs.tf
+└── <span class="hl-fn">environments/</span>
+    ├── prod/
+    └── staging/
+</pre>
+  </div>
+
+  <div class="card">
+    <div class="card-title">main.tf — Root Module</div>
+<pre>
+<span class="hl-kw">terraform</span> {
+  required_version = <span class="hl-str">">= 1.7.0"</span>
+  required_providers {
+    aws = {
+      source  = <span class="hl-str">"hashicorp/aws"</span>
+      version = <span class="hl-str">"~> 5.40"</span>
+    }
+    kubernetes = {
+      source  = <span class="hl-str">"hashicorp/kubernetes"</span>
+      version = <span class="hl-str">"~> 2.27"</span>
+    }
+  }
+  backend <span class="hl-str">"s3"</span> {
+    bucket         = <span class="hl-str">"globalfinserv-tfstate-prod"</span>
+    key            = <span class="hl-str">"infra/terraform.tfstate"</span>
+    region         = <span class="hl-str">"us-east-1"</span>
+    encrypt        = <span class="hl-kw">true</span>
+    dynamodb_table = <span class="hl-str">"tfstate-lock"</span>
+    kms_key_id     = <span class="hl-str">"arn:aws:kms:us-east-1:123456789:key/mrk-..."</span>
+  }
+}
+
+<span class="hl-kw">module</span> <span class="hl-str">"network"</span> {
+  source              = <span class="hl-str">"./modules/network"</span>
+  environment         = <span class="hl-kw">var</span>.environment
+  vpc_cidr            = <span class="hl-kw">var</span>.vpc_cidr
+  availability_zones  = <span class="hl-kw">var</span>.availability_zones
+  private_subnets     = <span class="hl-kw">var</span>.private_subnets
+  public_subnets      = <span class="hl-kw">var</span>.public_subnets
+  enable_nat_gateway  = <span class="hl-kw">true</span>
+  single_nat_gateway  = <span class="hl-kw">false</span>  <span class="hl-cmt"># HA: one NAT GW per AZ</span>
+  tags                = <span class="hl-kw">local</span>.common_tags
+}
+
+<span class="hl-kw">module</span> <span class="hl-str">"firewall"</span> {
+  source         = <span class="hl-str">"./modules/firewall"</span>
+  vpc_id         = <span class="hl-kw">module</span>.network.vpc_id
+  public_subnet  = <span class="hl-kw">module</span>.network.public_subnet_ids[0]
+  environment    = <span class="hl-kw">var</span>.environment
+  allowed_branch_cidrs = <span class="hl-kw">var</span>.branch_cidr_list
+  tags           = <span class="hl-kw">local</span>.common_tags
+}
+
+<span class="hl-kw">module</span> <span class="hl-str">"kubernetes"</span> {
+  source               = <span class="hl-str">"./modules/kubernetes"</span>
+  cluster_name         = <span class="hl-str">"globalfinserv-eks-prod"</span>
+  vpc_id               = <span class="hl-kw">module</span>.network.vpc_id
+  private_subnet_ids   = <span class="hl-kw">module</span>.network.private_subnet_ids
+  k8s_version          = <span class="hl-str">"1.29"</span>
+  node_instance_type   = <span class="hl-str">"m6i.xlarge"</span>
+  node_desired_size    = <span class="hl-num">6</span>
+  node_min_size        = <span class="hl-num">3</span>
+  node_max_size        = <span class="hl-num">20</span>
+  enable_irsa          = <span class="hl-kw">true</span>
+  tags                 = <span class="hl-kw">local</span>.common_tags
+}
+</pre>
+  </div>
+
+  <div class="card">
+    <div class="card-title">variables.tf</div>
+<pre>
+<span class="hl-kw">variable</span> <span class="hl-str">"environment"</span> {
+  description = <span class="hl-str">"Deployment environment (prod|staging|dev)"</span>
+  type        = <span class="hl-kw">string</span>
+  validation {
+    condition     = <span class="hl-fn">contains</span>([<span class="hl-str">"prod"</span>, <span class="hl-str">"staging"</span>, <span class="hl-str">"dev"</span>], <span class="hl-kw">var</span>.environment)
+    error_message = <span class="hl-str">"Must be prod, staging, or dev."</span>
+  }
+}
+
+<span class="hl-kw">variable</span> <span class="hl-str">"vpc_cidr"</span> {
+  description = <span class="hl-str">"Primary VPC CIDR block"</span>
+  type        = <span class="hl-kw">string</span>
+  default     = <span class="hl-str">"10.0.0.0/16"</span>
+}
+
+<span class="hl-kw">variable</span> <span class="hl-str">"availability_zones"</span> {
+  description = <span class="hl-str">"AZs to deploy into"</span>
+  type        = <span class="hl-kw">list</span>(<span class="hl-kw">string</span>)
+  default     = [<span class="hl-str">"us-east-1a"</span>, <span class="hl-str">"us-east-1b"</span>, <span class="hl-str">"us-east-1c"</span>]
+}
+
+<span class="hl-kw">variable</span> <span class="hl-str">"private_subnets"</span> {
+  type    = <span class="hl-kw">list</span>(<span class="hl-kw">string</span>)
+  default = [<span class="hl-str">"10.0.10.0/24"</span>, <span class="hl-str">"10.0.11.0/24"</span>, <span class="hl-str">"10.0.12.0/24"</span>]
+}
+
+<span class="hl-kw">variable</span> <span class="hl-str">"public_subnets"</span> {
+  type    = <span class="hl-kw">list</span>(<span class="hl-kw">string</span>)
+  default = [<span class="hl-str">"10.0.1.0/24"</span>, <span class="hl-str">"10.0.2.0/24"</span>, <span class="hl-str">"10.0.3.0/24"</span>]
+}
+
+<span class="hl-kw">variable</span> <span class="hl-str">"branch_cidr_list"</span> {
+  description = <span class="hl-str">"Approved branch office CIDR ranges"</span>
+  type        = <span class="hl-kw">list</span>(<span class="hl-kw">string</span>)
+  default     = [
+    <span class="hl-str">"192.168.10.0/24"</span>,  <span class="hl-cmt"># NYC branch</span>
+    <span class="hl-str">"192.168.20.0/24"</span>,  <span class="hl-cmt"># London branch</span>
+    <span class="hl-str">"192.168.30.0/24"</span>,  <span class="hl-cmt"># Singapore branch</span>
+  ]
+}
+</pre>
+  </div>
+
+  <div class="card">
+    <div class="card-title">modules/network/main.tf — VPC + Subnets + TGW</div>
+<pre>
+<span class="hl-kw">resource</span> <span class="hl-str">"aws_vpc"</span> <span class="hl-str">"main"</span> {
+  cidr_block           = <span class="hl-kw">var</span>.vpc_cidr
+  enable_dns_hostnames = <span class="hl-kw">true</span>
+  enable_dns_support   = <span class="hl-kw">true</span>
+  tags = <span class="hl-fn">merge</span>(<span class="hl-kw">var</span>.tags, {
+    Name = <span class="hl-str">"globalfinserv-vpc-${var.environment}"</span>
+  })
+}
+
+<span class="hl-kw">resource</span> <span class="hl-str">"aws_subnet"</span> <span class="hl-str">"private"</span> {
+  count             = <span class="hl-fn">length</span>(<span class="hl-kw">var</span>.private_subnets)
+  vpc_id            = <span class="hl-kw">aws_vpc</span>.main.id
+  cidr_block        = <span class="hl-kw">var</span>.private_subnets[count.index]
+  availability_zone = <span class="hl-kw">var</span>.availability_zones[count.index]
+  tags = <span class="hl-fn">merge</span>(<span class="hl-kw">var</span>.tags, {
+    Name                              = <span class="hl-str">"private-${count.index + 1}"</span>
+    <span class="hl-str">"kubernetes.io/role/internal-elb"</span>  = <span class="hl-str">"1"</span>
+  })
+}
+
+<span class="hl-kw">resource</span> <span class="hl-str">"aws_ec2_transit_gateway"</span> <span class="hl-str">"main"</span> {
+  description                     = <span class="hl-str">"GlobalFinServ Hub TGW"</span>
+  amazon_side_asn                 = <span class="hl-num">64512</span>
+  default_route_table_association = <span class="hl-str">"disable"</span>
+  default_route_table_propagation = <span class="hl-str">"disable"</span>
+  auto_accept_shared_attachments  = <span class="hl-str">"disable"</span>
+  tags = { Name = <span class="hl-str">"globalfinserv-tgw-prod"</span> }
+}
+
+<span class="hl-kw">resource</span> <span class="hl-str">"aws_security_group"</span> <span class="hl-str">"app_tier"</span> {
+  name_prefix = <span class="hl-str">"app-tier-"</span>
+  vpc_id      = <span class="hl-kw">aws_vpc</span>.main.id
+
+  ingress {
+    description      = <span class="hl-str">"HTTPS from ALB only"</span>
+    from_port        = <span class="hl-num">443</span>
+    to_port          = <span class="hl-num">443</span>
+    protocol         = <span class="hl-str">"tcp"</span>
+    security_groups  = [<span class="hl-kw">aws_security_group</span>.alb.id]
+  }
+  egress {
+    from_port   = <span class="hl-num">0</span>
+    to_port     = <span class="hl-num">0</span>
+    protocol    = <span class="hl-str">"-1"</span>
+    cidr_blocks = [<span class="hl-str">"0.0.0.0/0"</span>]
+  }
+  lifecycle { create_before_destroy = <span class="hl-kw">true</span> }
+}
+</pre>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════ 05 ANSIBLE ════════════════════════════════════ -->
+<section id="ansible">
+  <div class="section-header">
+    <div class="section-num">05</div>
+    <div><div class="section-title">🔧 Ansible Automation</div></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Inventory (inventory/prod.yml)</div>
+<pre class="orange">
+<span class="hl-key">all:</span>
+  <span class="hl-key">children:</span>
+    <span class="hl-key">firewalls:</span>
+      <span class="hl-key">hosts:</span>
+        <span class="hl-key">fw-nyc-01:</span>
+          <span class="hl-val">ansible_host:</span> <span class="hl-str">10.0.100.11</span>
+          <span class="hl-val">fw_zone:</span> <span class="hl-str">nyc-primary</span>
+        <span class="hl-key">fw-lon-01:</span>
+          <span class="hl-val">ansible_host:</span> <span class="hl-str">10.0.100.12</span>
+          <span class="hl-val">fw_zone:</span> <span class="hl-str">lon-primary</span>
+      <span class="hl-key">vars:</span>
+        <span class="hl-val">ansible_connection:</span> <span class="hl-str">network_cli</span>
+        <span class="hl-val">ansible_network_os:</span> <span class="hl-str">panos</span>
+        <span class="hl-val">ansible_user:</span> <span class="hl-str">"{{ vault_fw_user }}"</span>
+        <span class="hl-val">ansible_password:</span> <span class="hl-str">"{{ vault_fw_pass }}"</span>
+
+    <span class="hl-key">sdwan_edges:</span>
+      <span class="hl-key">hosts:</span>
+        <span class="hl-key">edge-nyc-01:</span>
+          <span class="hl-val">ansible_host:</span> <span class="hl-str">192.168.10.1</span>
+        <span class="hl-key">edge-lon-01:</span>
+          <span class="hl-val">ansible_host:</span> <span class="hl-str">192.168.20.1</span>
+      <span class="hl-key">vars:</span>
+        <span class="hl-val">ansible_connection:</span> <span class="hl-str">httpapi</span>
+        <span class="hl-val">ansible_network_os:</span> <span class="hl-str">cisco.sdwan.manager</span>
+</pre>
+    </div>
+    <div class="card">
+      <div class="card-title">playbooks/deploy_fw_rules.yml</div>
+<pre class="orange">
+<span class="hl-kw">---</span>
+<span class="hl-key">- name:</span> <span class="hl-str">Deploy NGFW Security Policies</span>
+  <span class="hl-key">hosts:</span> <span class="hl-str">firewalls</span>
+  <span class="hl-key">gather_facts:</span> <span class="hl-val">false</span>
+  <span class="hl-key">vars_files:</span>
+    <span class="hl-str">- vault/credentials.yml</span>
+
+  <span class="hl-key">pre_tasks:</span>
+    <span class="hl-key">- name:</span> <span class="hl-str">Validate connectivity</span>
+      <span class="hl-key">paloaltonetworks.panos.panos_facts:</span>
+        <span class="hl-key">provider:</span>
+          <span class="hl-val">ip_address:</span> <span class="hl-str">"{{ ansible_host }}"</span>
+          <span class="hl-val">username:</span>  <span class="hl-str">"{{ vault_fw_user }}"</span>
+          <span class="hl-val">password:</span>  <span class="hl-str">"{{ vault_fw_pass }}"</span>
+
+  <span class="hl-key">tasks:</span>
+    <span class="hl-key">- name:</span> <span class="hl-str">Create address object - trading platform</span>
+      <span class="hl-key">paloaltonetworks.panos.panos_address_object:</span>
+        <span class="hl-val">name:</span>        <span class="hl-str">trading-platform-alb</span>
+        <span class="hl-val">value:</span>       <span class="hl-str">"10.0.1.100/32"</span>
+        <span class="hl-val">description:</span> <span class="hl-str">EKS ALB trading-app ingress</span>
+
+    <span class="hl-key">- name:</span> <span class="hl-str">Push security rule - allow trading traffic</span>
+      <span class="hl-key">paloaltonetworks.panos.panos_security_rule:</span>
+        <span class="hl-val">rule_name:</span>    <span class="hl-str">ALLOW-TRADING-HTTPS</span>
+        <span class="hl-val">source_zone:</span>  [<span class="hl-str">branch-trust</span>]
+        <span class="hl-val">dest_zone:</span>    [<span class="hl-str">cloud-app</span>]
+        <span class="hl-val">source_ip:</span>    [<span class="hl-str">branch-users-group</span>]
+        <span class="hl-val">dest_ip:</span>      [<span class="hl-str">trading-platform-alb</span>]
+        <span class="hl-val">application:</span>  [<span class="hl-str">ssl</span>, <span class="hl-str">web-browsing</span>]
+        <span class="hl-val">service:</span>      [<span class="hl-str">application-default</span>]
+        <span class="hl-val">action:</span>       <span class="hl-str">allow</span>
+        <span class="hl-val">profile_setting:</span>
+          <span class="hl-val">group:</span> <span class="hl-str">strict-financial</span>
+        <span class="hl-val">log_end:</span>      <span class="hl-str">true</span>
+        <span class="hl-val">log_setting:</span>  <span class="hl-str">splunk-syslog-profile</span>
+
+    <span class="hl-key">- name:</span> <span class="hl-str">Commit configuration</span>
+      <span class="hl-key">paloaltonetworks.panos.panos_commit_firewall:</span>
+        <span class="hl-val">description:</span> <span class="hl-str">"Ansible deploy {{ ansible_date_time.iso8601 }}"</span>
+
+    <span class="hl-key">- name:</span> <span class="hl-str">Notify Slack on success</span>
+      <span class="hl-key">community.general.slack:</span>
+        <span class="hl-val">token:</span>    <span class="hl-str">"{{ vault_slack_token }}"</span>
+        <span class="hl-val">channel:</span> <span class="hl-str">"#secops-changes"</span>
+        <span class="hl-val">msg:</span>     <span class="hl-str">"✅ FW policy deployed on {{ inventory_hostname }}"</span>
+</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">playbooks/remediate_block_ip.yml — AI-triggered runbook</div>
+<pre class="orange">
+<span class="hl-kw">---</span>
+<span class="hl-key">- name:</span> <span class="hl-str">Emergency IP Block — AI-Triggered Remediation</span>
+  <span class="hl-key">hosts:</span> <span class="hl-str">firewalls</span>
+  <span class="hl-key">gather_facts:</span> <span class="hl-val">false</span>
+  <span class="hl-key">vars:</span>
+    <span class="hl-val">block_ip:</span>      <span class="hl-str">"{{ ai_recommended_block_ip }}"</span>   <span class="hl-cmt"># passed by AI agent</span>
+    <span class="hl-val">threat_score:</span>  <span class="hl-str">"{{ ai_threat_score }}"</span>
+    <span class="hl-val">incident_id:</span>   <span class="hl-str">"{{ splunk_incident_id }}"</span>
+
+  <span class="hl-key">tasks:</span>
+    <span class="hl-key">- name:</span> <span class="hl-str">Create blocked-IP address object</span>
+      <span class="hl-key">paloaltonetworks.panos.panos_address_object:</span>
+        <span class="hl-val">name:</span>        <span class="hl-str">"BLOCKED-{{ block_ip | replace('.', '-') }}"</span>
+        <span class="hl-val">value:</span>       <span class="hl-str">"{{ block_ip }}/32"</span>
+        <span class="hl-val">description:</span> <span class="hl-str">"AI block | Score:{{ threat_score }} | INC:{{ incident_id }}"</span>
+        <span class="hl-val">tags:</span>        [<span class="hl-str">ai-blocked</span>, <span class="hl-str">auto-remediation</span>]
+
+    <span class="hl-key">- name:</span> <span class="hl-str">Add to dynamic block list</span>
+      <span class="hl-key">paloaltonetworks.panos.panos_dag:</span>
+        <span class="hl-val">dag_name:</span> <span class="hl-str">AI-BLOCK-LIST</span>
+        <span class="hl-val">register_ip:</span> <span class="hl-str">"{{ block_ip }}"</span>
+        <span class="hl-val">tags:</span>        [<span class="hl-str">ai-blocked</span>]
+
+    <span class="hl-key">- name:</span> <span class="hl-str">Log action to Splunk HEC</span>
+      <span class="hl-key">uri:</span>
+        <span class="hl-val">url:</span>     <span class="hl-str">"https://splunk.internal:8088/services/collector"</span>
+        <span class="hl-val">method:</span> <span class="hl-str">POST</span>
+        <span class="hl-val">headers:</span>
+          <span class="hl-val">Authorization:</span> <span class="hl-str">"Splunk {{ vault_splunk_hec_token }}"</span>
+        <span class="hl-val">body_format:</span> <span class="hl-str">json</span>
+        <span class="hl-val">body:</span>
+          <span class="hl-val">event:</span>
+            <span class="hl-val">action:</span>     <span class="hl-str">ip_blocked</span>
+            <span class="hl-val">ip:</span>         <span class="hl-str">"{{ block_ip }}"</span>
+            <span class="hl-val">trigger:</span>    <span class="hl-str">ai_agent</span>
+            <span class="hl-val">incident:</span>   <span class="hl-str">"{{ incident_id }}"</span>
+</pre>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════ 06 KUBERNETES ════════════════════════════════════ -->
+<section id="k8s">
+  <div class="section-header">
+    <div class="section-num">06</div>
+    <div><div class="section-title">☸️ Kubernetes Setup</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Deployment — trading-app/deployment.yaml</div>
+<pre class="green">
+<span class="hl-key">apiVersion:</span> <span class="hl-str">apps/v1</span>
+<span class="hl-key">kind:</span> <span class="hl-str">Deployment</span>
+<span class="hl-key">metadata:</span>
+  <span class="hl-key">name:</span> <span class="hl-str">trading-app</span>
+  <span class="hl-key">namespace:</span> <span class="hl-str">trading-app</span>
+  <span class="hl-key">labels:</span>
+    <span class="hl-key">app:</span> <span class="hl-str">trading-app</span>
+    <span class="hl-key">version:</span> <span class="hl-str">"v2.4.1"</span>
+    <span class="hl-key">env:</span> <span class="hl-str">prod</span>
+<span class="hl-key">spec:</span>
+  <span class="hl-key">replicas:</span> <span class="hl-num">6</span>
+  <span class="hl-key">strategy:</span>
+    <span class="hl-key">type:</span> <span class="hl-str">RollingUpdate</span>
+    <span class="hl-key">rollingUpdate:</span>
+      <span class="hl-key">maxSurge:</span> <span class="hl-num">2</span>
+      <span class="hl-key">maxUnavailable:</span> <span class="hl-num">0</span>    <span class="hl-cmt"># zero-downtime deploy</span>
+  <span class="hl-key">selector:</span>
+    <span class="hl-key">matchLabels:</span>
+      <span class="hl-key">app:</span> <span class="hl-str">trading-app</span>
+      <span class="hl-key">role:</span> <span class="hl-str">api</span>
+  <span class="hl-key">template:</span>
+    <span class="hl-key">metadata:</span>
+      <span class="hl-key">labels:</span>
+        <span class="hl-key">app:</span> <span class="hl-str">trading-app</span>
+        <span class="hl-key">role:</span> <span class="hl-str">api</span>
+        <span class="hl-key">version:</span> <span class="hl-str">"v2.4.1"</span>
+      <span class="hl-key">annotations:</span>
+        <span class="hl-key">sidecar.istio.io/inject:</span> <span class="hl-str">"true"</span>
+        <span class="hl-key">prometheus.io/scrape:</span> <span class="hl-str">"true"</span>
+    <span class="hl-key">spec:</span>
+      <span class="hl-key">serviceAccountName:</span> <span class="hl-str">trading-app-sa</span>
+      <span class="hl-key">securityContext:</span>
+        <span class="hl-key">runAsNonRoot:</span> <span class="hl-val">true</span>
+        <span class="hl-key">runAsUser:</span> <span class="hl-num">1000</span>
+        <span class="hl-key">fsGroup:</span> <span class="hl-num">2000</span>
+        <span class="hl-key">seccompProfile:</span>
+          <span class="hl-key">type:</span> <span class="hl-str">RuntimeDefault</span>
+      <span class="hl-key">containers:</span>
+        <span class="hl-key">- name:</span> <span class="hl-str">trading-api</span>
+          <span class="hl-key">image:</span> <span class="hl-str">123456789.dkr.ecr.us-east-1.amazonaws.com/trading-app:v2.4.1</span>
+          <span class="hl-key">ports:</span>
+            <span class="hl-key">- containerPort:</span> <span class="hl-num">8443</span>
+              <span class="hl-key">name:</span> <span class="hl-str">https-api</span>
+          <span class="hl-key">resources:</span>
+            <span class="hl-key">requests:</span>
+              <span class="hl-key">cpu:</span> <span class="hl-str">"500m"</span>
+              <span class="hl-key">memory:</span> <span class="hl-str">"512Mi"</span>
+            <span class="hl-key">limits:</span>
+              <span class="hl-key">cpu:</span> <span class="hl-str">"2"</span>
+              <span class="hl-key">memory:</span> <span class="hl-str">"2Gi"</span>
+          <span class="hl-key">securityContext:</span>
+            <span class="hl-key">allowPrivilegeEscalation:</span> <span class="hl-val">false</span>
+            <span class="hl-key">readOnlyRootFilesystem:</span> <span class="hl-val">true</span>
+            <span class="hl-key">capabilities:</span>
+              <span class="hl-key">drop:</span> [<span class="hl-str">ALL</span>]
+          <span class="hl-key">livenessProbe:</span>
+            <span class="hl-key">httpGet:</span>
+              <span class="hl-key">path:</span>  <span class="hl-str">/healthz</span>
+              <span class="hl-key">port:</span>  <span class="hl-num">8443</span>
+              <span class="hl-key">scheme:</span> <span class="hl-str">HTTPS</span>
+            <span class="hl-key">initialDelaySeconds:</span> <span class="hl-num">15</span>
+            <span class="hl-key">periodSeconds:</span> <span class="hl-num">10</span>
+          <span class="hl-key">envFrom:</span>
+            <span class="hl-key">- secretRef:</span>
+                <span class="hl-key">name:</span> <span class="hl-str">trading-app-secrets</span>
+</pre>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">NetworkPolicy — strict ingress control</div>
+<pre class="green">
+<span class="hl-key">apiVersion:</span> <span class="hl-str">networking.k8s.io/v1</span>
+<span class="hl-key">kind:</span> <span class="hl-str">NetworkPolicy</span>
+<span class="hl-key">metadata:</span>
+  <span class="hl-key">name:</span> <span class="hl-str">trading-app-ingress</span>
+  <span class="hl-key">namespace:</span> <span class="hl-str">trading-app</span>
+<span class="hl-key">spec:</span>
+  <span class="hl-key">podSelector:</span>
+    <span class="hl-key">matchLabels:</span>
+      <span class="hl-key">role:</span> <span class="hl-str">api</span>
+  <span class="hl-key">policyTypes:</span>
+    <span class="hl-str">- Ingress</span>
+    <span class="hl-str">- Egress</span>
+  <span class="hl-key">ingress:</span>
+    <span class="hl-key">- from:</span>
+        <span class="hl-key">- namespaceSelector:</span>
+            <span class="hl-key">matchLabels:</span>
+              <span class="hl-key">name:</span> <span class="hl-str">istio-system</span>  <span class="hl-cmt"># ALB → Istio only</span>
+      <span class="hl-key">ports:</span>
+        <span class="hl-key">- port:</span> <span class="hl-num">8443</span>
+          <span class="hl-key">protocol:</span> <span class="hl-str">TCP</span>
+  <span class="hl-key">egress:</span>
+    <span class="hl-key">- to:</span>
+        <span class="hl-key">- namespaceSelector:</span>
+            <span class="hl-key">matchLabels:</span>
+              <span class="hl-key">name:</span> <span class="hl-str">data-tier</span>  <span class="hl-cmt"># DB access only</span>
+      <span class="hl-key">ports:</span>
+        <span class="hl-key">- port:</span> <span class="hl-num">5432</span>
+    <span class="hl-key">- to:</span>  <span class="hl-cmt"># Allow DNS</span>
+        <span class="hl-key">- namespaceSelector:</span> {}
+      <span class="hl-key">ports:</span>
+        <span class="hl-key">- port:</span> <span class="hl-num">53</span>
+          <span class="hl-key">protocol:</span> <span class="hl-str">UDP</span>
+</pre>
+    </div>
+    <div class="card">
+      <div class="card-title">HPA — autoscaling on latency + CPU</div>
+<pre class="green">
+<span class="hl-key">apiVersion:</span> <span class="hl-str">autoscaling/v2</span>
+<span class="hl-key">kind:</span> <span class="hl-str">HorizontalPodAutoscaler</span>
+<span class="hl-key">metadata:</span>
+  <span class="hl-key">name:</span> <span class="hl-str">trading-app-hpa</span>
+  <span class="hl-key">namespace:</span> <span class="hl-str">trading-app</span>
+<span class="hl-key">spec:</span>
+  <span class="hl-key">scaleTargetRef:</span>
+    <span class="hl-key">apiVersion:</span> <span class="hl-str">apps/v1</span>
+    <span class="hl-key">kind:</span> <span class="hl-str">Deployment</span>
+    <span class="hl-key">name:</span> <span class="hl-str">trading-app</span>
+  <span class="hl-key">minReplicas:</span> <span class="hl-num">6</span>
+  <span class="hl-key">maxReplicas:</span> <span class="hl-num">30</span>
+  <span class="hl-key">metrics:</span>
+    <span class="hl-key">- type:</span> <span class="hl-str">Resource</span>
+      <span class="hl-key">resource:</span>
+        <span class="hl-key">name:</span> <span class="hl-str">cpu</span>
+        <span class="hl-key">target:</span>
+          <span class="hl-key">type:</span> <span class="hl-str">Utilization</span>
+          <span class="hl-key">averageUtilization:</span> <span class="hl-num">65</span>
+    <span class="hl-key">- type:</span> <span class="hl-str">Pods</span>
+      <span class="hl-key">pods:</span>
+        <span class="hl-key">metric:</span>
+          <span class="hl-key">name:</span> <span class="hl-str">http_request_duration_p99</span>
+        <span class="hl-key">target:</span>
+          <span class="hl-key">type:</span> <span class="hl-str">AverageValue</span>
+          <span class="hl-key">averageValue:</span> <span class="hl-str">200m</span>  <span class="hl-cmt"># 200ms p99 target</span>
+  <span class="hl-key">behavior:</span>
+    <span class="hl-key">scaleUp:</span>
+      <span class="hl-key">stabilizationWindowSeconds:</span> <span class="hl-num">30</span>
+    <span class="hl-key">scaleDown:</span>
+      <span class="hl-key">stabilizationWindowSeconds:</span> <span class="hl-num">300</span>
+</pre>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════ 07 FIREWALL ════════════════════════════════════ -->
+<section id="firewall">
+  <div class="section-header">
+    <div class="section-num">07</div>
+    <div><div class="section-title">🔐 Firewall Configuration</div></div>
+  </div>
+
+  <div class="vendors">
+    <span class="vendor">Palo Alto PA-5450 (primary)</span>
+    <span class="vendor">Fortinet FortiGate 2600F (alt)</span>
+    <span class="vendor">Cisco FTD 4145 (branch edge)</span>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Zone Architecture</div>
+    <table>
+      <tr><th>Zone Name</th><th>Subnet / Interface</th><th>Trust Level</th><th>Description</th></tr>
+      <tr><td><code>branch-trust</code></td><td>192.168.0.0/14</td><td>Medium</td><td>Authenticated branch users via SD-WAN IPsec</td></tr>
+      <tr><td><code>branch-untrust</code></td><td>WAN interfaces</td><td>Untrusted</td><td>Raw internet, before tunnel establishment</td></tr>
+      <tr><td><code>cloud-app</code></td><td>10.0.1.0/24, 10.0.10.0/24</td><td>Medium</td><td>Cloud-hosted app workloads (ALB + EKS)</td></tr>
+      <tr><td><code>cloud-data</code></td><td>10.0.20.0/24</td><td>High</td><td>Database tier — most restricted zone</td></tr>
+      <tr><td><code>mgmt</code></td><td>10.0.100.0/24</td><td>High</td><td>OOB management — SSH/HTTPS only from bastion</td></tr>
+      <tr><td><code>internet</code></td><td>0.0.0.0/0</td><td>Untrusted</td><td>Internet-facing — WAF + Shield in front</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Security Policy Rules (Palo Alto PAN-OS JSON style)</div>
+<pre class="red">
+{
+  <span class="hl-key">"security_rules"</span>: [
+    {
+      <span class="hl-key">"name"</span>:         <span class="hl-str">"ALLOW-TRADING-HTTPS"</span>,
+      <span class="hl-key">"rule_type"</span>:    <span class="hl-str">"universal"</span>,
+      <span class="hl-key">"from_zone"</span>:    [<span class="hl-str">"branch-trust"</span>],
+      <span class="hl-key">"to_zone"</span>:      [<span class="hl-str">"cloud-app"</span>],
+      <span class="hl-key">"source"</span>:       [<span class="hl-str">"branch-trading-users"</span>],
+      <span class="hl-key">"destination"</span>:  [<span class="hl-str">"trading-platform-alb"</span>],
+      <span class="hl-key">"application"</span>:  [<span class="hl-str">"ssl"</span>],
+      <span class="hl-key">"service"</span>:      [<span class="hl-str">"application-default"</span>],
+      <span class="hl-key">"action"</span>:       <span class="hl-str">"allow"</span>,
+      <span class="hl-key">"profile_group"</span>: <span class="hl-str">"strict-financial"</span>,
+      <span class="hl-key">"ssl_decrypt"</span>:  <span class="hl-str">"forward-proxy"</span>,
+      <span class="hl-key">"log_end"</span>:      <span class="hl-kw">true</span>,
+      <span class="hl-key">"log_setting"</span>:  <span class="hl-str">"splunk-syslog"</span>,
+      <span class="hl-key">"description"</span>:  <span class="hl-str">"Trading staff HTTPS to EKS app — RULE-042"</span>
+    },
+    {
+      <span class="hl-key">"name"</span>:         <span class="hl-str">"ALLOW-API-PARTNERS"</span>,
+      <span class="hl-key">"from_zone"</span>:    [<span class="hl-str">"internet"</span>],
+      <span class="hl-key">"to_zone"</span>:      [<span class="hl-str">"cloud-app"</span>],
+      <span class="hl-key">"source"</span>:       [<span class="hl-str">"partner-ip-group"</span>],
+      <span class="hl-key">"destination"</span>:  [<span class="hl-str">"api-gateway-alb"</span>],
+      <span class="hl-key">"application"</span>:  [<span class="hl-str">"ssl"</span>],
+      <span class="hl-key">"service"</span>:      [<span class="hl-str">"TCP-443"</span>],
+      <span class="hl-key">"action"</span>:       <span class="hl-str">"allow"</span>,
+      <span class="hl-key">"profile_group"</span>: <span class="hl-str">"strict-financial"</span>
+    },
+    {
+      <span class="hl-key">"name"</span>:         <span class="hl-str">"DENY-APP-TO-DATA-DIRECT"</span>,
+      <span class="hl-key">"from_zone"</span>:    [<span class="hl-str">"cloud-app"</span>],
+      <span class="hl-key">"to_zone"</span>:      [<span class="hl-str">"cloud-data"</span>],
+      <span class="hl-key">"source"</span>:       [<span class="hl-str">"any"</span>],
+      <span class="hl-key">"destination"</span>:  [<span class="hl-str">"any"</span>],
+      <span class="hl-key">"application"</span>:  [<span class="hl-str">"any"</span>],
+      <span class="hl-key">"service"</span>:      [<span class="hl-str">"any"</span>],
+      <span class="hl-key">"action"</span>:       <span class="hl-str">"deny"</span>,
+      <span class="hl-key">"log_end"</span>:      <span class="hl-kw">true</span>,
+      <span class="hl-key">"description"</span>:  <span class="hl-str">"Block direct app-to-DB; must go through ORM layer only"</span>
+    },
+    {
+      <span class="hl-key">"name"</span>:         <span class="hl-str">"DENY-ALL-DEFAULT"</span>,
+      <span class="hl-key">"from_zone"</span>:    [<span class="hl-str">"any"</span>],
+      <span class="hl-key">"to_zone"</span>:      [<span class="hl-str">"any"</span>],
+      <span class="hl-key">"action"</span>:       <span class="hl-str">"deny"</span>,
+      <span class="hl-key">"log_end"</span>:      <span class="hl-kw">true</span>,
+      <span class="hl-key">"description"</span>:  <span class="hl-str">"Implicit deny with logging — catches missed traffic"</span>
+    }
+  ]
+}
+</pre>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════ 08 SD-WAN ════════════════════════════════════ -->
+<section id="sdwan">
+  <div class="section-header">
+    <div class="section-num">08</div>
+    <div><div class="section-title">🌍 SD-WAN Logic</div></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Path Selection Policy (vendor-neutral)</div>
+<pre>
+<span class="hl-cmt"># SD-WAN Application-Aware Routing Policy</span>
+<span class="hl-cmt"># Applied per-branch at vCPE edge device</span>
+
+<span class="hl-key">policy:</span> <span class="hl-str">TRADING-APP-SLA</span>
+  <span class="hl-key">match:</span>
+    <span class="hl-key">application:</span> <span class="hl-str">trading-platform</span>     <span class="hl-cmt"># App-ID via DPI</span>
+    <span class="hl-key">destination:</span> <span class="hl-str">10.0.0.0/8</span>
+    <span class="hl-key">dscp:</span>        <span class="hl-str">EF (46)</span>               <span class="hl-cmt"># Expedited Forwarding</span>
+  <span class="hl-key">preferred_path:</span>  <span class="hl-str">MPLS</span>
+  <span class="hl-key">sla_thresholds:</span>
+    <span class="hl-key">latency_ms:</span>    <span class="hl-num">50</span>
+    <span class="hl-key">jitter_ms:</span>     <span class="hl-num">10</span>
+    <span class="hl-key">packet_loss:</span>   <span class="hl-str">0.1%</span>
+  <span class="hl-key">failover_order:</span>  [<span class="hl-str">MPLS</span>, <span class="hl-str">DIA</span>, <span class="hl-str">LTE</span>]
+  <span class="hl-key">probe_interval:</span>  <span class="hl-num">300ms</span>              <span class="hl-cmt"># BFD echo packets</span>
+  <span class="hl-key">switchover_time:</span> <span class="hl-str">&lt; 1 second</span>
+
+<span class="hl-key">policy:</span> <span class="hl-str">BULK-DATA-COST-OPT</span>
+  <span class="hl-key">match:</span>
+    <span class="hl-key">application:</span>  [<span class="hl-str">backup</span>, <span class="hl-str">file-transfer</span>]
+    <span class="hl-key">dscp:</span>         <span class="hl-str">CS1 (low priority)</span>
+  <span class="hl-key">preferred_path:</span>  <span class="hl-str">DIA</span>
+  <span class="hl-key">failover_order:</span>  [<span class="hl-str">DIA</span>, <span class="hl-str">MPLS</span>]
+
+<span class="hl-key">policy:</span> <span class="hl-str">VOICE-SLA</span>
+  <span class="hl-key">match:</span>
+    <span class="hl-key">application:</span>  [<span class="hl-str">sip</span>, <span class="hl-str">rtp</span>, <span class="hl-str">webex</span>]
+  <span class="hl-key">preferred_path:</span>  <span class="hl-str">MPLS</span>
+  <span class="hl-key">sla_thresholds:</span>
+    <span class="hl-key">latency_ms:</span>    <span class="hl-num">100</span>
+    <span class="hl-key">jitter_ms:</span>     <span class="hl-num">30</span>
+    <span class="hl-key">mos_min:</span>       <span class="hl-num">3.6</span>
+</pre>
+    </div>
+    <div class="card">
+      <div class="card-title">Failover Behavior</div>
+      <ul class="list">
+        <li><strong>Detection:</strong> BFD sessions every 300ms on all tunnels. Link state tracked independently per-path. No dependency on routing protocol convergence.</li>
+        <li><strong>Switchover:</strong> When MPLS path SLA threshold exceeded for 2 consecutive probes, traffic instantly re-steered to DIA. ECMP load sharing available across equal-quality paths.</li>
+        <li><strong>Re-convergence:</strong> MPLS path reinstated when it passes SLA for 10 consecutive probes (~3 seconds). Hysteresis prevents flapping.</li>
+        <li><strong>LTE fallback:</strong> LTE modem pre-provisioned in warm-standby. Zero-touch provisioning via SD-WAN controller. Activates if both MPLS and DIA fail. Bandwidth limit: 50Mbps. Only critical app traffic (trading, voice) routed over LTE.</li>
+        <li><strong>Telemetry:</strong> All path switches generate Syslog → Splunk with tunnel ID, previous path, new path, SLA metrics at time of failure.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════ 09 SPLUNK ════════════════════════════════════ -->
+<section id="splunk">
+  <div class="section-header">
+    <div class="section-num">09</div>
+    <div><div class="section-title">📊 Splunk Integration</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Log Sources &amp; Ingestion Methods</div>
+    <table>
+      <tr><th>Source</th><th>Format</th><th>Method</th><th>Index</th><th>Volume</th></tr>
+      <tr><td>Palo Alto NGFW</td><td>CEF Syslog</td><td>UDP/TCP 514 → Splunk HF</td><td>fw_traffic</td><td>~8 GB/day</td></tr>
+      <tr><td>SD-WAN vCPE (all branches)</td><td>IPFIX/NetFlow + Syslog</td><td>UDP 2055 → Splunk HF</td><td>sdwan_netflow</td><td>~4 GB/day</td></tr>
+      <tr><td>EKS Audit Logs</td><td>JSON</td><td>Splunk Connect for K8s (Helm)</td><td>k8s_audit</td><td>~3 GB/day</td></tr>
+      <tr><td>Application Logs (pods)</td><td>JSON structured</td><td>Fluent Bit DaemonSet → HEC</td><td>app_logs</td><td>~12 GB/day</td></tr>
+      <tr><td>AWS CloudTrail</td><td>JSON</td><td>S3 SQS-based input</td><td>aws_cloudtrail</td><td>~2 GB/day</td></tr>
+      <tr><td>AWS ALB Access Logs</td><td>W3C</td><td>S3 → Splunk S3 input</td><td>aws_alb</td><td>~5 GB/day</td></tr>
+      <tr><td>VPC Flow Logs</td><td>Text</td><td>CloudWatch → Lambda → HEC</td><td>vpc_flows</td><td>~6 GB/day</td></tr>
+    </table>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Sample Firewall Log — CEF Format</div>
+<pre>
+Jan 15 14:32:01 fw-nyc-01 CEF:0|Palo Alto Networks|PAN-OS|11.0|TRAFFIC|traffic|3|
+  rt=Jan 15 2026 14:32:01 UTC
+  src=192.168.10.45   spt=54321
+  dst=10.0.1.100      dpt=443
+  cs1=ALLOW-TRADING-HTTPS         cs1Label=RuleName
+  app=ssl             proto=TCP
+  act=allowed         outcome=allow
+  in=128430           out=8192
+  cn1=1               cn1Label=SessionID
+  cs2=branch-trust    cs2Label=SrcZone
+  cs3=cloud-app       cs3Label=DstZone
+  cs4=trading-app     cs4Label=URLCategory
+  cs5=medium          cs5Label=ThreatScore
+  request=trading-app.internal.globalfinserv.com
+</pre>
+  </div>
+
+  <div class="card">
+    <div class="card-title">SPL Queries — Operational &amp; Security</div>
+<pre class="purple">
+<span class="hl-cmt">-- 1. Branch latency degradation detection --</span>
+index=sdwan_netflow sourcetype=cisco:sdwan:events
+  event_type=path_change
+| eval latency_delta = new_latency - prev_latency
+| where latency_delta > 20
+| stats count avg(latency_delta) by branch_id, tunnel_id, new_path
+| sort -avg(latency_delta)
+
+<span class="hl-cmt">-- 2. Denied traffic by zone pair (NGFW baseline) --</span>
+index=fw_traffic action=denied
+| stats count by src_zone, dest_zone, app, rule_name
+| sort -count
+| head 20
+
+<span class="hl-cmt">-- 3. Kubernetes privileged pod creation alert --</span>
+index=k8s_audit verb=create resource=pods
+  objectRef.namespace!=kube-system
+| spath output=privileged path=requestObject.spec.containers{}.securityContext.privileged
+| where privileged="true"
+| table _time, user.username, objectRef.namespace, objectRef.name
+
+<span class="hl-cmt">-- 4. Correlation: branch IP + FW deny + K8s anomaly --</span>
+index=fw_traffic action=denied src_ip=192.168.10.*
+  [search index=k8s_audit verb=create | return src_ip]
+| join src_ip
+    [search index=app_logs level=ERROR | stats count by client_ip
+     | rename client_ip as src_ip]
+| table _time, src_ip, dest_ip, rule_name, k8s_anomaly, error_count
+
+<span class="hl-cmt">-- 5. Risk-based alert: high-value asset access from new geo --</span>
+index=fw_traffic dest_zone=cloud-data
+| iplocation src_ip
+| stats dc(Country) as unique_countries by src_ip
+| where unique_countries > 1
+| join src_ip [search index=fw_traffic | stats count by src_ip]
+</pre>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════ 10 AI AGENT ════════════════════════════════════ -->
+<section id="ai">
+  <div class="section-header">
+    <div class="section-num">10</div>
+    <div><div class="section-title">🤖 AI Agent Design</div></div>
+  </div>
+
+  <div class="callout callout-info">
+    <strong>Stack:</strong> Claude claude-sonnet-4-20250514 API · LangChain orchestration · FastAPI microservice · Kafka consumer for alert ingestion · Redis for short-term context window · Postgres for incident history
+  </div>
+
+  <div class="card">
+    <div class="card-title">Agent System Prompt</div>
+<pre class="purple">
+You are SecOpsAI, a Principal-level network and cloud security engineer with deep expertise in:
+- Palo Alto PAN-OS NGFW, Cisco SD-WAN, AWS networking
+- Kubernetes security (EKS, Calico, Falco, OPA)
+- Splunk ES correlation and SIEM analysis
+- Incident response and root cause analysis
+
+You receive structured JSON alerts from Splunk. Your task:
+1. DIAGNOSE: Identify the exact root cause using ALL provided telemetry. 
+   Be specific — name the rule, IP, pod, tunnel, or interface involved.
+2. CORRELATE: Cross-reference events across layers (network/security/app).
+3. RECOMMEND: Provide 2-3 ranked remediation options with specific commands or config.
+4. ACT: Specify which automated runbook to execute (block_ip / reroute_sdwan / 
+   scale_pods / rotate_creds / open_incident), with parameters.
+5. RISK: State the blast radius if no action is taken in <15min.
+
+Format your response as structured JSON matching the RemediationPlan schema.
+Be direct. No fluff. This is a production incident.
+</pre>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Example AI Agent Input (Splunk alert payload)</div>
+<pre>
+{
+  <span class="hl-key">"incident_id"</span>: <span class="hl-str">"INC-20260115-0847"</span>,
+  <span class="hl-key">"alert_name"</span>: <span class="hl-str">"TRADING_APP_LATENCY_SPIKE"</span>,
+  <span class="hl-key">"severity"</span>: <span class="hl-str">"critical"</span>,
+  <span class="hl-key">"timestamp"</span>: <span class="hl-str">"2026-01-15T14:31:58Z"</span>,
+  <span class="hl-key">"telemetry"</span>: {
+    <span class="hl-key">"sdwan"</span>: {
+      <span class="hl-key">"branch"</span>: <span class="hl-str">"NYC-01"</span>,
+      <span class="hl-key">"event"</span>: <span class="hl-str">"sla_violation"</span>,
+      <span class="hl-key">"tunnel"</span>: <span class="hl-str">"mpls-nyc-hub-01"</span>,
+      <span class="hl-key">"current_latency_ms"</span>: <span class="hl-num">187</span>,
+      <span class="hl-key">"threshold_ms"</span>: <span class="hl-num">50</span>,
+      <span class="hl-key">"packet_loss_pct"</span>: <span class="hl-num">3.2</span>,
+      <span class="hl-key">"path_status"</span>: <span class="hl-str">"degraded"</span>,
+      <span class="hl-key">"dia_path_latency_ms"</span>: <span class="hl-num">28</span>,
+      <span class="hl-key">"dia_path_status"</span>: <span class="hl-str">"healthy"</span>
+    },
+    <span class="hl-key">"app_metrics"</span>: {
+      <span class="hl-key">"service"</span>: <span class="hl-str">"trading-app"</span>,
+      <span class="hl-key">"p99_latency_ms"</span>: <span class="hl-num">1840</span>,
+      <span class="hl-key">"error_rate_pct"</span>: <span class="hl-num">12.4</span>,
+      <span class="hl-key">"affected_users"</span>: <span class="hl-num">87</span>,
+      <span class="hl-key">"pod_count"</span>: <span class="hl-num">6</span>,
+      <span class="hl-key">"cpu_utilization_pct"</span>: <span class="hl-num">34</span>
+    },
+    <span class="hl-key">"fw_traffic"</span>: {
+      <span class="hl-key">"denied_events_last_5min"</span>: <span class="hl-num">0</span>,
+      <span class="hl-key">"threat_events"</span>: <span class="hl-num">0</span>
+    }
+  }
+}
+</pre>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Example AI Agent Output (RemediationPlan)</div>
+<pre class="green">
+{
+  <span class="hl-key">"incident_id"</span>: <span class="hl-str">"INC-20260115-0847"</span>,
+  <span class="hl-key">"diagnosis"</span>: {
+    <span class="hl-key">"root_cause"</span>: <span class="hl-str">"MPLS tunnel mpls-nyc-hub-01 is experiencing severe degradation
+      (187ms latency, 3.2% packet loss — 3.7x above SLA threshold). This is a
+      network-layer issue; application tier and firewall show no anomalies.
+      DIA path to same hub shows 28ms RTT — fully healthy. The SD-WAN policy
+      has NOT automatically failed over, indicating the failover policy either
+      has not triggered (requires 2 consecutive probe failures) or the vCPE
+      path-selection policy is misconfigured for this app class."</span>,
+    <span class="hl-key">"confidence"</span>: <span class="hl-num">0.94</span>,
+    <span class="hl-key">"affected_layer"</span>: <span class="hl-str">"sd-wan-underlay"</span>,
+    <span class="hl-key">"blast_radius_if_unresolved"</span>: <span class="hl-str">"87 traders on NYC branch cannot execute
+      trades. Market-hours impact. Estimated revenue exposure: $240K/min."</span>
+  },
+  <span class="hl-key">"recommendations"</span>: [
+    {
+      <span class="hl-key">"rank"</span>: <span class="hl-num">1</span>,
+      <span class="hl-key">"action"</span>: <span class="hl-str">"Force-steer trading traffic from MPLS to DIA immediately"</span>,
+      <span class="hl-key">"method"</span>: <span class="hl-str">"ansible_runbook"</span>,
+      <span class="hl-key">"runbook"</span>: <span class="hl-str">"reroute_sdwan_path"</span>,
+      <span class="hl-key">"params"</span>: {
+        <span class="hl-key">"branch"</span>: <span class="hl-str">"NYC-01"</span>,
+        <span class="hl-key">"app_policy"</span>: <span class="hl-str">"TRADING-APP-SLA"</span>,
+        <span class="hl-key">"force_path"</span>: <span class="hl-str">"DIA"</span>,
+        <span class="hl-key">"duration_minutes"</span>: <span class="hl-num">30</span>
+      },
+      <span class="hl-key">"requires_approval"</span>: <span class="hl-kw">false</span>,
+      <span class="hl-key">"estimated_recovery_seconds"</span>: <span class="hl-num">8</span>
+    },
+    {
+      <span class="hl-key">"rank"</span>: <span class="hl-num">2</span>,
+      <span class="hl-key">"action"</span>: <span class="hl-str">"Open ISP ticket for MPLS circuit nyc-mpls-circuit-AT&T-004"</span>,
+      <span class="hl-key">"method"</span>: <span class="hl-str">"servicenow_api"</span>,
+      <span class="hl-key">"priority"</span>: <span class="hl-str">"P1"</span>
+    }
+  ],
+  <span class="hl-key">"auto_execute"</span>: <span class="hl-kw">true</span>,
+  <span class="hl-key">"execute_rank"</span>: <span class="hl-num">1</span>
+}
+</pre>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════ 11 AUTOMATION ════════════════════════════════════ -->
+<section id="automation">
+  <div class="section-header">
+    <div class="section-num">11</div>
+    <div><div class="section-title">🔄 Automation Workflow</div></div>
+  </div>
+
+  <div class="arch-diagram">
+    <span style="color:#4a6070;font-size:10px;letter-spacing:3px;">EVENT-DRIVEN REMEDIATION PIPELINE</span>
+    <br><br>
+
+    <div class="arch-layer layer-obs">
+      [1] SPLUNK ES  →  Correlation rule fires (threshold exceeded)  →  Notable Event created
+      →  REST webhook POST to Kafka topic: <span style="color:#fbbf24;">secops.alerts.critical</span>
+    </div>
+    <div class="arrow">│  (Kafka consumer — FastAPI AI service)</div>
+
+    <div class="arch-layer layer-ai">
+      [2] AI AGENT  →  Consumes alert JSON  →  Fetches last 15min of related telemetry from Splunk API
+      →  Builds context window (network state + app state + incident history)
+      →  Calls Claude API with structured prompt  →  Receives RemediationPlan JSON
+    </div>
+    <div class="arrow">│  (decision gate)</div>
+
+    <div class="arch-layer layer-sdwan" style="border-color:#7c3aed;">
+      [3] APPROVAL GATE
+      Severity CRITICAL + confidence &gt; 0.85 + no_approval_required = AUTO-EXECUTE
+      Otherwise  →  PagerDuty alert + Slack interactive approval button (15min timeout)
+      Timeout with no response = execute rank-1 recommendation automatically
+    </div>
+    <div class="arrow">│</div>
+
+    <div class="arch-layer layer-users" style="border-color:#2563eb;">
+      [4] EXECUTION  →  AWX (Ansible Tower) API  →  Launch job template with AI-provided vars
+      OR  →  Terraform Cloud API  →  Queue Plan → Auto-Apply (for infra changes)
+      OR  →  kubectl apply via in-cluster service account (for K8s changes)
+    </div>
+    <div class="arrow">│</div>
+
+    <div class="arch-layer layer-k8s">
+      [5] VALIDATION  →  Post-remediation check (60s delay)
+      Re-fetch metrics from Splunk / Prometheus  →  Compare against SLA thresholds
+      PASS → Close incident, log to Splunk (action=remediated, outcome=success)
+      FAIL → Escalate to human, lock out further auto-execution for this incident
+    </div>
+  </div>
+
+  <div class="callout callout-warn">
+    <strong>Human-in-the-loop gates:</strong> Changes to firewall zone rules, Terraform destroy operations, and credential rotation ALWAYS require human approval via Slack, regardless of AI confidence score. Auto-execution is scoped to reversible actions only.
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════ 12 USE CASE ════════════════════════════════════ -->
+<section id="usecase">
+  <div class="section-header">
+    <div class="section-num">12</div>
+    <div><div class="section-title">🧪 Real-World Use Case</div></div>
+  </div>
+
+  <div class="callout callout-crit">
+    <strong>Incident: "NYC traders cannot access trading platform. Market opens in 8 minutes."</strong>
+    Time: 2026-01-15 14:31:58 UTC · Reported by: automated Splunk alert (zero human detection lag)
+  </div>
+
+  <div class="flow-steps">
+    <div class="flow-step" data-step="T+0">
+      <div>
+        <div class="step-title">Splunk detects SLA violation</div>
+        <div class="step-body">Correlation rule <code>TRADING_LATENCY_SPIKE</code> fires. Criteria: <code>sdwan_path_latency > 100ms AND app_p99 > 500ms AND branch=NYC</code> for 60 consecutive seconds. Notable event created. Webhook fires to Kafka in 200ms.</div>
+      </div>
+    </div>
+    <div class="flow-step" data-step="T+2s">
+      <div>
+        <div class="step-title">AI Agent receives alert, fetches context</div>
+        <div class="step-body">Agent calls Splunk API: <code>GET /servicesNS/admin/search/search/jobs</code> with search <code>index=sdwan_netflow branch=NYC-01 earliest=-15m</code>. Retrieves 847 events. Cross-correlates with <code>index=fw_traffic</code> (no denies) and <code>index=app_logs level=ERROR</code> (timeout errors to trading-app pods).</div>
+      </div>
+    </div>
+    <div class="flow-step" data-step="T+4s">
+      <div>
+        <div class="step-title">AI diagnosis complete</div>
+        <div class="step-body">Claude identifies MPLS path degradation (187ms, 3.2% loss). DIA path healthy at 28ms. Auto-execute decision: <code>severity=critical AND confidence=0.94 AND runbook=reroute_sdwan_path AND requires_approval=false</code>. Triggers AWX job template <code>JT-087-SDWAN-REROUTE</code> via API.</div>
+      </div>
+    </div>
+    <div class="flow-step" data-step="T+6s">
+      <div>
+        <div class="step-title">Ansible executes SD-WAN path override</div>
+        <div class="step-body">AWX runs <code>reroute_sdwan_path.yml</code> against NYC-01 edge. SD-WAN controller API call: <code>PATCH /dataservice/template/policy/definition/qosmap</code> forces <code>TRADING-APP-SLA</code> policy to prefer DIA for 30 minutes. Execution: 2.3 seconds.</div>
+      </div>
+    </div>
+    <div class="flow-step" data-step="T+8s">
+      <div>
+        <div class="step-title">Traffic rerouted — latency recovered</div>
+        <div class="step-body">Trading traffic now flowing over DIA tunnel (28ms RTT). SD-WAN telemetry confirms path switch. App p99 latency drops from 1840ms → 42ms within 15 seconds. Error rate drops from 12.4% → 0.1%.</div>
+      </div>
+    </div>
+    <div class="flow-step" data-step="T+68s">
+      <div>
+        <div class="step-title">Validation pass — incident auto-closed</div>
+        <div class="step-body">Post-remediation check passes (all metrics below SLA). Splunk incident auto-closed with <code>outcome=success, auto_remediated=true, total_ttfr=8s</code>. ServiceNow P1 ticket opened for MPLS circuit investigation. ISP notified automatically.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════ 13 RESULTS ════════════════════════════════════ -->
+<section id="results">
+  <div class="section-header">
+    <div class="section-num">13</div>
+    <div><div class="section-title">📈 Output &amp; Results</div></div>
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-card before">
+      <div class="compare-label">BEFORE ARCHITECTURE</div>
+      <div class="metric"><span class="metric-name">Branch-to-cloud latency (p99)</span><span class="metric-val">320ms</span></div>
+      <div class="metric"><span class="metric-name">WAN failover time</span><span class="metric-val">5–8 minutes</span></div>
+      <div class="metric"><span class="metric-name">Mean Time to Detect (MTTD)</span><span class="metric-val">72 hours</span></div>
+      <div class="metric"><span class="metric-name">Mean Time to Remediate (MTTR)</span><span class="metric-val">4–6 hours</span></div>
+      <div class="metric"><span class="metric-name">FW change lead time</span><span class="metric-val">3–5 days</span></div>
+      <div class="metric"><span class="metric-name">Annual downtime (trading)</span><span class="metric-val">47 hours</span></div>
+      <div class="metric"><span class="metric-name">Security incidents missed</span><span class="metric-val">~68% undetected</span></div>
+      <div class="metric"><span class="metric-name">Compliance posture</span><span class="metric-val">Partial PCI-DSS</span></div>
+    </div>
+    <div class="compare-card after">
+      <div class="compare-label">AFTER ARCHITECTURE</div>
+      <div class="metric"><span class="metric-name">Branch-to-cloud latency (p99)</span><span class="metric-val">28–42ms</span></div>
+      <div class="metric"><span class="metric-name">WAN failover time</span><span class="metric-val">&lt; 1 second</span></div>
+      <div class="metric"><span class="metric-name">Mean Time to Detect (MTTD)</span><span class="metric-val">&lt; 60 seconds</span></div>
+      <div class="metric"><span class="metric-name">Mean Time to Remediate (MTTR)</span><span class="metric-val">8–90 seconds (auto)</span></div>
+      <div class="metric"><span class="metric-name">FW change lead time</span><span class="metric-val">Minutes (GitOps CI)</span></div>
+      <div class="metric"><span class="metric-name">Annual downtime (trading)</span><span class="metric-val">&lt; 2 hours</span></div>
+      <div class="metric"><span class="metric-name">Security incidents missed</span><span class="metric-val">&lt; 5% (SIEM correlated)</span></div>
+      <div class="metric"><span class="metric-name">Compliance posture</span><span class="metric-val">Full PCI-DSS + SOX</span></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════ 14 ANALYSIS ════════════════════════════════════ -->
+<section id="analysis">
+  <div class="section-header">
+    <div class="section-num">14</div>
+    <div><div class="section-title">🔍 Architecture Analysis</div></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Why This Architecture Works</div>
+      <ul class="list">
+        <li><strong>Defense in depth:</strong> No single security control is a single point of failure. NGFW at edge + K8s NetworkPolicy + Istio mTLS + WAF means 4 independent layers must be bypassed for a breach.</li>
+        <li><strong>Closed-loop automation:</strong> Detect → Diagnose → Remediate → Validate happens entirely without human intervention for 80% of operational events, eliminating alert fatigue.</li>
+        <li><strong>IaC as truth:</strong> All state lives in Git. Any drift is detected and corrected. No snowflake infrastructure.</li>
+        <li><strong>Application-aware transport:</strong> SD-WAN with App-ID means the network understands what matters to the business and protects it accordingly.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">Trade-offs &amp; Honest Limitations</div>
+      <ul class="list">
+        <li><strong>Complexity:</strong> This architecture has 7 integrated layers. Requires strong operational maturity. A team of 3–5 skilled engineers to maintain.</li>
+        <li><strong>AI confidence risk:</strong> Auto-execution on AI recommendations introduces blast radius if the model hallucinates. Mitigated by: confidence thresholds, scoping auto-execution to reversible actions, and post-remediation validation.</li>
+        <li><strong>Splunk cost:</strong> At 40GB/day ingestion, Splunk Enterprise licensing is ~$200–400K/year. Alternatives: OpenSearch + Grafana for cost reduction at the expense of ES maturity.</li>
+        <li><strong>SD-WAN vendor lock-in:</strong> Cisco or Fortinet SD-WAN creates dependency. Vendor-neutral abstraction layer (Terraform + Ansible) mitigates partially.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">Scalability Considerations</div>
+      <ul class="list">
+        <li><strong>Branch scale:</strong> SD-WAN controller supports 1,000+ edges. Zero-touch provisioning via Ansible + SD-WAN onboarding API.</li>
+        <li><strong>K8s scale:</strong> Karpenter node autoprovisioning handles bursty trading load. KEDA scales pods on custom metrics (order queue depth).</li>
+        <li><strong>Splunk scale:</strong> Distributed deployment with indexer clustering. SmartStore offloads cold data to S3 at ~$23/TB/month vs hot storage.</li>
+        <li><strong>Multi-region:</strong> AWS Global Accelerator can be added to route NYC→eu-west-1 for EMEA branches, reducing latency by 40ms on transatlantic paths.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">Cost Considerations (Annual)</div>
+      <ul class="list">
+        <li><strong>AWS (EKS + VPC + ALB + TGW):</strong> ~$180K/year for prod scale</li>
+        <li><strong>Splunk Enterprise Security:</strong> ~$250K/year (40GB/day)</li>
+        <li><strong>Palo Alto NGFW (PA-5450 x2):</strong> ~$120K/year (HW + subscriptions)</li>
+        <li><strong>SD-WAN (42 branches):</strong> ~$80K/year (controller SaaS + vCPE licensing)</li>
+        <li><strong>MPLS circuits (42 branches):</strong> ~$420K/year</li>
+        <li><strong>Total TCO:</strong> ~$1.1M/year. <em>Offset by: 95% downtime reduction on a platform processing $50M/day in trades.</em></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ════════════════════════════════════ 15 BONUS ════════════════════════════════════ -->
+<section id="bonus">
+  <div class="section-header">
+    <div class="section-num">15</div>
+    <div><div class="section-title">⭐ Bonus — GitHub, Demo &amp; Extensions</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">GitHub Repository Structure</div>
+    <div class="folder-tree">
+<span class="f-dir">enterprise-secops-architecture/</span>
+├── <span class="f-dir">terraform/</span>
+│   ├── <span class="f-dir">modules/</span>
+│   │   ├── <span class="f-dir">network/</span>        <span class="f-cmt">vpc, subnets, tgw, route tables</span>
+│   │   ├── <span class="f-dir">firewall/</span>       <span class="f-cmt">sg, nacl, waf, fw API resources</span>
+│   │   ├── <span class="f-dir">kubernetes/</span>     <span class="f-cmt">eks, node groups, irsa, addons</span>
+│   │   └── <span class="f-dir">observability/</span>  <span class="f-cmt">splunk hf ec2, cloudwatch, s3</span>
+│   └── <span class="f-dir">environments/</span>
+│       ├── <span class="f-dir">prod/</span>
+│       └── <span class="f-dir">staging/</span>
+├── <span class="f-dir">ansible/</span>
+│   ├── <span class="f-dir">inventory/</span>         <span class="f-cmt">prod.yml, staging.yml</span>
+│   ├── <span class="f-dir">playbooks/</span>         <span class="f-cmt">deploy_fw_rules.yml, remediate_*.yml</span>
+│   ├── <span class="f-dir">roles/</span>             <span class="f-cmt">firewall/, sdwan/, k8s_ops/</span>
+│   └── <span class="f-dir">vault/</span>             <span class="f-cmt">encrypted credentials (ansible-vault)</span>
+├── <span class="f-dir">kubernetes/</span>
+│   ├── <span class="f-dir">base/</span>              <span class="f-cmt">namespaces, rbac, psp (deprecated → OPA)</span>
+│   ├── <span class="f-dir">trading-app/</span>      <span class="f-cmt">deployment, service, hpa, netpol</span>
+│   ├── <span class="f-dir">security/</span>         <span class="f-cmt">falco-config, opa-policies, istio</span>
+│   └── <span class="f-dir">observability/</span>    <span class="f-cmt">fluent-bit, splunk-connect-k8s</span>
+├── <span class="f-dir">ai-agent/</span>
+│   ├── <span class="f-file">agent.py</span>           <span class="f-cmt">FastAPI service, Kafka consumer</span>
+│   ├── <span class="f-file">prompts.py</span>         <span class="f-cmt">system prompt templates</span>
+│   ├── <span class="f-file">runbooks.py</span>        <span class="f-cmt">AWX/Terraform Cloud API callers</span>
+│   ├── <span class="f-file">schemas.py</span>         <span class="f-cmt">RemediationPlan pydantic model</span>
+│   └── <span class="f-file">tests/</span>             <span class="f-cmt">unit tests for AI decision logic</span>
+├── <span class="f-dir">splunk/</span>
+│   ├── <span class="f-file">correlation_rules/</span>  <span class="f-cmt">savedsearches.conf</span>
+│   ├── <span class="f-file">dashboards/</span>        <span class="f-cmt">xml dashboard definitions</span>
+│   └── <span class="f-file">queries/</span>           <span class="f-cmt">spl reference library</span>
+├── <span class="f-dir">docs/</span>
+│   ├── <span class="f-file">architecture.png</span>
+│   ├── <span class="f-file">runbook-index.md</span>
+│   └── <span class="f-file">threat-model.md</span>
+├── <span class="f-file">.gitlab-ci.yml</span>     <span class="f-cmt">GitOps pipeline: validate → plan → apply</span>
+└── <span class="f-file">README.md</span>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">How to Demo This Project</div>
+      <ul class="list">
+        <li><strong>Local lab:</strong> Use GNS3 or EVE-NG for SD-WAN/NGFW simulation. Kind or k3d for Kubernetes. Splunk Free (500MB/day). Localstack for AWS APIs.</li>
+        <li><strong>Cloud demo:</strong> Terraform apply to AWS creates full environment in ~12 minutes. Cost: ~$8/hour to run full stack. Use <code>terraform destroy</code> after demo.</li>
+        <li><strong>Simulation mode:</strong> The <code>ai-agent/</code> service has a <code>--dry-run</code> flag. Feed it sample JSON payloads from <code>tests/fixtures/</code> to demonstrate AI diagnosis without live infrastructure.</li>
+        <li><strong>Live demo flow:</strong> (1) Show Splunk dashboard → (2) Inject synthetic SLA violation → (3) Watch AI agent log in real time → (4) Show AWX job execution → (5) Show Splunk incident auto-closed.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">Future Extensions with AI/LLM</div>
+      <ul class="list">
+        <li><strong>Predictive failure:</strong> Train a time-series model on 6 months of SD-WAN telemetry to predict MPLS degradation 10–15 minutes before SLA breach. Pre-reroute traffic proactively.</li>
+        <li><strong>Natural language policy authoring:</strong> "Allow the risk-engine team to access the trading database on port 5432 from 9am–6pm EST" → LLM generates Terraform + Ansible + K8s NetworkPolicy diffs for human review.</li>
+        <li><strong>Multi-agent architecture:</strong> Specialized agents per domain (NetworkAgent, SecurityAgent, AppAgent) with a coordinator LLM that routes alerts and aggregates findings — improves accuracy on complex cross-domain incidents.</li>
+        <li><strong>RAG over runbooks:</strong> Index all 200+ operational runbooks in a vector DB. Agent retrieves relevant runbooks dynamically rather than relying on hardcoded runbook names.</li>
+        <li><strong>LLM-generated SPL:</strong> SecOps analyst describes anomaly in plain English → LLM generates optimized SPL query → Runs against Splunk → Returns structured findings. No SPL expertise required.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout callout-tip">
+    <strong>Interview tip:</strong> When presenting this architecture, start from business impact ("87 traders blocked, $240K/min exposure") and work backwards to the technical solution. Frame every technical decision as solving a specific business or operational constraint. The AI agent section consistently generates the most discussion — be prepared to explain confidence thresholds, blast-radius scoping of auto-execution, and how you'd handle false positives.
+  </div>
+</section>
+
+</div><!-- /container -->
+
+<footer style="background:var(--surface);border-top:1px solid var(--border);padding:24px 60px;margin-top:60px;display:flex;justify-content:space-between;align-items:center;">
+  <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-dim);">GlobalFinServ Enterprise SecOps Architecture · Principal-grade Design · 2026</span>
+  <div class="badges">
+    <span class="badge badge-blue">PCI-DSS</span>
+    <span class="badge badge-org">SOX</span>
+    <span class="badge badge-pur">GDPR</span>
+    <span class="badge badge-grn">ISO 27001</span>
+  </div>
+</footer>
+
+</body>
+</html>

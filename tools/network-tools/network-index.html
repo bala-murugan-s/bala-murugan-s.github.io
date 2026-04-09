@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>NetOps Toolbox | Professional Network Engineering Suite</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Light theme (default) */
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-card: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --accent: #3b82f6;
+            --accent-dark: #2563eb;
+            --accent-glow: rgba(59, 130, 246, 0.2);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body.dark {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.4);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: var(--transition);
+            line-height: 1.5;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Header & Navigation */
+        .top-bar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(8px);
+            padding: 12px 0;
+            animation: slideIn 0.4s ease-out;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .btn-icon {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-primary);
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .btn-icon:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            border-color: var(--accent);
+            background: var(--accent-glow);
+        }
+
+        .btn-icon:active {
+            transform: translateY(0);
+        }
+
+        .theme-toggle {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            color: var(--text-primary);
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+            border-color: var(--accent);
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        /* Tool Grid */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 28px;
+            margin: 40px 0;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .tool-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            animation: scaleIn 0.4s ease-out;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-hover);
+            border-color: var(--accent);
+        }
+
+        .card-header {
+            padding: 20px 24px;
+            background: linear-gradient(135deg, var(--bg-card) 0%, var(--bg-primary) 100%);
+            border-bottom: 2px solid var(--accent);
+        }
+
+        .card-header h3 {
+            font-size: 1.35rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        button:not(.btn-icon):not(.theme-toggle) {
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        button:not(.btn-icon):not(.theme-toggle):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        button:not(.btn-icon):not(.theme-toggle):active {
+            transform: translateY(0);
+        }
+
+        .result-area {
+            margin-top: 20px;
+            padding: 16px;
+            background: var(--bg-primary);
+            border-radius: 16px;
+            border-left: 4px solid var(--accent);
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            font-size: 0.85rem;
+            word-break: break-all;
+            transition: var(--transition);
+        }
+
+        .result-area pre {
+            white-space: pre-wrap;
+            font-family: inherit;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            background: var(--accent-glow);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-left: 8px;
+        }
+
+        /* Scroll to top indicator */
+        .scroll-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--accent);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+            z-index: 99;
+        }
+
+        .scroll-top.visible {
+            opacity: 1;
+        }
+
+        .scroll-top:hover {
+            transform: translateY(-5px);
+            background: var(--accent-dark);
+        }
+
+        /* Footer */
+        .site-footer {
+            margin-top: 60px;
+            border-top: 1px solid var(--border);
+            padding: 32px 0;
+            background: var(--bg-secondary);
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .footer-inner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .ft-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .ft-copy {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .ft-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .ft-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .ft-links a:hover {
+            color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        /* Utility */
+        .flex-btns {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .success-text {
+            color: var(--success);
+        }
+
+        .warning-text {
+            color: var(--warning);
+        }
+
+        @media (max-width: 768px) {
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            .footer-inner {
+                flex-direction: column;
+                text-align: center;
+            }
+            .logo-area {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="container nav-container">
+            <div class="logo-area">
+                <button class="btn-icon" id="homeBtn">🏠 Home</button>
+                <button class="btn-icon" id="toolsHomeBtn">🛠️ Tools Home</button>
+                <h1>🔧 NetOps Toolbox</h1>
+            </div>
+            <button class="theme-toggle" id="themeToggle">🌙 Dark Mode</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="tools-grid" id="toolsGrid"></div>
+    </div>
+
+    <div class="scroll-top" id="scrollTop">↑</div>
+
+    <footer class="site-footer">
+        <div class="container">
+            <div class="footer-inner">
+                <span class="ft-name">Balamurugan Sivaraman</span>
+                <span class="ft-copy">© 2026 · Designed & built from scratch for NOC engineers.</span>
+                <div class="ft-links">
+                    <a href="https://www.linkedin.com/in/bala-murugan-s/" target="_blank" rel="noopener">LinkedIn</a>
+                    <a href="https://bala-murugan-s.github.io" target="_blank" rel="noopener">GitHub</a>
+                    <a href="https://wa.me/919003234312" target="_blank" rel="noopener">WhatsApp</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ======================== MAC OUI DATABASE ========================
+        const ouiDatabase = {
+            "00:00:0C": "Cisco Systems, Inc",
+            "00:14:22": "Dell Inc.",
+            "00:1A:11": "Hewlett Packard",
+            "00:1B:21": "Apple Inc.",
+            "00:23:12": "Intel Corporate",
+            "00:50:56": "VMware, Inc.",
+            "00:0C:29": "VMware, Inc.",
+            "00:50:F2": "Microsoft Corporation",
+            "00:1E:C2": "Juniper Networks",
+            "00:15:5D": "Microsoft Corporation",
+            "00:1A:A0": "Broadcom Corporation",
+            "00:1F:33": "Cisco Systems",
+            "00:25:9C": "Aruba Networks",
+            "00:26:99": "Ruckus Wireless",
+            "00:27:0E": "Samsung Electronics",
+            "00:30:48": "Nokia Corporation",
+            "00:60:2F": "3Com Corporation",
+            "00:80:77": "IBM Corp",
+            "00:90:A9": "Nortel Networks",
+            "00:D0:59": "Extreme Networks",
+            "04:7D:7B": "Huawei Technologies",
+            "08:00:27": "Oracle VirtualBox",
+            "0C:8D:DB": "Cisco Meraki",
+            "10:DD:B1": "Ubiquiti Inc.",
+            "14:CC:20": "TP-Link Technologies",
+            "18:34:51": "Netgear Inc.",
+            "1C:69:7A": "Sony Corporation",
+            "24:0A:C4": "Raspberry Pi Foundation",
+            "28:6C:07": "Google Inc.",
+            "2C:54:91": "Amazon Technologies",
+            "30:9C:23": "ASUSTek Computer",
+            "34:08:04": "ZTE Corporation",
+            "38:60:77": "MikroTik",
+            "3C:15:C2": "Intel Corporate",
+            "40:16:7E": "Hewlett Packard Enterprise",
+            "44:38:39": "D-Link Corporation",
+            "48:5A:3F": "F5 Networks",
+            "4C:5E:0C": "Cisco Systems",
+            "50:2B:73": "Ericsson AB",
+            "54:27:1E": "Motorola Mobility",
+            "58:8B:F3": "NEC Corporation",
+            "5C:A6:E6": "Zyxel Communications",
+            "60:32:B1": "Apple Inc.",
+            "64:16:F0": "Qualcomm Technologies",
+            "68:72:3F": "Lenovo",
+            "6C:72:E7": "Huawei Technologies",
+            "70:3A:0E": "Alcatel-Lucent",
+            "74:83:C2": "Fortinet Inc.",
+            "78:2B:46": "Palo Alto Networks",
+            "7C:2A:31": "Nvidia Corp",
+            "80:3F:5D": "Intel Corporate",
+            "84:2A:4B": "Fujitsu Limited",
+            "88:66:5A": "ASRock Inc.",
+            "8C:70:5A": "Samsung Electronics",
+            "90:2B:34": "Dell Inc.",
+            "94:DE:80": "Cisco Systems",
+            "98:90:96": "Google Inc.",
+            "9C:8E:CD": "Microsoft Mobile",
+            "A0:20:A6": "Nokia Solutions",
+            "A4:4E:31": "Ruckus Wireless",
+            "A8:5E:45": "Ubiquiti Inc.",
+            "AC:3A:7A": "IBM Corporation",
+            "B0:5A:DA": "Arista Networks",
+            "B4:2E:99": "Cisco Systems",
+            "B8:27:EB": "Raspberry Pi Foundation",
+            "BC:AE:C5": "Huawei Technologies",
+            "C0:25:06": "MikroTik",
+            "C4:85:08": "TP-Link Technologies",
+            "C8:5B:76": "Netgear",
+            "CC:2D:21": "Intel Corporate",
+            "D0:50:99": "Dell EMC",
+            "D4:CA:6E": "Hewlett Packard",
+            "D8:50:E6": "Qualcomm Atheros",
+            "DC:85:DE": "Cisco Systems",
+            "E0:3F:49": "Samsung Electronics",
+            "E4:5F:01": "Apple Inc.",
+            "E8:FC:AF": "Amazon Devices",
+            "EC:9B:F3": "Toshiba Corporation",
+            "F0:9F:C2": "Intel Corporate",
+            "F4:F2:6D": "Google Fiber",
+            "F8:4D:89": "Huawei Technologies",
+            "FC:EC:DA": "Xiaomi Communications"
+        };
+
+        function lookupMAC(mac) {
+            let clean = mac.toUpperCase().replace(/[^0-9A-F]/g, '');
+            if (clean.length < 6) return "❌ Invalid MAC (need at least 6 hex digits)";
+            let prefix = clean.slice(0,6).match(/.{1,2}/g).join(':');
+            return ouiDatabase[prefix] || "ℹ️ Vendor not in local DB (generic/unknown OUI)";
+        }
+
+        // Port Service Mapping
+        const portServices = {
+            20: "FTP (Data)", 21: "FTP (Control)", 22: "SSH - Secure Shell", 23: "Telnet", 25: "SMTP - Email",
+            53: "DNS - Domain Name System", 67: "DHCP Server", 68: "DHCP Client", 69: "TFTP", 80: "HTTP - Web",
+            110: "POP3 - Email", 111: "RPC", 123: "NTP - Network Time", 137: "NetBIOS-NS", 138: "NetBIOS-DGM",
+            139: "NetBIOS-SSN", 143: "IMAP - Email", 161: "SNMP - Network Management", 162: "SNMP-Trap",
+            179: "BGP - Border Gateway Protocol", 389: "LDAP", 443: "HTTPS - Secure Web", 445: "SMB - File Sharing",
+            465: "SMTPS", 514: "Syslog", 587: "SMTP Submission", 636: "LDAPS", 873: "Rsync", 993: "IMAPS",
+            995: "POP3S", 1433: "MSSQL Database", 1521: "Oracle DB", 1723: "PPTP VPN", 1812: "RADIUS Auth",
+            1813: "RADIUS Acct", 2049: "NFS", 3306: "MySQL Database", 3389: "RDP - Remote Desktop",
+            5060: "SIP - VoIP", 5061: "SIP TLS", 5432: "PostgreSQL", 5900: "VNC - Remote Access",
+            6379: "Redis", 8080: "HTTP Proxy/Alt", 8443: "HTTPS Alt", 27017: "MongoDB"
+        };
+
+        // ======================== Render All Tools ========================
+        const tools = [
+            { id: "subnet", name: "📡 Subnet Calculator", desc: "CIDR to Network/Broadcast/Hosts", comp: "Easy" },
+            { id: "mac", name: "🔍 MAC OUI Lookup", desc: "Identify vendor from MAC address", comp: "Easy" },
+            { id: "port", name: "🚪 Port to Service", desc: "Common ports mapping", comp: "Easy" },
+            { id: "vlan", name: "🏷️ VLAN Validator", desc: "Validate & explain VLAN ranges", comp: "Easy" },
+            { id: "asn", name: "🌍 BGP ASN Lookup", desc: "ASN information (local DB)", comp: "Medium" },
+            { id: "mtu", name: "📏 MTU Calculator", desc: "Optimal MTU for paths", comp: "Easy" },
+            { id: "latency", name: "⏱️ Latency Visualizer", desc: "Simulate network latency effects", comp: "Medium" },
+            { id: "packet", name: "📦 Packet Header Builder", desc: "TCP/UDP/IP headers visually", comp: "Medium" },
+            { id: "ipconv", name: "🔄 IPv4/IPv6 Converter", desc: "Convert between formats", comp: "Easy" },
+            { id: "diagram", name: "📊 Network Diagram", desc: "ASCII topology generator", comp: "Medium" }
+        ];
+
+        const asnDB = {
+            15169: { name: "Google LLC", country: "US", type: "Content/CDN" },
+            16509: { name: "Amazon.com, Inc.", country: "US", type: "Cloud/Hosting" },
+            8075: { name: "Microsoft Corporation", country: "US", type: "Cloud" },
+            32934: { name: "Facebook, Inc.", country: "US", type: "Social Media" },
+            13335: { name: "Cloudflare Inc.", country: "US", type: "CDN/Security" },
+            2914: { name: "NTT America", country: "US", type: "Tier-1 Transit" },
+            7018: { name: "AT&T Services", country: "US", type: "ISP/Tier-1" },
+            6453: { name: "Tata Communications", country: "IN", type: "Tier-1" },
+            9498: { name: "BHARTI Airtel", country: "IN", type: "ISP" },
+            18209: { name: "Vodafone Idea", country: "IN", type: "ISP" },
+            24429: { name: "Reliance Jio", country: "IN", type: "ISP" },
+            4134: { name: "China Telecom", country: "CN", type: "ISP" }
+        };
+
+        function getASNInfo(asn) {
+            let num = parseInt(asn);
+            if (asnDB[num]) return `🏢 ${asnDB[num].name} | 🌍 Country: ${asnDB[num].country} | 📡 Type: ${asnDB[num].type}`;
+            return "ℹ️ ASN not in local DB (private/reserved/not listed)";
+        }
+
+        function generateNetworkDiagram(nodesStr) {
+            let nodes = nodesStr.split(',').map(s => s.trim()).filter(s => s);
+            if (nodes.length === 0) return "⚠️ Enter devices (e.g., Router,Switch,Firewall,Server)";
+            let ascii = "╔════════════════════════════════════╗\n";
+            ascii += "║     NETWORK TOPOLOGY DIAGRAM       ║\n";
+            ascii += "╚════════════════════════════════════╝\n\n";
+            ascii += "🌐 INTERNET\n";
+            ascii += "    ↓\n";
+            ascii += "┌──[EDGE ROUTER]──┐\n";
+            for(let i = 0; i < nodes.length; i++) {
+                ascii += `│   [${nodes[i]}]`;
+                if(i < nodes.length - 1) ascii += "   │\n│       ↓       │\n";
+                else ascii += "   │\n";
+            }
+            ascii += "└────────────────┘\n\n";
+            ascii += "📌 Legend: → = Uplink, Devices in order of connectivity\n";
+            ascii += `💡 Total Devices: ${nodes.length}\n`;
+            return ascii;
+        }
+
+        function buildToolHTML(tool) {
+            if (tool.id === "subnet") {
+                return `<div class="tool-card"><div class="card-header"><h3>📡 Subnet Calculator <span class="badge">CIDR/Netmask</span></h3></div><div class="card-body"><div class="input-group"><label>CIDR Notation (e.g., 192.168.1.0/24)</label><input type="text" id="cidrInput" placeholder="192.168.1.0/24"></div><button onclick="calcSubnet()">Calculate Network Details</button><div class="result-area" id="subnetResult">Enter CIDR to calculate network, broadcast, hosts</div></div></div>`;
+            }
+            if (tool.id === "mac") {
+                return `<div class="tool-card"><div class="card-header"><h3>🔍 MAC OUI Lookup <span class="badge">Vendor DB</span></h3></div><div class="card-body"><div class="input-group"><label>MAC Address (e.g., 00:1B:21:88:2A:11)</label><input type="text" id="macInput" placeholder="00:1B:21:88:2A:11"></div><button onclick="lookupMACAddr()">Lookup Manufacturer</button><div class="result-area" id="macResult">Enter MAC to identify the hardware vendor</div></div></div>`;
+            }
+            if (tool.id === "port") {
+                return `<div class="tool-card"><div class="card-header"><h3>🚪 Port to Service <span class="badge">Common Ports</span></h3></div><div class="card-body"><div class="input-group"><label>Port Number (1-65535)</label><input type="number" id="portNum" placeholder="443"></div><button onclick="mapPort()">Map to Service</button><div class="result-area" id="portResult">Shows service/protocol for network troubleshooting</div></div></div>`;
+            }
+            if (tool.id === "vlan") {
+                return `<div class="tool-card"><div class="card-header"><h3>🏷️ VLAN Validator <span class="badge">802.1Q</span></h3></div><div class="card-body"><div class="input-group"><label>VLAN ID (1-4094)</label><input type="number" id="vlanId" placeholder="100"></div><button onclick="validateVLAN()">Validate & Explain</button><div class="result-area" id="vlanResult">VLAN range validation with best practices</div></div></div>`;
+            }
+            if (tool.id === "asn") {
+                return `<div class="tool-card"><div class="card-header"><h3>🌍 BGP ASN Lookup <span class="badge">Local DB</span></h3></div><div class="card-body"><div class="input-group"><label>AS Number (e.g., 15169)</label><input type="number" id="asnNum" placeholder="15169"></div><button onclick="lookupASN()">Lookup ASN Details</button><div class="result-area" id="asnResult">ASN owner, country, and type information</div></div></div>`;
+            }
+            if (tool.id === "mtu") {
+                return `<div class="tool-card"><div class="card-header"><h3>📏 MTU Calculator <span class="badge">Path MTU</span></h3></div><div class="card-body"><div class="input-group"><label>Path MTU (bytes, typical: 1500)</label><input type="number" id="mtuVal" placeholder="1500"></div><button onclick="calcMTU()">Calculate Optimal MSS</button><div class="result-area" id="mtuResult">Calculate optimal payload and overhead</div></div></div>`;
+            }
+            if (tool.id === "latency") {
+                return `<div class="tool-card"><div class="card-header"><h3>⏱️ Latency Visualizer <span class="badge">Simulation</span></h3></div><div class="card-body"><div class="input-group"><label>Simulated Latency (ms)</label><input type="number" id="latencyMs" placeholder="150"></div><button onclick="simulateLatency()">Simulate Network Delay</button><div class="result-area" id="latencyResult">Click to experience simulated network latency</div></div></div>`;
+            }
+            if (tool.id === "packet") {
+                return `<div class="tool-card"><div class="card-header"><h3>📦 Packet Header Builder <span class="badge">TCP/UDP/IP</span></h3></div><div class="card-body"><div class="input-group"><label>Source IP</label><input type="text" id="srcIP" placeholder="10.0.0.1"><label style="margin-top:12px">Destination IP</label><input type="text" id="dstIP" placeholder="10.0.0.2"><label style="margin-top:12px">Protocol</label><select id="protoSel"><option>TCP</option><option>UDP</option></select></div><button onclick="buildPacket()">Build & Analyze Header</button><div class="result-area" id="packetResult">Complete packet header structure</div></div></div>`;
+            }
+            if (tool.id === "ipconv") {
+                return `<div class="tool-card"><div class="card-header"><h3>🔄 IPv4/IPv6 Converter <span class="badge">Address Transform</span></h3></div><div class="card-body"><div class="input-group"><label>IPv4 Address</label><input type="text" id="ipv4Addr" placeholder="192.168.1.1"></div><button onclick="convertIPv6()">Convert to IPv6 Formats</button><div class="result-area" id="convResult">IPv4-mapped, compatible, and 6to4 formats</div></div></div>`;
+            }
+            if (tool.id === "diagram") {
+                return `<div class="tool-card"><div class="card-header"><h3>📊 Network Diagram <span class="badge">ASCII Topology</span></h3></div><div class="card-body"><div class="input-group"><label>Network Devices (comma-separated)</label><input type="text" id="devices" placeholder="Core Switch,Distribution Switch,Access Switch,Firewall,Server"></div><button onclick="genDiagram()">Generate Topology</button><div class="result-area" id="diagramResult"><pre>Enter devices to generate network diagram</pre></div></div></div>`;
+            }
+            return "";
+        }
+
+        // Tool Functions
+        window.calcSubnet = () => {
+            let cidr = document.getElementById("cidrInput").value.trim();
+            let [ip, maskBits] = cidr.split('/');
+            if (!ip || !maskBits) { document.getElementById("subnetResult").innerHTML = "❌ Invalid format. Use e.g., 192.168.1.0/24"; return; }
+            let bits = parseInt(maskBits);
+            if (bits < 0 || bits > 32) { document.getElementById("subnetResult").innerHTML = "❌ Invalid CIDR prefix (0-32)"; return; }
+            let ipInt = ip.split('.').reduce((acc, oct) => (acc << 8) + parseInt(oct), 0) >>> 0;
+            let mask = (~0) << (32 - bits) >>> 0;
+            let network = ipInt & mask;
+            let broadcast = network | (~mask >>> 0);
+            let hosts = Math.pow(2, 32 - bits) - 2;
+            function intToIp(int) { return [(int>>>24)&255, (int>>>16)&255, (int>>>8)&255, int&255].join('.'); }
+            document.getElementById("subnetResult").innerHTML = `<strong>📡 Network Address:</strong> ${intToIp(network)}<br><strong>📢 Broadcast Address:</strong> ${intToIp(broadcast)}<br><strong>🖥️ Usable Hosts:</strong> ${hosts}<br><strong>🔢 Subnet Mask:</strong> ${intToIp(mask)}<br><strong>📌 CIDR Notation:</strong> /${bits}<br><strong>✨ Wildcard Mask:</strong> ${intToIp(~mask >>> 0)}`;
+        };
+        
+        window.lookupMACAddr = () => {
+            let mac = document.getElementById("macInput").value;
+            if (!mac) { document.getElementById("macResult").innerHTML = "⚠️ Please enter a MAC address"; return; }
+            let vendor = lookupMAC(mac);
+            document.getElementById("macResult").innerHTML = `🔧 Vendor: ${vendor}<br><small>📝 OUI: First 6 hex digits identify manufacturer</small>`;
+        };
+        
+        window.mapPort = () => {
+            let port = parseInt(document.getElementById("portNum").value);
+            if (isNaN(port)) { document.getElementById("portResult").innerHTML = "⚠️ Enter a valid port number"; return; }
+            let service = portServices[port] || "🔍 Unassigned/Private Port (not in common services DB)";
+            document.getElementById("portResult").innerHTML = `🚪 Port ${port} → ${service}<br><small>📌 Used for network troubleshooting and firewall rules</small>`;
+        };
+        
+        window.validateVLAN = () => {
+            let vlan = parseInt(document.getElementById("vlanId").value);
+            if (isNaN(vlan)) { document.getElementById("vlanResult").innerHTML = "⚠️ Enter numeric VLAN ID"; return; }
+            if (vlan < 1) document.getElementById("vlanResult").innerHTML = "❌ Invalid: VLAN 0 reserved for priority tagging only";
+            else if (vlan === 1) document.getElementById("vlanResult").innerHTML = "⚠️ VLAN 1 is default/native VLAN - Security best practice: change from default";
+            else if (vlan >= 2 && vlan <= 1001) document.getElementById("vlanResult").innerHTML = "✅ Normal Range VLAN (2-1001) - Standard Ethernet VLANs, supported by all switches";
+            else if (vlan >= 1002 && vlan <= 1005) document.getElementById("vlanResult").innerHTML = "⚠️ Reserved VLANs (1002-1005) - Token Ring/FDDI, cannot be deleted/modified";
+            else if (vlan >= 1006 && vlan <= 4094) document.getElementById("vlanResult").innerHTML = "✅ Extended VLAN Range (1006-4094) - Requires VTPv3 or manual config";
+            else document.getElementById("vlanResult").innerHTML = "❌ Invalid: VLAN max is 4094";
+        };
+        
+        window.lookupASN = () => {
+            let asn = document.getElementById("asnNum").value;
+            if (!asn) { document.getElementById("asnResult").innerHTML = "⚠️ Enter AS number"; return; }
+            let info = getASNInfo(asn);
+            document.getElementById("asnResult").innerHTML = `🔢 AS${asn}: ${info}<br><small>📡 Used for BGP routing and Internet peering</small>`;
+        };
+        
+        window.calcMTU = () => {
+            let mtu = parseInt(document.getElementById("mtuVal").value);
+            if (isNaN(mtu)) { document.getElementById("mtuResult").innerHTML = "⚠️ Enter MTU value"; return; }
+            let overhead = 28;
+            let optimalPayload = mtu - overhead;
+            document.getElementById("mtuResult").innerHTML = `📏 Path MTU: ${mtu} bytes<br>📦 TCP/IP overhead: ${overhead} bytes (20 IP + 8 TCP)<br>✨ Optimal MSS: ${optimalPayload} bytes<br>💡 Recommendation: Configure interface MTU ≥ ${mtu}<br>⚠️ Fragmentation occurs if MTU exceeds path limit`;
+        };
+        
+        window.simulateLatency = () => {
+            let ms = parseInt(document.getElementById("latencyMs").value);
+            if (isNaN(ms)) { document.getElementById("latencyResult").innerHTML = "⚠️ Enter latency value"; return; }
+            document.getElementById("latencyResult").innerHTML = `⏳ Simulating ${ms}ms network latency... please wait.`;
+            setTimeout(() => {
+                document.getElementById("latencyResult").innerHTML = `⚡ Simulated ${ms}ms delay completed!<br><br>📊 Impact Guide:<br>• <50ms: Excellent (Gaming/VoIP)<br>• 50-100ms: Good<br>• 100-150ms: Acceptable<br>• >150ms: Poor quality for real-time apps<br>• >300ms: Noticeable lag<br><br>⏱️ Your network feels like ${ms}ms of delay`;
+            }, ms);
+        };
+        
+        window.buildPacket = () => {
+            let src = document.getElementById("srcIP").value;
+            let dst = document.getElementById("dstIP").value;
+            let proto = document.getElementById("protoSel").value;
+            if (!src || !dst) { document.getElementById("packetResult").innerHTML = "⚠️ Enter both source and destination IPs"; return; }
+            let ttl = 64;
+            let payload = "Network Payload Data";
+            document.getElementById("packetResult").innerHTML = `📦 [IP HEADER]<br>├─ SRC: ${src}<br>├─ DST: ${dst}<br>├─ TTL: ${ttl}<br>├─ Protocol: ${proto}<br>├─ Header Length: 20 bytes<br>└─ Total Length: 20 + ${payload.length}<br><br>🚀 [${proto.toUpperCase()} HEADER]<br>├─ Source Port: Dynamic (49152-65535)<br>├─ Dest Port: Service-specific<br>├─ Sequence/Ack Numbers: Random<br>└─ Flags: SYN/ACK (if TCP)<br><br>📝 Payload: "${payload}" (${payload.length} bytes)`;
+        };
+        
+        window.convertIPv6 = () => {
+            let ipv4 = document.getElementById("ipv4Addr").value;
+            let parts = ipv4.split('.');
+            if(parts.length !== 4 || parts.some(p => isNaN(p) || p < 0 || p > 255)) { 
+                document.getElementById("convResult").innerHTML = "❌ Invalid IPv4 address"; 
+                return; 
+            }
+            let hex = parts.map(p => parseInt(p).toString(16).padStart(2,'0')).join('');
+            let ipv6Mapped = `::ffff:${ipv4}`;
+            let ipv6Compat = `::${ipv4}`;
+            document.getElementById("convResult").innerHTML = `🔄 IPv4: ${ipv4}<br><br>📌 IPv4-mapped IPv6: ${ipv6Mapped}<br>📌 IPv4-compatible: ${ipv6Compat}<br>📌 6to4 prefix: 2002:${hex.slice(0,4)}:${hex.slice(4)}::/48<br><br>💡 Use IPv4-mapped for dual-stack, 6to4 for tunneling`;
+        };
+        
+        window.genDiagram = () => {
+            let devices = document.getElementById("devices").value;
+            if (!devices) { document.getElementById("diagramResult").innerHTML = "<pre>⚠️ Enter network devices (e.g., Router,Switch,Server)</pre>"; return; }
+            let diagram = generateNetworkDiagram(devices);
+            document.getElementById("diagramResult").innerHTML = `<pre>${diagram}</pre>`;
+        };
+
+        function renderTools() {
+            const grid = document.getElementById("toolsGrid");
+            grid.innerHTML = tools.map(t => buildToolHTML(t)).join('');
+        }
+
+        // Navigation and Scroll Functions
+        function scrollToTop() {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
+
+        function homeAction() {
+            scrollToTop();
+            // Optional: Show a quick notification
+            const toolsGrid = document.getElementById("toolsGrid");
+            toolsGrid.style.animation = 'none';
+            setTimeout(() => {
+                toolsGrid.style.animation = 'fadeInUp 0.6s ease-out';
+            }, 10);
+        }
+
+        // Theme handling
+        const themeToggle = document.getElementById("themeToggle");
+        themeToggle.addEventListener("click", () => {
+            document.body.classList.toggle("dark");
+            themeToggle.innerText = document.body.classList.contains("dark") ? "☀️ Light Mode" : "🌙 Dark Mode";
+        });
+
+        // Button Event Listeners
+        document.getElementById("homeBtn").addEventListener("click", goHome);
+        document.getElementById("toolsHomeBtn").addEventListener("click", goToolsHome);
+
+        function goHome() {
+            window.location.href = "/index.html";   // main home
+        }
+
+        function goToolsHome() {
+            window.location.href = "/tools/tools-home.html";   // tools home
+        }
+        
+        // Scroll to top button visibility
+        const scrollTopBtn = document.getElementById("scrollTop");
+        window.addEventListener("scroll", () => {
+            if (window.pageYOffset > 300) {
+                scrollTopBtn.classList.add("visible");
+            } else {
+                scrollTopBtn.classList.remove("visible");
+            }
+        });
+        
+        scrollTopBtn.addEventListener("click", scrollToTop);
+
+        // Initialize
+        renderTools();
+        
+        // Set default theme to light
+        if (!document.body.classList.contains('dark')) {
+            document.body.classList.remove('dark');
+        }
+    </script>
+</body>
+</html>

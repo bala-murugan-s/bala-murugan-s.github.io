@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F5 AI Agent Demo — LTM Pool Recovery</title>
+<style>
+  @import url('data:text/css,');
+
+  :root {
+    --bg:        #060b14;
+    --bg2:       #0b1220;
+    --bg3:       #111c2e;
+    --border:    #1a2840;
+    --border2:   #243652;
+    --text:      #c8d8f0;
+    --text2:     #6a85a8;
+    --text3:     #3a5070;
+    --cyan:      #00c8f0;
+    --cyan-dim:  rgba(0,200,240,0.12);
+    --green:     #22d47a;
+    --green-dim: rgba(34,212,122,0.10);
+    --amber:     #f0a020;
+    --amber-dim: rgba(240,160,32,0.10);
+    --red:       #f05050;
+    --red-dim:   rgba(240,80,80,0.10);
+    --purple:    #a060f0;
+    --purple-dim:rgba(160,96,240,0.10);
+    --mono: 'Courier New', 'Lucida Console', monospace;
+    --sans: 'Trebuchet MS', 'Segoe UI', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    min-height: 100vh;
+    padding: 24px 20px 40px;
+    line-height: 1.5;
+  }
+
+  /* ── scanline overlay ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.07) 2px,
+      rgba(0,0,0,0.07) 4px
+    );
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ── header ── */
+  .header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  .header-eyebrow {
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--cyan);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .header-title {
+    font-family: var(--sans);
+    font-size: 26px;
+    font-weight: 700;
+    color: #e8f0ff;
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+  .header-sub {
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 1px;
+  }
+
+  /* ── panel ── */
+  .panel {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .panel-label {
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--text3);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  /* ── incident bar ── */
+  .incident-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-bottom: 14px;
+    transition: border-color 0.5s, background 0.5s;
+  }
+  .incident-bar.active  { border-color: rgba(240,80,80,0.4);  background: rgba(240,80,80,0.04); }
+  .incident-bar.resolved{ border-color: rgba(34,212,122,0.4); background: rgba(34,212,122,0.04); }
+
+  .inc-left { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .inc-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--text3); flex-shrink: 0;
+    transition: background 0.4s;
+  }
+  .inc-dot.active   { background: var(--red);   animation: blink 1s infinite; }
+  .inc-dot.resolved { background: var(--green);  animation: pulse-dot 2s infinite; }
+
+  .inc-id   { color: var(--text2); }
+  .inc-desc { color: #e8f0ff; font-weight: 700; font-family: var(--sans); font-size: 13px; }
+
+  .badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .badge-red    { background: var(--red-dim);   color: var(--red);   }
+  .badge-green  { background: var(--green-dim); color: var(--green); }
+
+  .inc-right { display: flex; align-items: center; gap: 14px; }
+  .mttr { font-size: 12px; color: var(--text2); }
+  .mttr span { color: var(--amber); }
+  .mttr.done span { color: var(--green); }
+
+  /* ── buttons ── */
+  .btn {
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    cursor: pointer;
+    border: none;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--cyan); color: var(--bg); }
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border2);
+    color: var(--text2);
+  }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  /* ── pipeline ── */
+  .pipeline {
+    display: flex;
+    align-items: center;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    gap: 0;
+  }
+  .pipe-node {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 5px; flex-shrink: 0;
+    opacity: 0.25; transition: opacity 0.4s;
+  }
+  .pipe-node.done, .pipe-node.active { opacity: 1; }
+
+  .pipe-circle {
+    width: 36px; height: 36px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    background: var(--bg3);
+    border: 2px solid var(--border);
+    transition: background 0.4s, border-color 0.4s, box-shadow 0.4s;
+  }
+  .pipe-node.done .pipe-circle {
+    background: var(--green-dim);
+    border-color: var(--green);
+    color: var(--green);
+  }
+  .pipe-node.active .pipe-circle {
+    border-color: var(--cyan);
+    box-shadow: 0 0 14px rgba(0,200,240,0.5);
+    animation: ring-pulse 1.5s infinite;
+  }
+  .pipe-label {
+    font-size: 9px; color: var(--text3); text-align: center;
+    max-width: 56px; line-height: 1.3;
+  }
+  .pipe-node.done .pipe-label,
+  .pipe-node.active .pipe-label { color: var(--text2); }
+
+  .pipe-line {
+    flex: 1; height: 1px;
+    background: var(--border);
+    margin: 0 4px; margin-bottom: 20px;
+    min-width: 18px;
+    transition: background 0.5s;
+  }
+  .pipe-line.done { background: var(--green); }
+
+  /* ── grid ── */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  @media (max-width: 700px) { .grid2 { grid-template-columns: 1fr; } }
+
+  /* ── pool members ── */
+  .vs-badge {
+    display: flex; align-items: center; gap: 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    margin-bottom: 10px;
+    font-size: 11px;
+    transition: border-color 0.5s, background 0.5s;
+  }
+  .vs-badge.up   { border-color: rgba(34,212,122,0.3); background: var(--green-dim); }
+  .vs-badge.down { border-color: rgba(240,80,80,0.3);  background: var(--red-dim);  }
+  .vs-status { margin-left: auto; font-weight: 700; font-size: 11px; }
+  .vs-badge.up   .vs-status { color: var(--green); }
+  .vs-badge.down .vs-status { color: var(--red);   }
+
+  .member-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 12px; border-radius: 6px;
+    border: 1px solid rgba(240,80,80,0.2);
+    background: var(--red-dim);
+    margin-bottom: 6px;
+    font-size: 11px;
+    transition: all 0.6s;
+  }
+  .member-row.up {
+    border-color: rgba(34,212,122,0.2);
+    background: var(--green-dim);
+  }
+  .member-dot {
+    width: 9px; height: 9px; border-radius: 50%;
+    background: var(--red); flex-shrink: 0;
+    transition: background 0.5s, box-shadow 0.5s;
+  }
+  .member-row.up .member-dot {
+    background: var(--green);
+    box-shadow: 0 0 8px rgba(34,212,122,0.8);
+    animation: pulse-dot 2s infinite;
+  }
+  .member-addr { color: var(--text2); min-width: 110px; }
+  .member-state {
+    font-weight: 700; font-size: 10px; text-transform: uppercase;
+    color: var(--red); min-width: 28px;
+    transition: color 0.5s;
+  }
+  .member-row.up .member-state { color: var(--green); }
+  .member-reason { color: var(--text3); font-size: 10px; flex: 1; }
+
+  /* ── monitor box ── */
+  .monitor-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-top: 10px;
+    font-size: 11px;
+  }
+  .monitor-label { font-size: 9px; color: var(--text3); letter-spacing: 2px; margin-bottom: 5px; }
+  .monitor-send { transition: color 0.5s; }
+  .monitor-send.old { color: var(--amber); }
+  .monitor-send.new { color: var(--green); }
+  .monitor-recv { color: var(--text2); }
+  .monitor-updated { color: var(--green); font-size: 9px; margin-top: 5px; display: none; }
+
+  /* ── terminal ── */
+  .terminal {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 12px 14px;
+    height: 264px;
+    overflow-y: auto;
+    font-size: 11px;
+    line-height: 1.7;
+    scroll-behavior: smooth;
+  }
+  .terminal::-webkit-scrollbar { width: 3px; }
+  .terminal::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+  .log-line { display: flex; gap: 8px; }
+  .log-ts   { color: var(--text3); min-width: 50px; font-size: 10px; }
+  .log-lvl  { min-width: 82px; font-weight: 700; font-size: 10px; }
+  .log-msg  { color: #b8cce8; word-break: break-all; flex: 1; }
+  .log-empty { color: var(--text3); }
+
+  .lvl-ALERT    { color: #f05050; }
+  .lvl-WARN     { color: #f0a020; }
+  .lvl-INFO     { color: #6090c0; }
+  .lvl-DATA     { color: #80a8e0; }
+  .lvl-SKILL    { color: #00c8f0; }
+  .lvl-KNOWLEDGE{ color: #a060f0; }
+  .lvl-LLM      { color: #f0a020; }
+  .lvl-PLAN     { color: #20c0d0; }
+  .lvl-ACTION   { color: #20d490; }
+  .lvl-SUCCESS  { color: #22d47a; }
+
+  /* ── phase label in terminal header ── */
+  .term-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 10px;
+  }
+  .phase-indicator {
+    font-size: 10px; font-weight: 700;
+    transition: color 0.3s;
+    animation: blink 1s infinite;
+  }
+
+  /* ── resolution panel ── */
+  .resolution {
+    background: var(--green-dim);
+    border: 1px solid rgba(34,212,122,0.3);
+    border-radius: 8px;
+    padding: 18px;
+    margin-bottom: 14px;
+    display: none;
+  }
+  .resolution.visible { display: block; }
+  .res-header {
+    font-size: 9px; letter-spacing: 3px; color: var(--green);
+    text-transform: uppercase; margin-bottom: 14px;
+  }
+  .res-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 14px; }
+  @media (max-width: 700px) { .res-grid { grid-template-columns: 1fr; } }
+  .res-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+  }
+  .res-card-label { font-size: 9px; color: var(--text3); letter-spacing: 2px; margin-bottom: 5px; }
+  .res-card-val   { font-size: 11px; color: var(--text2); line-height: 1.6; }
+
+  .metrics-row { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+  @media (max-width: 600px) { .metrics-row { grid-template-columns: repeat(2,1fr); } }
+  .metric-card {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 8px;
+    text-align: center;
+  }
+  .metric-val { font-size: 18px; font-weight: 700; font-family: var(--sans); margin-bottom: 3px; }
+  .metric-lbl { font-size: 9px; color: var(--text3); letter-spacing: 1px; }
+
+  /* ── legend ── */
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 16px;
+    justify-content: center;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 18px;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text2); }
+  .legend-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+  /* ── footer ── */
+  .footer { text-align: center; margin-top: 16px; font-size: 9px; color: var(--text3); letter-spacing: 2px; }
+
+  /* ── animations ── */
+  @keyframes blink {
+    0%,100%{ opacity:1; } 50%{ opacity:0.3; }
+  }
+  @keyframes pulse-dot {
+    0%,100%{ box-shadow: 0 0 5px rgba(34,212,122,0.5); }
+    50%{     box-shadow: 0 0 14px rgba(34,212,122,1);   }
+  }
+  @keyframes ring-pulse {
+    0%,100%{ box-shadow: 0 0 12px rgba(0,200,240,0.5); }
+    50%{     box-shadow: 0 0 22px rgba(0,200,240,0.9); }
+  }
+  @keyframes fadeInUp {
+    from{ opacity:0; transform:translateY(6px); }
+    to  { opacity:1; transform:translateY(0);   }
+  }
+  .resolution.visible { animation: fadeInUp 0.5s ease; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     HEADER
+════════════════════════════════════════════════════ -->
+<div class="header">
+  <div class="header-eyebrow">F5 BIG-IP // AI Agent System // LTM Domain</div>
+  <div class="header-title">Autonomous Pool Failure Recovery</div>
+  <div class="header-sub">Monitor misconfiguration → 503 outbreak → AI-driven remediation in &lt;60s</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     INCIDENT BAR
+════════════════════════════════════════════════════ -->
+<div class="incident-bar" id="incBar">
+  <div class="inc-left">
+    <div class="inc-dot" id="incDot"></div>
+    <span class="inc-id">INC-1710510622</span>
+    <span class="inc-desc">vs-app-prod → app-pool-prod — ALL MEMBERS DOWN</span>
+    <span class="badge badge-red" id="incBadge" style="display:none">P1 — ACTIVE</span>
+  </div>
+  <div class="inc-right">
+    <div class="mttr" id="mttrEl" style="display:none">MTTR: <span id="mttrVal">0.0s</span></div>
+    <button class="btn btn-primary" id="runBtn" onclick="startDemo()">&#9654; RUN DEMO</button>
+    <button class="btn btn-secondary" id="resetBtn" onclick="resetDemo()" style="display:none">&#8635; RESET</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     PIPELINE
+════════════════════════════════════════════════════ -->
+<div class="panel">
+  <div class="panel-label">Agent Workflow Pipeline</div>
+  <div class="pipeline" id="pipeline"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     MAIN GRID: Pool Status + Terminal
+════════════════════════════════════════════════════ -->
+<div class="grid2">
+
+  <!-- Pool Status -->
+  <div class="panel">
+    <div class="panel-label">Pool Status — app-pool-prod</div>
+
+    <div class="vs-badge down" id="vsBadge">
+      <div class="member-dot" id="vsDot" style="width:7px;height:7px"></div>
+      <span style="color:var(--text2);font-size:11px">10.10.10.100:443</span>
+      <span class="vs-status" id="vsStatus">—</span>
+    </div>
+
+    <div id="membersContainer">
+      <!-- Rendered by JS -->
+    </div>
+
+    <div class="monitor-box">
+      <div class="monitor-label">MONITOR: mon-http-app-prod</div>
+      <div>
+        <span style="color:var(--text2)">send: </span>
+        <span class="monitor-send old" id="monSend">"GET / HTTP/1.1\r\n..."</span>
+      </div>
+      <div>
+        <span style="color:var(--text2)">recv: </span>
+        <span class="monitor-recv">"200 OK"</span>
+      </div>
+      <div class="monitor-updated" id="monUpdated">&#10003; Updated by AI Agent at 14:21:16 UTC</div>
+    </div>
+  </div>
+
+  <!-- Terminal -->
+  <div class="panel">
+    <div class="term-header">
+      <div class="panel-label" style="margin:0">Agent Execution Log</div>
+      <div class="phase-indicator" id="phaseIndicator" style="display:none;color:var(--cyan)"></div>
+    </div>
+    <div class="terminal" id="terminal">
+      <div class="log-empty">Waiting for events...</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     RESOLUTION PANEL
+════════════════════════════════════════════════════ -->
+<div class="resolution" id="resPanel">
+  <div class="res-header">[AI AGENT OUTPUT] — INCIDENT RESOLVED</div>
+  <div class="res-grid">
+    <div class="res-card">
+      <div class="res-card-label">ROOT CAUSE</div>
+      <div class="res-card-val">HTTP monitor send path '/' returns 301. Backends healthy at '/healthz'.</div>
+    </div>
+    <div class="res-card">
+      <div class="res-card-label">ACTION TAKEN</div>
+      <div class="res-card-val">PATCH mon-http-app-prod: send 'GET / ...' → 'GET /healthz ...'</div>
+    </div>
+    <div class="res-card">
+      <div class="res-card-label">OUTCOME</div>
+      <div class="res-card-val">All 3 members UP. VS available. Error rate 0%. MTTR: 44.7s</div>
+    </div>
+  </div>
+  <div class="metrics-row">
+    <div class="metric-card">
+      <div class="metric-val" style="color:var(--green)">97%</div>
+      <div class="metric-lbl">Confidence</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val" style="color:var(--cyan);font-size:13px">SAFE_CHANGE</div>
+      <div class="metric-lbl">Autonomy Level</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val" style="color:var(--purple)">&#10003; Ready</div>
+      <div class="metric-lbl">Rollback</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val" style="color:var(--green)">In Sync</div>
+      <div class="metric-lbl">HA Status</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     LEGEND
+════════════════════════════════════════════════════ -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#00c8f0"></div>SKILL — iControl REST / tmsh</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#a060f0"></div>KNOWLEDGE — RAG Runbooks</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f0a020"></div>LLM — Reasoning Engine</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#20d490"></div>ACTION — Autonomous Change</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#22d47a"></div>SUCCESS — Validated Resolution</div>
+</div>
+
+<div class="footer">F5-AI-AGENT-DEMO // SCENARIO: LTM-POOL-001 // github.com/yourorg/f5-ai-agent-demo</div>
+
+<!-- ═══════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ── Data ─────────────────────────────────────────── */
+const PHASES = [
+  { id:'idle',     label:'Standby',       icon:'○',  color:'#00c8f0' },
+  { id:'alert',    label:'Alert\nIngested', icon:'⚡', color:'#f05050',
+    duration:1800,
+    log:[
+      {t:0,    level:'ALERT',   msg:'Splunk webhook received: P1 — app-pool-prod'},
+      {t:420,  level:'INFO',    msg:"Source: index=f5 sourcetype=syslog 'No members available'"},
+      {t:900,  level:'INFO',    msg:'Severity: P1 | VS: vs-app-prod | Pool: app-pool-prod'},
+      {t:1400, level:'INFO',    msg:'Orchestrator classifying incident domain...'},
+    ]
+  },
+  { id:'classify', label:'Classified\nLTM', icon:'🧠', color:'#a060f0',
+    duration:1200,
+    log:[
+      {t:0,   level:'INFO', msg:"Keyword scan: 'pool','monitor','503','ltm' → score LTM=5 GTM=0"},
+      {t:500, level:'INFO', msg:'Domain: LTM | Change window: EMERGENCY (P1 auto-approved)'},
+      {t:950, level:'INFO', msg:'Dispatching to LTM Agent...'},
+    ]
+  },
+  { id:'diagnose', label:'Diagnosing', icon:'🔍', color:'#f0a020',
+    duration:4200,
+    log:[
+      {t:0,    level:'SKILL',     msg:'GET /mgmt/tm/ltm/pool/app-pool-prod/members'},
+      {t:280,  level:'DATA',      msg:'10.10.1.10:8080 → state: DOWN | reason: recv string not found'},
+      {t:460,  level:'DATA',      msg:'10.10.1.11:8080 → state: DOWN | reason: recv string not found'},
+      {t:640,  level:'DATA',      msg:'10.10.1.12:8080 → state: DOWN | reason: recv string not found'},
+      {t:820,  level:'WARN',      msg:'ALL 3 MEMBERS DOWN — systematic failure detected'},
+      {t:1050, level:'SKILL',     msg:"grep /var/log/ltm → pattern: 'recv string not found' ×12"},
+      {t:1350, level:'SKILL',     msg:'GET /mgmt/tm/ltm/monitor/http/mon-http-app-prod'},
+      {t:1620, level:'DATA',      msg:"Monitor send: 'GET / HTTP/1.1' | recv: '200 OK'"},
+      {t:1900, level:'SKILL',     msg:'curl http://10.10.1.10:8080/ → HTTP 301 Moved Permanently'},
+      {t:2180, level:'SKILL',     msg:'curl http://10.10.1.10:8080/healthz → HTTP 200 OK ✓'},
+      {t:2460, level:'KNOWLEDGE', msg:'RAG: runbook/pool-member-down.md (score: 0.94)'},
+      {t:2740, level:'KNOWLEDGE', msg:'Pattern LTM-POOL-001: simultaneous DOWN + recv fail = monitor misconfiguration'},
+      {t:3050, level:'LLM',       msg:"Reasoning: app root '/' now returns 301, health endpoint '/healthz' returns 200..."},
+      {t:3500, level:'LLM',       msg:'Root cause confirmed: monitor path mismatch (confidence: 97%)'},
+    ]
+  },
+  { id:'plan', label:'Remediation\nPlan', icon:'📋', color:'#20c0d0',
+    duration:1500,
+    log:[
+      {t:0,    level:'PLAN', msg:'Action: update_monitor_send | Autonomy: SAFE_CHANGE'},
+      {t:420,  level:'PLAN', msg:"New send string: 'GET /healthz HTTP/1.1\\r\\nHost: app.internal'"},
+      {t:840,  level:'PLAN', msg:"Rollback: restore send to 'GET / HTTP/1.1'"},
+      {t:1150, level:'PLAN', msg:'Validation: poll pool members until UP (max 60s)'},
+    ]
+  },
+  { id:'execute', label:'Executing\nFix', icon:'⚙', color:'#20d490',
+    duration:3200,
+    log:[
+      {t:0,    level:'ACTION', msg:'POST /mgmt/tm/sys/ucs — backup: pre-INC-1710510622.ucs ✓'},
+      {t:480,  level:'ACTION', msg:'Checking HA sync: bigip-prod-01 ↔ bigip-prod-02 — In Sync ✓'},
+      {t:860,  level:'ACTION', msg:'PATCH /mgmt/tm/ltm/monitor/http/mon-http-app-prod'},
+      {t:1050, level:'ACTION', msg:'  Body: {"send":"GET /healthz HTTP/1.1\\r\\nHost: app.internal\\r\\n..."}'},
+      {t:1360, level:'ACTION', msg:'HTTP 200 OK — monitor updated ✓'},
+      {t:1640, level:'ACTION', msg:'POST /mgmt/tm/sys/config {"command":"save"} — config saved ✓'},
+      {t:1920, level:'ACTION', msg:'Syncing to device group: device-group-prod ✓'},
+      {t:2300, level:'INFO',   msg:'Waiting 20s for monitor re-evaluation (interval=10s × 2)...'},
+    ]
+  },
+  { id:'validate', label:'Validating', icon:'✓', color:'#22d47a',
+    duration:2500,
+    log:[
+      {t:0,    level:'SKILL',   msg:'GET /mgmt/tm/ltm/pool/app-pool-prod/members'},
+      {t:380,  level:'DATA',    msg:'10.10.1.10:8080 → state: UP ✓'},
+      {t:560,  level:'DATA',    msg:'10.10.1.11:8080 → state: UP ✓'},
+      {t:740,  level:'DATA',    msg:'10.10.1.12:8080 → state: UP ✓'},
+      {t:960,  level:'SKILL',   msg:'GET /mgmt/tm/ltm/virtual/vs-app-prod/stats'},
+      {t:1240, level:'DATA',    msg:'VS availability: available | curConns: 847 | errorRate: 0%'},
+      {t:1560, level:'SUCCESS', msg:'All validation checks PASSED ✓'},
+      {t:1860, level:'SUCCESS', msg:'Incident INC-1710510622 resolved in 44.7 seconds'},
+      {t:2150, level:'SUCCESS', msg:'ServiceNow INC-1710510622 → Resolved | MTTR: 44.7s'},
+    ]
+  },
+  { id:'resolved', label:'Resolved', icon:'🎯', color:'#22d47a' },
+];
+
+const MEMBERS_BEFORE = [
+  { addr:'10.10.1.10:8080', state:'down', reason:'recv string not found in response' },
+  { addr:'10.10.1.11:8080', state:'down', reason:'recv string not found in response' },
+  { addr:'10.10.1.12:8080', state:'down', reason:'recv string not found in response' },
+];
+const MEMBERS_AFTER = [
+  { addr:'10.10.1.10:8080', state:'up', reason:'Pool member is available' },
+  { addr:'10.10.1.11:8080', state:'up', reason:'Pool member is available' },
+  { addr:'10.10.1.12:8080', state:'up', reason:'Pool member is available' },
+];
+
+/* ── State ─────────────────────────────────────────── */
+let phaseIdx   = 0;
+let running    = false;
+let startTime  = null;
+let timerID    = null;
+let logCount   = 0;
+let abortFlag  = false;
+
+/* ── Init ──────────────────────────────────────────── */
+function init() {
+  buildPipeline();
+  renderMembers(MEMBERS_BEFORE);
+  updateVsBadge(false);
+}
+
+/* ── Pipeline ──────────────────────────────────────── */
+function buildPipeline() {
+  const container = document.getElementById('pipeline');
+  container.innerHTML = '';
+  PHASES.forEach((phase, i) => {
+    const node = document.createElement('div');
+    node.className = 'pipe-node';
+    node.id = 'pipe-' + i;
+    node.innerHTML = `
+      <div class="pipe-circle" id="pipe-circle-${i}">${phase.icon}</div>
+      <div class="pipe-label">${phase.label.replace('\n','<br>')}</div>
+    `;
+    container.appendChild(node);
+
+    if (i < PHASES.length - 1) {
+      const line = document.createElement('div');
+      line.className = 'pipe-line';
+      line.id = 'pipe-line-' + i;
+      container.appendChild(line);
+    }
+  });
+}
+
+function updatePipeline(currentIdx) {
+  PHASES.forEach((_, i) => {
+    const node = document.getElementById('pipe-' + i);
+    const circle = document.getElementById('pipe-circle-' + i);
+    node.className = 'pipe-node';
+    if (i < currentIdx)       { node.classList.add('done'); circle.textContent = '✓'; }
+    else if (i === currentIdx){ node.classList.add('active'); circle.textContent = PHASES[i].icon; }
+    else                      { circle.textContent = PHASES[i].icon; }
+
+    if (i < PHASES.length - 1) {
+      const line = document.getElementById('pipe-line-' + i);
+      line.className = 'pipe-line' + (i < currentIdx ? ' done' : '');
+    }
+  });
+}
+
+/* ── Members ───────────────────────────────────────── */
+function renderMembers(data) {
+  const container = document.getElementById('membersContainer');
+  container.innerHTML = data.map(m => `
+    <div class="member-row ${m.state}" id="member-${m.addr.replace(':','_')}">
+      <div class="member-dot"></div>
+      <span class="member-addr">${m.addr}</span>
+      <span class="member-state">${m.state}</span>
+      <span class="member-reason">${m.reason}</span>
+    </div>
+  `).join('');
+}
+
+function transitionMembersUp() {
+  MEMBERS_AFTER.forEach((m, i) => {
+    setTimeout(() => {
+      const row = document.getElementById('member-' + m.addr.replace(':','_'));
+      if (!row) return;
+      row.classList.remove('down');
+      row.classList.add('up');
+      row.querySelector('.member-state').textContent = 'UP';
+      row.querySelector('.member-reason').textContent = m.reason;
+    }, i * 300);
+  });
+}
+
+function updateVsBadge(up) {
+  const badge  = document.getElementById('vsBadge');
+  const dot    = document.getElementById('vsDot');
+  const status = document.getElementById('vsStatus');
+  badge.className = 'vs-badge ' + (up ? 'up' : 'down');
+  dot.style.background = up ? 'var(--green)' : 'var(--text3)';
+  status.textContent = up ? 'available' : (running ? 'unavailable — 503' : '—');
+}
+
+/* ── Terminal ──────────────────────────────────────── */
+function clearTerminal() {
+  const t = document.getElementById('terminal');
+  t.innerHTML = '<div class="log-empty">Waiting for events...</div>';
+  logCount = 0;
+}
+
+function appendLog(level, msg) {
+  const t = document.getElementById('terminal');
+  if (t.querySelector('.log-empty')) t.innerHTML = '';
+  logCount++;
+  const ts = String(Math.floor(logCount * 0.8)).padStart(3,'0') + 'ms';
+  const line = document.createElement('div');
+  line.className = 'log-line';
+  line.innerHTML = `
+    <span class="log-ts">${ts}</span>
+    <span class="log-lvl lvl-${level}">[${level}]</span>
+    <span class="log-msg">${escHtml(msg)}</span>
+  `;
+  t.appendChild(line);
+  t.scrollTop = t.scrollHeight;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ── Timer ─────────────────────────────────────────── */
+function startTimer() {
+  startTime = Date.now();
+  const el = document.getElementById('mttrEl');
+  const val = document.getElementById('mttrVal');
+  el.style.display = '';
+  el.className = 'mttr';
+  timerID = setInterval(() => {
+    val.textContent = ((Date.now() - startTime) / 1000).toFixed(1) + 's';
+  }, 100);
+}
+
+function stopTimer(final) {
+  clearInterval(timerID);
+  const val = document.getElementById('mttrVal');
+  const el  = document.getElementById('mttrEl');
+  val.textContent = final;
+  el.className = 'mttr done';
+}
+
+/* ── Async helpers ─────────────────────────────────── */
+function sleep(ms) {
+  return new Promise(res => setTimeout(res, ms));
+}
+
+function schedulePhaseLog(phase) {
+  return new Promise(resolve => {
+    const entries = phase.log || [];
+    if (!entries.length) { resolve(); return; }
+    let scheduled = entries.map(e => setTimeout(() => {
+      if (!abortFlag) appendLog(e.level, e.msg);
+    }, e.t));
+    setTimeout(() => { scheduled.forEach(clearTimeout); resolve(); }, phase.duration);
+  });
+}
+
+/* ── Demo control ──────────────────────────────────── */
+async function startDemo() {
+  abortFlag = false;
+  running = true;
+
+  // UI: activate
+  document.getElementById('runBtn').style.display = 'none';
+  document.getElementById('resetBtn').style.display = '';
+  document.getElementById('resetBtn').disabled = true;
+  document.getElementById('incDot').className = 'inc-dot active';
+  document.getElementById('incBadge').style.display = '';
+  document.getElementById('incBar').className = 'incident-bar active';
+  document.getElementById('phaseIndicator').style.display = '';
+  startTimer();
+
+  const execPhases = PHASES.slice(1, -1); // skip idle + resolved
+
+  for (let i = 0; i < execPhases.length; i++) {
+    if (abortFlag) return;
+    const phase = execPhases[i];
+    const pipelinePos = i + 1;
+    phaseIdx = pipelinePos;
+
+    updatePipeline(pipelinePos);
+    const pi = document.getElementById('phaseIndicator');
+    pi.textContent = '● ' + phase.label.replace('\n',' ');
+    pi.style.color = phase.color;
+
+    // monitor update: flip send string mid-execute phase
+    if (phase.id === 'execute') {
+      setTimeout(() => {
+        if (abortFlag) return;
+        const s = document.getElementById('monSend');
+        s.textContent = '"GET /healthz HTTP/1.1\\r\\n..."';
+        s.className = 'monitor-send new';
+        document.getElementById('monUpdated').style.display = 'block';
+      }, 1300);
+    }
+
+    // members up: at start of validate
+    if (phase.id === 'validate') {
+      setTimeout(() => { if (!abortFlag) transitionMembersUp(); }, 500);
+      setTimeout(() => { if (!abortFlag) updateVsBadge(true);   }, 1200);
+    }
+
+    await schedulePhaseLog(phase);
+    if (abortFlag) return;
+  }
+
+  // Resolved state
+  phaseIdx = PHASES.length - 1;
+  updatePipeline(phaseIdx);
+  stopTimer('44.7s');
+
+  document.getElementById('incDot').className = 'inc-dot resolved';
+  document.getElementById('incBadge').className = 'badge badge-green';
+  document.getElementById('incBadge').textContent = 'RESOLVED';
+  document.getElementById('incBar').className = 'incident-bar resolved';
+  document.getElementById('phaseIndicator').style.display = 'none';
+
+  document.getElementById('resPanel').classList.add('visible');
+
+  running = false;
+  document.getElementById('resetBtn').disabled = false;
+}
+
+function resetDemo() {
+  abortFlag = true;
+  running   = false;
+  phaseIdx  = 0;
+  clearInterval(timerID);
+
+  // Reset UI
+  document.getElementById('runBtn').style.display = '';
+  document.getElementById('resetBtn').style.display = 'none';
+  document.getElementById('incDot').className = 'inc-dot';
+  document.getElementById('incBadge').style.display = 'none';
+  document.getElementById('incBar').className = 'incident-bar';
+  document.getElementById('mttrEl').style.display = 'none';
+  document.getElementById('phaseIndicator').style.display = 'none';
+  document.getElementById('resPanel').classList.remove('visible');
+
+  // Reset monitor
+  const s = document.getElementById('monSend');
+  s.textContent = '"GET / HTTP/1.1\\r\\n..."';
+  s.className = 'monitor-send old';
+  document.getElementById('monUpdated').style.display = 'none';
+
+  updateVsBadge(false);
+  updatePipeline(0);
+  renderMembers(MEMBERS_BEFORE);
+  clearTerminal();
+}
+
+/* ── Bootstrap ─────────────────────────────────────── */
+init();
+</script>
+</body>
+</html>

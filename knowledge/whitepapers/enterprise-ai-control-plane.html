@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enterprise Infrastructure AI Control Plane</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=IBM+Plex+Serif:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f1117;
+    --ink-soft: #2d3142;
+    --ink-muted: #5a6072;
+    --ink-faint: #8892a4;
+    --rule: #d4d9e8;
+    --rule-light: #eceef4;
+    --page: #fafbfd;
+    --paper: #ffffff;
+    --accent: #0043ce;
+    --accent-light: #e8f0fe;
+    --accent-mid: #4f76e8;
+    --warn: #b45309;
+    --warn-light: #fef3c7;
+    --critical: #be185d;
+    --critical-light: #fce7f3;
+    --success: #166534;
+    --success-light: #dcfce7;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'IBM Plex Sans', sans-serif;
+    --serif: 'IBM Plex Serif', serif;
+    --col: 72ch;
+    --wide: 90ch;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; font-size: 16px; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--page);
+    color: var(--ink);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── COVER ── */
+  .cover {
+    background: var(--ink);
+    color: white;
+    padding: 5rem 3rem 4rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cover::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 39px,
+      rgba(255,255,255,0.03) 39px,
+      rgba(255,255,255,0.03) 40px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 39px,
+      rgba(255,255,255,0.02) 39px,
+      rgba(255,255,255,0.02) 40px
+    );
+  }
+
+  .cover-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .cover-badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    border: 1px solid rgba(255,255,255,0.15);
+    padding: 0.3rem 0.75rem;
+    border-radius: 2px;
+    margin-bottom: 2.5rem;
+  }
+
+  .cover h1 {
+    font-family: var(--sans);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 300;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+    max-width: 20ch;
+  }
+
+  .cover h1 strong {
+    font-weight: 700;
+    display: block;
+    color: #7eb3ff;
+  }
+
+  .cover-sub {
+    font-family: var(--serif);
+    font-size: 1.1rem;
+    font-weight: 300;
+    font-style: italic;
+    color: rgba(255,255,255,0.55);
+    max-width: 60ch;
+    margin-bottom: 3rem;
+  }
+
+  .cover-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.35);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    padding-top: 1.5rem;
+  }
+
+  .cover-meta span { letter-spacing: 0.05em; }
+  .cover-meta strong { color: rgba(255,255,255,0.6); font-weight: 500; }
+
+  /* ── TOC ── */
+  .toc-wrapper {
+    background: var(--paper);
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .toc {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 3rem 3rem;
+  }
+
+  .toc-title {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 1.5rem;
+  }
+
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 0.25rem 3rem;
+  }
+
+  .toc-item {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--rule-light);
+    text-decoration: none;
+    color: var(--ink-soft);
+    font-size: 0.875rem;
+    transition: color 0.15s;
+  }
+
+  .toc-item:hover { color: var(--accent); }
+
+  .toc-num {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    color: var(--ink-faint);
+    flex-shrink: 0;
+    min-width: 2.5ch;
+  }
+
+  /* ── CONTENT ── */
+  .content {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 3rem;
+  }
+
+  /* ── SECTION HEADERS ── */
+  .section {
+    padding: 4rem 0 2rem;
+    border-top: 1px solid var(--rule);
+    margin-top: 2rem;
+  }
+
+  .section:first-child { border-top: none; margin-top: 0; }
+
+  .section-num {
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+
+  h2 {
+    font-family: var(--sans);
+    font-size: 1.75rem;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+    color: var(--ink);
+    margin-bottom: 1.5rem;
+  }
+
+  h3 {
+    font-family: var(--sans);
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    margin: 2.5rem 0 0.75rem;
+  }
+
+  h4 {
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    margin: 2rem 0 0.6rem;
+  }
+
+  p {
+    color: var(--ink-soft);
+    font-size: 0.975rem;
+    margin-bottom: 1.1rem;
+    max-width: var(--col);
+  }
+
+  p:last-child { margin-bottom: 0; }
+
+  /* ── DIAGRAM ── */
+  .diagram-block {
+    background: var(--ink);
+    border-radius: 4px;
+    padding: 2.5rem 2rem;
+    margin: 2rem 0;
+    overflow-x: auto;
+    position: relative;
+  }
+
+  .diagram-label {
+    font-family: var(--mono);
+    font-size: 0.63rem;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.25);
+    margin-bottom: 1.25rem;
+  }
+
+  .diagram-block pre {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: #9ecbff;
+    white-space: pre;
+    margin: 0;
+  }
+
+  .diagram-block pre .d-box { color: #79c0ff; }
+  .diagram-block pre .d-flow { color: #56d364; }
+  .diagram-block pre .d-label { color: #ffa657; }
+  .diagram-block pre .d-comment { color: rgba(255,255,255,0.3); }
+  .diagram-block pre .d-hi { color: #f8f8f2; font-weight: 600; }
+
+  /* ── COMPONENT CARDS ── */
+  .component-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 2rem 0;
+  }
+
+  .component-card {
+    background: var(--paper);
+    padding: 1.5rem;
+  }
+
+  .component-card-icon {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-light);
+    display: inline-block;
+    padding: 0.2rem 0.5rem;
+    border-radius: 2px;
+    margin-bottom: 0.75rem;
+  }
+
+  .component-card h4 {
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink);
+    margin: 0 0 0.5rem;
+  }
+
+  .component-card p {
+    font-size: 0.825rem;
+    color: var(--ink-muted);
+    margin: 0;
+    line-height: 1.55;
+    max-width: none;
+  }
+
+  /* ── CALLOUTS ── */
+  .callout {
+    border-left: 3px solid;
+    padding: 1rem 1.25rem;
+    margin: 1.75rem 0;
+    border-radius: 0 3px 3px 0;
+  }
+
+  .callout.warn {
+    border-color: var(--warn);
+    background: var(--warn-light);
+  }
+
+  .callout.critical {
+    border-color: var(--critical);
+    background: var(--critical-light);
+  }
+
+  .callout.info {
+    border-color: var(--accent);
+    background: var(--accent-light);
+  }
+
+  .callout.success {
+    border-color: var(--success);
+    background: var(--success-light);
+  }
+
+  .callout-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .callout.warn .callout-label { color: var(--warn); }
+  .callout.critical .callout-label { color: var(--critical); }
+  .callout.info .callout-label { color: var(--accent); }
+  .callout.success .callout-label { color: var(--success); }
+
+  .callout p {
+    font-size: 0.875rem;
+    color: var(--ink-soft);
+    max-width: none;
+    margin: 0;
+  }
+
+  /* ── FLOW TABLE ── */
+  .flow-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin: 1.5rem 0;
+  }
+
+  .flow-table th {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    text-align: left;
+    padding: 0.6rem 1rem;
+    background: var(--rule-light);
+    border: 1px solid var(--rule);
+  }
+
+  .flow-table td {
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--rule);
+    color: var(--ink-soft);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+
+  .flow-table tr:nth-child(even) td { background: #f8f9fc; }
+
+  .flow-table td:first-child {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--accent);
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  /* ── STEP FLOW ── */
+  .step-flow {
+    margin: 2rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    gap: 0 1.5rem;
+    position: relative;
+  }
+
+  .step-num-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .step-num {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .step-line {
+    width: 1px;
+    flex: 1;
+    background: var(--rule);
+    margin: 0.25rem 0;
+    min-height: 1.5rem;
+  }
+
+  .step-body {
+    padding-bottom: 2rem;
+  }
+
+  .step-title {
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--ink);
+    margin-bottom: 0.4rem;
+    margin-top: 0.25rem;
+  }
+
+  .step-desc {
+    font-size: 0.84rem;
+    color: var(--ink-muted);
+    line-height: 1.6;
+    max-width: none;
+  }
+
+  .step-tag {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.15rem 0.45rem;
+    border-radius: 2px;
+    margin-top: 0.5rem;
+    margin-right: 0.25rem;
+  }
+
+  .tag-layer { background: #e0e7ff; color: #3730a3; }
+  .tag-tool { background: #fef3c7; color: #92400e; }
+  .tag-action { background: #dcfce7; color: #166534; }
+  .tag-risk { background: #fce7f3; color: #9d174d; }
+
+  /* ── MVP TABLE ── */
+  .mvp-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 2rem 0;
+  }
+
+  .mvp-col {
+    background: var(--paper);
+    padding: 1.5rem;
+  }
+
+  .mvp-col h4 {
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink);
+    margin: 0 0 1rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .mvp-col ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .mvp-col ul li {
+    font-size: 0.84rem;
+    color: var(--ink-muted);
+    padding: 0.35rem 0;
+    border-bottom: 1px solid var(--rule-light);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    line-height: 1.45;
+  }
+
+  .mvp-col ul li::before {
+    content: '→';
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--ink-faint);
+    margin-top: 0.05rem;
+    flex-shrink: 0;
+  }
+
+  .mvp-col.in h4 { color: var(--success); }
+  .mvp-col.out h4 { color: var(--critical); }
+
+  /* ── ROADMAP ── */
+  .roadmap {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 2rem 0;
+  }
+
+  .roadmap-phase {
+    background: var(--paper);
+    padding: 1.5rem;
+  }
+
+  .roadmap-phase-label {
+    font-family: var(--mono);
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 0.4rem;
+  }
+
+  .roadmap-phase h4 {
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--ink);
+    margin: 0 0 1rem;
+  }
+
+  .roadmap-phase ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .roadmap-phase ul li {
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+    padding: 0.3rem 0;
+    border-bottom: 1px solid var(--rule-light);
+    line-height: 1.45;
+  }
+
+  /* ── INLINE MONO ── */
+  code {
+    font-family: var(--mono);
+    font-size: 0.82em;
+    background: var(--rule-light);
+    color: var(--accent);
+    padding: 0.1em 0.35em;
+    border-radius: 2px;
+    border: 1px solid var(--rule);
+  }
+
+  /* ── BLOCKQUOTE ── */
+  blockquote {
+    border-left: 3px solid var(--rule);
+    padding: 0.75rem 1.25rem;
+    margin: 1.5rem 0;
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--ink-muted);
+    font-size: 0.975rem;
+  }
+
+  /* ── FOOTER ── */
+  .doc-footer {
+    margin-top: 5rem;
+    padding: 3rem;
+    border-top: 1px solid var(--rule);
+    background: var(--paper);
+  }
+
+  .doc-footer-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  .doc-footer p {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--ink-faint);
+    max-width: none;
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* ── UTIL ── */
+  .muted { color: var(--ink-muted); }
+  .mono { font-family: var(--mono); }
+  .spacer { height: 2rem; }
+  hr.section-rule { border: none; border-top: 1px solid var(--rule); margin: 3rem 0; }
+
+  @media (max-width: 680px) {
+    .cover { padding: 3rem 1.5rem; }
+    .content { padding: 0 1.5rem; }
+    .toc { padding: 2rem 1.5rem; }
+    .component-grid, .mvp-grid, .roadmap { grid-template-columns: 1fr; }
+    .toc-grid { grid-template-columns: 1fr; }
+    .doc-footer { padding: 2rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ COVER -->
+<div class="cover">
+  <div class="cover-inner">
+    <div class="cover-badge">Technical Architecture Document · v1.0</div>
+    <h1>Enterprise Infrastructure<br><strong>AI Control Plane</strong></h1>
+    <p class="cover-sub">A framework for AI-driven infrastructure automation — from orchestration theory to real-world implementation reality.</p>
+    <div class="cover-meta">
+      <span><strong>Audience</strong> Senior Engineers · Enterprise Architects · DevSecOps</span>
+      <span><strong>Scope</strong> Architecture · Implementation · MVP · Roadmap</span>
+      <span><strong>Status</strong> Foundation Document</span>
+      <span><strong>Revision</strong> April 2026</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ TOC -->
+<div class="toc-wrapper">
+  <div class="toc">
+    <div class="toc-title">Contents</div>
+    <div class="toc-grid">
+      <a href="#s1" class="toc-item"><span class="toc-num">01</span> Executive Summary</a>
+      <a href="#s2" class="toc-item"><span class="toc-num">02</span> Architecture Overview</a>
+      <a href="#s3" class="toc-item"><span class="toc-num">03</span> Architecture Diagram</a>
+      <a href="#s4" class="toc-item"><span class="toc-num">04</span> Component Deep Dive</a>
+      <a href="#s5" class="toc-item"><span class="toc-num">05</span> Data Flow Explained</a>
+      <a href="#s6" class="toc-item"><span class="toc-num">06</span> Real-World Challenges</a>
+      <a href="#s7" class="toc-item"><span class="toc-num">07</span> End-to-End Demo Scenario</a>
+      <a href="#s8" class="toc-item"><span class="toc-num">08</span> MVP Definition</a>
+      <a href="#s9" class="toc-item"><span class="toc-num">09</span> Evolution Strategy</a>
+      <a href="#s10" class="toc-item"><span class="toc-num">10</span> Product Thinking</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ CONTENT -->
+<div class="content">
+
+<!-- ── SECTION 1 ── -->
+<div class="section" id="s1">
+  <span class="section-num">01 · Executive Summary</span>
+  <h2>The Problem Isn't Tooling. It's Coordination.</h2>
+
+  <p>Enterprise infrastructure teams are not suffering from a lack of tools. They are drowning in them. Terraform manages provisioning. Ansible handles configuration. Splunk aggregates logs. Palo Alto enforces perimeter security. Kubernetes orchestrates workloads. SD-WAN manages network paths. Each tool is capable. Each has its own API, its own schema, its own failure modes, and its own operational team guarding it.</p>
+
+  <p>The result is an environment where responding to a single infrastructure event — say, a detected lateral movement in production — requires a network engineer, a cloud architect, a security analyst, and a change manager to manually coordinate across five systems, three approval workflows, and two vendor support portals. Median response time: hours to days. Actual risk window: minutes.</p>
+
+  <p>The <strong>Enterprise Infrastructure AI Control Plane</strong> is an architectural framework that addresses this coordination gap. It does not replace your existing tooling. It builds an intelligent decision layer on top of it — one that can reason about multi-system state, retrieve operational knowledge, execute targeted remediation actions, validate outcomes, and escalate to humans only when genuinely necessary.</p>
+
+  <p>This document is the foundational design specification for building that system. It covers the full architectural model, its six core components, the real-world constraints that will challenge its implementation, a complete end-to-end scenario demonstrating its behavior, and a practical roadmap for getting there from where you are today.</p>
+
+  <div class="callout warn">
+    <div class="callout-label">Honest Framing</div>
+    <p>This is not a fully automatable system on day one. It is a progressive architecture — designed to start narrow and gain autonomy as trust is established. Treating it otherwise will produce brittle automation that erodes operator confidence and gets switched off. The goal is reliable augmentation first, autonomous operation second.</p>
+  </div>
+</div>
+
+<!-- ── SECTION 2 ── -->
+<div class="section" id="s2">
+  <span class="section-num">02 · Architecture Overview</span>
+  <h2>Six Components. One Coherent System.</h2>
+
+  <p>The Control Plane is structured around six interlocking components. Each has a distinct responsibility. Together they form a closed loop: observe, reason, act, validate, learn.</p>
+
+  <div class="component-grid">
+    <div class="component-card">
+      <div class="component-card-icon">Layer 1</div>
+      <h4>Foundation Models</h4>
+      <p>The reasoning engine. LLMs that interpret natural language intent, parse structured signals, generate plans, and synthesize findings into human-readable outputs.</p>
+    </div>
+    <div class="component-card">
+      <div class="component-card-icon">Layer 2</div>
+      <h4>Knowledge</h4>
+      <p>The institutional memory. Runbooks, policies, topology maps, change histories, vendor documentation, and configuration baselines — all made retrievable at inference time.</p>
+    </div>
+    <div class="component-card">
+      <div class="component-card-icon">Layer 3</div>
+      <h4>Skills</h4>
+      <p>The action library. A catalog of pre-approved, bounded automation functions that wrap real tool APIs — Terraform, Ansible, Kubernetes, firewall vendors, and cloud providers.</p>
+    </div>
+    <div class="component-card">
+      <div class="component-card-icon">Layer 4</div>
+      <h4>Agents</h4>
+      <p>Domain-specialized execution units. Each agent owns a subdomain — network, cloud, security, compliance — and operates with scoped credentials and scoped authority.</p>
+    </div>
+    <div class="component-card">
+      <div class="component-card-icon">Layer 5</div>
+      <h4>Autonomy</h4>
+      <p>The judgment and control layer. Governs what agents can do without human approval, handles retry and fallback logic, enforces blast radius limits, and manages rollback.</p>
+    </div>
+    <div class="component-card">
+      <div class="component-card-icon">Layer 6</div>
+      <h4>Orchestrator</h4>
+      <p>The decision engine. Receives signals from all sources, determines intent, decomposes complex goals into agent tasks, manages coordination, and owns the audit trail.</p>
+    </div>
+  </div>
+
+  <p>These components are not independent microservices that happen to share a message bus. They are designed as a cognitive system — each layer consuming the outputs of the layers below it and producing structured inputs that enable the layers above. The analogy is not a pipeline. It is closer to a nervous system.</p>
+</div>
+
+<!-- ── SECTION 3 ── -->
+<div class="section" id="s3">
+  <span class="section-num">03 · Architecture Diagram</span>
+  <h2>System Structure and Data Flow</h2>
+
+  <p>The following diagram represents the full system topology — from external signal ingestion through orchestration, knowledge retrieval, agent dispatch, skill execution, and validation output. Read it top-to-bottom for intent flow, and bottom-to-top for telemetry feedback.</p>
+
+  <div class="diagram-block">
+    <div class="diagram-label">Figure 1 — Enterprise Infrastructure AI Control Plane · Full Architecture</div>
+    <pre>
+<span class="d-comment">┌─────────────────────────────────────────────────────────────────────────────────────┐</span>
+<span class="d-comment">│                          SIGNAL INGESTION LAYER                                     │</span>
+<span class="d-comment">└─────────────────────────────────────────────────────────────────────────────────────┘</span>
+      │                     │                     │                     │
+ <span class="d-label">[Human Input]</span>      <span class="d-label">[Splunk Alerts]</span>     <span class="d-label">[Cloud Events]</span>     <span class="d-label">[ITSM Triggers]</span>
+  NL Query / CLI     SPL-fired rules      AWS CloudTrail       ServiceNow
+  Slack / Portal     SIEM correlations    Azure Monitor        Jira / PagerDuty
+      │                     │                     │                     │
+      └─────────────────────┴─────────────────────┴─────────────────────┘
+                                          │
+                            ┌─────────────▼─────────────┐
+                            │   <span class="d-hi">ORCHESTRATOR</span>            │
+                            │   Decision Engine          │
+                            │                            │
+                            │  • Intent classification   │
+                            │  • Task decomposition      │
+                            │  • Agent routing           │
+                            │  • Conflict detection      │
+                            │  • Audit trail ownership   │
+                            │  • HITL escalation gate    │
+                            └─────────────┬─────────────┘
+                                          │
+               ┌──────────────────────────┼──────────────────────────┐
+               │                          │                           │
+               ▼                          ▼                           ▼
+  <span class="d-box">┌────────────────────┐</span>  <span class="d-box">┌────────────────────┐</span>  <span class="d-box">┌────────────────────┐</span>
+  <span class="d-box">│   KNOWLEDGE STORE  │</span>  <span class="d-box">│  FOUNDATION MODEL  │</span>  <span class="d-box">│  AUTONOMY LAYER    │</span>
+  <span class="d-box">│                    │</span>  <span class="d-box">│                    │</span>  <span class="d-box">│                    │</span>
+  <span class="d-box">│ Runbooks (RAG)     │</span>  <span class="d-box">│ LLM Reasoning      │</span>  <span class="d-box">│ Policy enforcement │</span>
+  <span class="d-box">│ Policies           │</span>  <span class="d-box">│ Plan generation    │</span>  <span class="d-box">│ Blast radius ctrl  │</span>
+  <span class="d-box">│ Config baselines   │</span>  <span class="d-box">│ Diff analysis      │</span>  <span class="d-box">│ Retry / fallback   │</span>
+  <span class="d-box">│ Topology maps      │</span>  <span class="d-box">│ Risk assessment    │</span>  <span class="d-box">│ Rollback triggers  │</span>
+  <span class="d-box">│ Vendor docs        │</span>  <span class="d-box">│ Output synthesis   │</span>  <span class="d-box">│ Change window chk  │</span>
+  <span class="d-box">│ Change history     │</span>  <span class="d-box">│ Structured output  │</span>  <span class="d-box">│ Approval routing   │</span>
+  <span class="d-box">└────────────────────┘</span>  <span class="d-box">└────────────────────┘</span>  <span class="d-box">└────────────────────┘</span>
+               │                          │                           │
+               └──────────────────────────┼──────────────────────────┘
+                                          │
+                            ┌─────────────▼─────────────┐
+                            │     AGENT DISPATCH BUS     │
+                            │     (Task routing layer)   │
+                            └──┬──────┬──────┬──────┬───┘
+                               │      │      │      │
+          ┌────────────────────┘      │      │      └──────────────────────┐
+          │                           │      │                             │
+          ▼                           ▼      ▼                             ▼
+<span class="d-box">┌──────────────────┐</span>   <span class="d-box">┌──────────────────┐</span>  <span class="d-box">┌──────────────────┐</span>  <span class="d-box">┌──────────────────┐</span>
+<span class="d-box">│  NETWORK AGENT   │</span>   <span class="d-box">│  CLOUD AGENT     │</span>  <span class="d-box">│  SECURITY AGENT  │</span>  <span class="d-box">│ COMPLIANCE AGENT │</span>
+<span class="d-box">│                  │</span>   <span class="d-box">│                  │</span>  <span class="d-box">│                  │</span>  <span class="d-box">│                  │</span>
+<span class="d-box">│ SD-WAN policies  │</span>   <span class="d-box">│ Terraform state  │</span>  <span class="d-box">│ NGFW rule mgmt   │</span>  <span class="d-box">│ CIS benchmark    │</span>
+<span class="d-box">│ BGP/routing      │</span>   <span class="d-box">│ AWS/Azure APIs   │</span>  <span class="d-box">│ Vuln triage      │</span>  <span class="d-box">│ PCI-DSS checks   │</span>
+<span class="d-box">│ QoS management   │</span>   <span class="d-box">│ K8s workloads    │</span>  <span class="d-box">│ Incident contain │</span>  <span class="d-box">│ SOC2 evidence    │</span>
+<span class="d-box">└────────┬─────────┘</span>   <span class="d-box">└────────┬─────────┘</span>  <span class="d-box">└────────┬─────────┘</span>  <span class="d-box">└────────┬─────────┘</span>
+         │                        │                   │                   │
+         └────────────────────────┴───────────────────┴───────────────────┘
+                                          │
+                            ┌─────────────▼─────────────┐
+                            │       SKILLS LAYER         │
+                            │   (Pre-approved actions)   │
+                            │                            │
+                            │  Terraform plan/apply      │
+                            │  Ansible playbooks         │
+                            │  PAN-OS API calls          │
+                            │  K8s kubectl / Helm        │
+                            │  AWS CLI / Azure SDK       │
+                            │  Splunk search / alert     │
+                            └─────────────┬─────────────┘
+                                          │
+<span class="d-comment">┌─────────────────────────────────────────────────────────────────────────────────────┐</span>
+<span class="d-comment">│                       TARGET INFRASTRUCTURE LAYER                                   │</span>
+<span class="d-comment">│                                                                                     │</span>
+<span class="d-comment">│  [Palo Alto NGFW]  [Fortinet]  [Cisco SD-WAN]  [AWS VPC]  [Azure NSG]  [K8s]       │</span>
+<span class="d-comment">│  [Terraform State] [Ansible Inventory] [Splunk HEC] [HashiCorp Vault]              │</span>
+<span class="d-comment">└─────────────────────────────────────────────────────────────────────────────────────┘</span>
+                                          │
+                            <span class="d-flow">◄── TELEMETRY FEEDBACK ──────────────────────────────</span>
+                            <span class="d-flow">    Execution results, diff outputs, health checks,</span>
+                            <span class="d-flow">    audit logs → back to Orchestrator + Knowledge Store</span>
+</pre>
+  </div>
+
+  <h3>Reading the Diagram</h3>
+
+  <p>Signals enter from the top — human queries, automated alerts, cloud events, or ITSM tickets. The Orchestrator receives all signals and acts as the central decision point. It consults the Knowledge Store via retrieval-augmented generation (RAG), uses the Foundation Model for reasoning and plan generation, and checks the Autonomy Layer for execution authority before dispatching any work.</p>
+
+  <p>Agents receive scoped task assignments and invoke specific Skills — the bounded automation actions that interact with real infrastructure. Execution results flow back upward as telemetry, enriching the Knowledge Store over time and providing the Orchestrator with outcome data for validation and learning.</p>
+
+  <p>Every action that crosses the Skills boundary must pass through the Autonomy Layer's gate. This is not optional and cannot be bypassed by agents. It is the control surface that keeps automated remediation within pre-approved boundaries.</p>
+</div>
+
+<!-- ── SECTION 4 ── -->
+<div class="section" id="s4">
+  <span class="section-num">04 · Component Deep Dive</span>
+  <h2>What Each Layer Actually Does</h2>
+
+  <h3>The Orchestrator — Decision Engine</h3>
+
+  <p>The Orchestrator is the most complex component in the system. It is not simply a router that forwards requests to agents. It must maintain contextual state across multi-step operations, detect when concurrent agent tasks might conflict (e.g., two agents modifying overlapping firewall rule sets), manage rollback sequences if a downstream step fails, and produce a complete structured audit log suitable for compliance review.</p>
+
+  <p>In practice, the Orchestrator is implemented as a stateful workflow engine paired with an LLM reasoning loop. The workflow engine tracks task state, handles timeouts and retries, and manages the human-in-the-loop escalation queue. The LLM reasoning loop interprets ambiguous inputs, generates multi-step plans, and synthesizes outputs into reports. Neither component works effectively in isolation.</p>
+
+  <table class="flow-table">
+    <thead>
+      <tr><th>Input Type</th><th>Orchestrator Behavior</th><th>Output</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Natural language query</td>
+        <td>Classify intent, decompose into sub-tasks, route to agents</td>
+        <td>Structured task plan with agent assignments</td>
+      </tr>
+      <tr>
+        <td>SIEM alert (Splunk)</td>
+        <td>Enrich with topology context, assess severity, check change window</td>
+        <td>Remediation proposal or escalation ticket</td>
+      </tr>
+      <tr>
+        <td>Terraform plan diff</td>
+        <td>Validate against policy baseline, assess risk, recommend approve/reject</td>
+        <td>Annotated risk report with approval recommendation</td>
+      </tr>
+      <tr>
+        <td>Scheduled compliance scan</td>
+        <td>Dispatch Compliance Agent, aggregate findings, diff against last scan</td>
+        <td>Compliance delta report with remediation priorities</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h3>Knowledge Store — Institutional Memory</h3>
+
+  <p>The Knowledge Store is the component most teams underinvest in initially, and it is the one that most determines system quality at runtime. An LLM reasoning over a well-structured, current knowledge base performs dramatically better than the same model operating without context. The difference is not marginal — it is the difference between useful output and confident hallucination.</p>
+
+  <p>The Knowledge Store is composed of several distinct data types that require different ingestion and retrieval strategies. Runbooks and standard operating procedures are best stored as chunked documents with semantic embedding for RAG retrieval. Configuration baselines and policy definitions are better stored as structured JSON or YAML with deterministic lookup, not semantic search. Network topology maps need graph-based representation. Change history requires time-series structure with relational linkage to configuration snapshots.</p>
+
+  <p>All of these must be versioned, access-controlled, and continuously updated. A knowledge base that drifts from the actual state of the environment becomes actively dangerous — it causes the system to make confident decisions based on outdated assumptions.</p>
+
+  <div class="callout critical">
+    <div class="callout-label">Critical Implementation Risk</div>
+    <p>The Knowledge Store is not a static document repository. If your runbooks haven't been updated in six months, if your topology map doesn't reflect the last three infrastructure changes, or if your policy definitions haven't been reconciled against actual configurations — your AI system will make authoritative-sounding recommendations based on wrong information. Governance of the knowledge base is not a documentation task. It is a security and reliability requirement.</p>
+  </div>
+
+  <h3>Skills — The Action Library</h3>
+
+  <p>Skills are the only mechanism through which the system interacts with real infrastructure. Every integration with a real tool — Terraform, Ansible, the Palo Alto PAN-OS API, AWS SDK, Kubernetes API server — must be wrapped as a Skill with an explicit, bounded interface. Skills are not general-purpose script runners. Each Skill defines what inputs it accepts, what actions it can perform, what outputs it produces, and what rollback mechanism it supports.</p>
+
+  <p>The catalog of Skills grows incrementally. At MVP, you might have a dozen: firewall rule query, Terraform plan execution, K8s pod restart, Splunk alert acknowledgment. Over time, Skills expand to cover more vendors, more complex workflows, and multi-system coordinated actions.</p>
+
+  <p>Every Skill must be developed with the assumption that it will be called by an LLM-driven agent operating at speed without human review of each individual API call. This means input validation must be strict, actions must be atomic and idempotent where possible, and every Skill must have a clearly defined rollback path. A Skill that can push a firewall rule but cannot remove it is not a safe Skill for autonomous operation.</p>
+
+  <h3>Agents — Domain Specialists</h3>
+
+  <p>Agents are the execution units. Each agent is specialized to a specific infrastructure domain and operates with credentials scoped to that domain only. The Network Agent has read/write access to SD-WAN controllers and routing platforms. The Cloud Agent holds IAM permissions limited to infrastructure provisioning operations. The Security Agent can query and modify firewall policies. The Compliance Agent has read-only access to all systems plus write access to the compliance evidence store.</p>
+
+  <p>This scoping is not just security hygiene. It is the architectural mechanism that makes the system safe to operate autonomously. An agent cannot exceed its domain. If a task requires cross-domain coordination — say, a security incident that requires both a firewall block and a cloud security group update — the Orchestrator dispatches parallel tasks to multiple agents and coordinates their outputs, rather than giving any single agent cross-domain authority.</p>
+
+  <h3>Autonomy Layer — The Judgment and Control Surface</h3>
+
+  <p>The Autonomy Layer is where this system either succeeds or fails in production. It is the component that answers the question: "Should we do this automatically, or should we ask a human?" Every action proposed by an agent must pass through the Autonomy Layer's decision gate before execution.</p>
+
+  <p>The decision gate evaluates several factors simultaneously: the risk classification of the proposed action, whether a change window is currently active, whether a similar action has been executed recently (deduplication), whether the cumulative scope of recent autonomous actions exceeds predefined blast radius limits, and whether the action is classified as fully-automatable, requires supervisor approval, or requires formal change management. Only when all gates pass does the Autonomy Layer authorize Skill execution.</p>
+
+  <h3>Foundation Models — The Reasoning Engine</h3>
+
+  <p>Foundation models are the cognitive substrate of the system — but they are not its brain. They are a reasoning tool that the Orchestrator employs for specific tasks: interpreting ambiguous natural language input, generating structured plans from retrieved knowledge, analyzing configuration diffs for risk implications, and synthesizing multi-source findings into coherent reports.</p>
+
+  <p>The system must be architected to function even when the foundation model produces suboptimal output. This means structured output schemas with validation, fallback to deterministic rule-based logic for safety-critical decisions, and human escalation when model confidence signals are low. A system that crashes or takes dangerous action because the LLM produced unexpected output has not been properly engineered.</p>
+</div>
+
+<!-- ── SECTION 5 ── -->
+<div class="section" id="s5">
+  <span class="section-num">05 · Data Flow Explained</span>
+  <h2>How Information Moves Through the System</h2>
+
+  <p>Understanding the data flow is essential for both implementation and debugging. The following describes the canonical path for an alert-triggered remediation scenario.</p>
+
+  <div class="step-flow">
+    <div class="step">
+      <div class="step-num-col">
+        <div class="step-num">1</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">Signal Ingestion</div>
+        <div class="step-desc">A Splunk correlation search fires a webhook. The alert payload — containing event type, severity, affected assets, timestamps, and raw SPL query context — arrives at the Orchestrator's ingestion endpoint. The signal is normalized into a standard envelope format that the Orchestrator can reason about consistently, regardless of source.</div>
+        <span class="step-tag tag-tool">Splunk HEC</span>
+        <span class="step-tag tag-layer">Ingestion Layer</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num-col">
+        <div class="step-num">2</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">Context Enrichment via Knowledge Retrieval</div>
+        <div class="step-desc">The Orchestrator issues a RAG query against the Knowledge Store using the alert's asset identifiers, event type, and severity. It retrieves: the relevant runbook for this alert category, the configuration baseline for the affected device, recent change history for that asset, and any active suppression rules. This context is assembled into a structured prompt payload for the Foundation Model.</div>
+        <span class="step-tag tag-layer">Knowledge Store</span>
+        <span class="step-tag tag-action">RAG Retrieval</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num-col">
+        <div class="step-num">3</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">Reasoning and Plan Generation</div>
+        <div class="step-desc">The Foundation Model receives the enriched context and generates a structured remediation plan: a prioritized list of actions, their rationale, the risk level of each, and the agent assignments. The plan is returned as a structured object — not free text — with explicit fields that the Orchestrator can validate programmatically. If the model's output fails schema validation or signals low confidence, the Orchestrator escalates to a human immediately rather than proceeding.</div>
+        <span class="step-tag tag-layer">Foundation Model</span>
+        <span class="step-tag tag-action">Plan Generation</span>
+        <span class="step-tag tag-risk">Risk Scoring</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num-col">
+        <div class="step-num">4</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">Autonomy Gate Evaluation</div>
+        <div class="step-desc">Each proposed action in the plan passes through the Autonomy Layer. The gate checks: Is this action in the approved automation catalog? Is the risk classification within autonomous execution thresholds? Is a change window active or required? Has a similar action been executed on this asset recently? Has today's autonomous action count for this agent exceeded the daily blast radius limit? Actions that pass all gates are authorized. Those that fail are queued for approval or escalated.</div>
+        <span class="step-tag tag-layer">Autonomy Layer</span>
+        <span class="step-tag tag-risk">Gate Enforcement</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num-col">
+        <div class="step-num">5</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">Agent Dispatch and Skill Execution</div>
+        <div class="step-desc">Authorized tasks are dispatched to the appropriate domain agents. Each agent receives a scoped task payload — the specific action, target asset, parameters, and expected outcome. The agent invokes the relevant Skill, which translates the task into vendor-specific API calls. The Security Agent calls the PAN-OS API to modify a firewall rule. The Cloud Agent executes a targeted Terraform plan. Outputs are captured and returned to the Orchestrator.</div>
+        <span class="step-tag tag-tool">PAN-OS API</span>
+        <span class="step-tag tag-tool">Terraform</span>
+        <span class="step-tag tag-action">Skill Execution</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num-col">
+        <div class="step-num">6</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">Validation and Telemetry Feedback</div>
+        <div class="step-desc">The Orchestrator validates execution outcomes against expected results. A firewall rule block is verified by querying the device state post-execution. A Terraform apply is validated against the expected state diff. If validation fails, the Autonomy Layer's rollback mechanism triggers. Successful execution results — including timing, scope, and outcome — are written back to the Knowledge Store as historical entries, enriching the system's operational memory for future decisions.</div>
+        <span class="step-tag tag-action">Validation</span>
+        <span class="step-tag tag-layer">Knowledge Update</span>
+        <span class="step-tag tag-risk">Rollback Gate</span>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num-col">
+        <div class="step-num">7</div>
+        <div class="step-line"></div>
+      </div>
+      <div class="step-body">
+        <div class="step-title">Report Generation and Audit Record</div>
+        <div class="step-desc">The Foundation Model synthesizes all activity into a structured incident report: what was detected, what was done, by which agent, under whose authorization, at what time, with what outcome, and what recommended follow-up actions exist. The full execution trace — every decision, retrieval, agent dispatch, and API call — is written to the immutable audit log. This log is the compliance artifact, the debugging surface, and the training signal for system improvement.</div>
+        <span class="step-tag tag-action">Report Output</span>
+        <span class="step-tag tag-layer">Audit Log</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── SECTION 6 ── -->
+<div class="section" id="s6">
+  <span class="section-num">06 · Real-World Challenges</span>
+  <h2>Where This Architecture Will Fight You</h2>
+
+  <p>Any architect who presents this system as straightforwardly deployable is either selling something or hasn't tried to build it. The following challenges are not edge cases — they are standard conditions in enterprise environments. A realistic implementation plan must account for all of them from day one.</p>
+
+  <h3>Multi-Vendor API Inconsistency</h3>
+
+  <p>Every vendor's API was designed by a different team with different priorities at a different point in time. Palo Alto's PAN-OS API is XML-based, requires session authentication, has different endpoints for on-premise vs. Panorama-managed devices, and has known behavioral differences between firmware versions. Fortinet's API uses REST with JSON but has inconsistent error response formats across firmware generations. Cisco's SD-WAN vManage API returns different data structures for the same endpoint depending on whether the device is in policy-mode or feature-mode configuration. AWS and Azure APIs are generally well-documented but have eventual consistency behaviors that require careful state polling strategies.</p>
+
+  <p>Each of these vendors will require a custom Skills adapter. There is no generic abstraction that works cleanly across all of them without losing fidelity. The abstraction layer must be thin enough to preserve vendor-specific behavior that matters for correctness, and thick enough to provide a consistent interface to the agents above it. This is ongoing engineering work, not a one-time integration task.</p>
+
+  <h3>Configuration State Drift and Shadow Changes</h3>
+
+  <p>Enterprise infrastructure is modified by humans outside of any automated system, constantly. A network engineer adds a temporary firewall rule during an incident and forgets to remove it. A developer modifies a security group manually in the AWS console. A vendor support technician changes a device parameter during a support session. None of these changes are in Terraform state, none are in your runbooks, and none are reflected in the system's knowledge base.</p>
+
+  <p>This means the system will regularly be operating on the assumption that the environment matches its knowledge — when it does not. Pre-execution state validation before any Skill invocation is not optional. It is a core safety requirement. The system must read current state, compare it to expected state, and decide whether to proceed, adjust its plan, or escalate, before executing any change.</p>
+
+  <h3>Change Management Process Integration</h3>
+
+  <p>In any regulated enterprise environment — financial services, healthcare, critical infrastructure — changes to production systems require formal approval through a change management process. This is not bureaucracy that AI automation can bypass. It is a regulatory requirement and a risk management mechanism.</p>
+
+  <p>The Autonomy Layer must have deep integration with your change management system — ServiceNow, Jira, Remedy, or whatever is in use. For any action classified above the autonomous execution threshold, the system must open a change request, attach its execution plan and risk assessment as supporting documentation, wait for approval, execute within the approved change window, and close the ticket with an execution report. This is a significant integration engineering effort and introduces latency that conflicts with the "rapid response" narrative of AI automation. Both things are true: the system responds faster than humans at analysis and proposal, but formal change execution still takes however long your process requires.</p>
+
+  <div class="callout warn">
+    <div class="callout-label">Process Reality Check</div>
+    <p>If your change management process requires 48-hour approval windows, AI automation does not magically compress that to minutes. What it does is eliminate the human time spent analyzing, documenting, and drafting the change request — potentially from 4 hours of analyst work to 4 minutes of system-generated documentation. The approval window is governed by organizational policy, not by the speed of the AI system. Align expectations accordingly.</p>
+  </div>
+
+  <h3>Credential and Secret Management in Autonomous Contexts</h3>
+
+  <p>Every agent needs credentials to interact with its target systems. Managing these credentials for a system that executes autonomously — potentially at 3am with no human in the loop — requires a secret management architecture that is both secure and operationally robust. HashiCorp Vault with dynamic secrets and short-lived credentials is the right approach, but it requires careful configuration: secret lease durations must be appropriate for long-running workflows, renewal logic must handle failures gracefully, and access policies must enforce the principle of least privilege at the agent level.</p>
+
+  <p>In air-gapped environments — which is a real deployment context for security-sensitive operations — this becomes more complex. Secret retrieval, model inference endpoints, and API targets may all be on isolated networks with no internet connectivity. The architecture must accommodate fully on-premise or hybrid air-gapped deployments. This affects everything: which foundation models can be used (local inference only), how the knowledge base is updated, and how the audit log is exported for compliance review.</p>
+
+  <h3>Failure Handling and Partial Execution</h3>
+
+  <p>Multi-step automated workflows fail in the middle. A Terraform apply completes resource creation but fails on tagging. A firewall rule is pushed to the primary device but the secondary device times out. An Ansible playbook completes on 11 of 12 hosts. Each of these partial failure states leaves the environment in an inconsistent condition that the system must detect, characterize, and resolve without making things worse.</p>
+
+  <p>Designing for clean rollback is significantly harder than designing for happy-path execution. Not all infrastructure changes are reversible. A deleted IAM role that other resources depended on cannot simply be restored by re-creating it — the trust relationships and inline policies must be restored as well. Every Skill must be designed with its failure modes as carefully considered as its success path.</p>
+
+  <h3>Model Reliability and Output Determinism</h3>
+
+  <p>Foundation models are probabilistic. They do not produce the same output for the same input every time. In an infrastructure automation context, this is a fundamental tension: you need reliable, predictable behavior from a system whose core reasoning component is inherently non-deterministic. Mitigation strategies include structured output schemas with strict validation, temperature controls, few-shot examples with specific expected output formats, and deterministic fallbacks for safety-critical decision branches. None of these fully eliminate the risk. They reduce it to an acceptable level — which is not the same thing.</p>
+</div>
+
+<!-- ── SECTION 7 ── -->
+<div class="section" id="s7">
+  <span class="section-num">07 · End-to-End Demo Scenario</span>
+  <h2>Multi-Cloud Security Misconfiguration Detection and Remediation</h2>
+
+  <p>The following scenario is designed to be realistic, cross-cutting, and representative of the type of problem the Control Plane is built to solve. It involves multiple cloud environments, a compliance requirement, real risk decisions, and both autonomous and human-in-the-loop actions.</p>
+
+  <div class="callout info">
+    <div class="callout-label">Scenario Context</div>
+    <p>A financial services enterprise runs workloads in AWS (primary) and Azure (DR). A scheduled CIS Benchmark compliance scan has detected security group and network security group misconfigurations across both environments. The Compliance Agent has filed an alert. The security team wants to understand scope, prioritize risk, and where possible, begin autonomous remediation for low-risk items while escalating high-risk changes for human review.</p>
+  </div>
+
+  <h3>Step 1 — Signal and Intent Classification</h3>
+
+  <p>The Compliance Agent's scheduled scan completes and writes findings to the Orchestrator's event queue. The payload includes 23 findings across 8 AWS accounts and 3 Azure subscriptions. The Orchestrator's Foundation Model classifies the intent as a compliance remediation task with a cross-cloud scope. It identifies this as a multi-agent task requiring both the Cloud Agent (for AWS and Azure configuration changes) and the Compliance Agent (for evidence collection and audit trail management).</p>
+
+  <p>The Orchestrator does not begin executing immediately. It first determines whether this falls within an authorized autonomous execution window or requires formal change management. Current time: Tuesday 2:00 PM. Standard change window: Tuesday–Thursday, 10:00 PM–4:00 AM. Conclusion: out-of-window. Autonomous low-risk remediations are still permitted. High-risk changes will be queued for tonight's window with a pre-generated change request.</p>
+
+  <h3>Step 2 — Knowledge Retrieval and Risk Stratification</h3>
+
+  <p>The Orchestrator issues a Knowledge Store retrieval for: the organization's security group policy baseline, the CIS AWS Foundations Benchmark at the currently certified version, the CIS Azure Security Benchmark, the risk classification matrix for security group changes, and any known exceptions or suppressed findings for these accounts.</p>
+
+  <p>The Foundation Model analyzes all 23 findings against this context and stratifies them into three tiers. Tier 1 (high-risk, 4 findings): publicly exposed management ports on production database subnets — these require formal change approval and human confirmation before any action. Tier 2 (medium-risk, 11 findings): overly permissive CIDR ranges on application-tier security groups — these are within autonomous remediation thresholds but require post-execution validation. Tier 3 (low-risk, 8 findings): missing required tags on security groups — fully automatable, no change window required.</p>
+
+  <h3>Step 3 — Autonomous Remediation of Tier 3 Findings</h3>
+
+  <p>The Autonomy Layer authorizes Tier 3 execution immediately. The Cloud Agent receives task assignments for each of the 8 tag-compliance findings. For each, it invokes the AWS Tag Enforcement Skill and the Azure Tag Policy Skill. Each Skill reads current state, computes the required tag additions, applies them, and returns a validation response confirming the tags are now present. All 8 complete successfully within 4 minutes. Results are written to the audit log and the Compliance Agent updates the evidence store.</p>
+
+  <h3>Step 4 — Tier 2 Risk Assessment and Remediation Proposal</h3>
+
+  <p>For the 11 medium-risk findings, the Foundation Model generates a remediation plan for each, specifying the exact CIDR range changes required, the business justification (inferred from the runbook and the account's workload classification), and the expected risk reduction. The Autonomy Layer approves these for execution in tonight's change window.</p>
+
+  <p>The system automatically opens 11 sub-items on a change request in ServiceNow, attaches the generated remediation plan, the risk assessment, and the CIS finding reference to each, and assigns the ticket to the on-call network security engineer for review. The engineer's role is to review, not to create the documentation — that work is already done. Review time estimated: 15–20 minutes for all 11 items, versus 3–4 hours to manually research, document, and draft each one.</p>
+
+  <h3>Step 5 — Tier 1 Escalation with Full Context</h3>
+
+  <p>The 4 high-risk findings — publicly exposed management ports on production database subnets — require explicit human decision-making. The Orchestrator does not simply open a ticket and wait. It generates a situation report that includes: the exact current configuration of each security group, the workloads dependent on those security groups, the network paths that would be affected by remediation, two proposed remediation options with their impact analysis, and the historical context of how these rules were created (retrieved from the change log in the Knowledge Store).</p>
+
+  <p>This report is delivered to the security team via their incident response channel. The senior security architect reviews it in 10 minutes and approves Option 2 for three of the four findings. The fourth requires a call with the database team to confirm that the access pattern driving the permissive rule can be replaced with a VPN-based path. The Control Plane schedules a follow-up task for after that confirmation is received.</p>
+
+  <h3>Step 6 — Overnight Execution and Validation</h3>
+
+  <p>At 10:00 PM, the change window opens. The Cloud Agent executes the 11 approved Tier 2 remediations in batched sequence, targeting one account at a time. After each batch, the Compliance Agent re-runs the relevant CIS checks to confirm remediation. Nine of eleven succeed on the first pass. Two fail — one due to a dependent rule that wasn't captured in the original analysis, one due to an API timeout. The Autonomy Layer's failure handler executes rollback for both, logs the failure with root cause context, and queues them for manual review with a detailed failure report.</p>
+
+  <p>By 11:30 PM, the execution is complete. The Orchestrator generates a comprehensive remediation report: 21 of 23 findings addressed, 2 requiring human follow-up with detailed failure analysis, estimated risk reduction quantified against the CIS benchmark score. The report is in the inbox of the CISO, the compliance officer, and the on-call security engineer before midnight.</p>
+
+  <div class="callout success">
+    <div class="callout-label">Outcome Assessment</div>
+    <p>What would have taken a security analyst 2–3 days of investigation, documentation, coordination, and manual remediation was completed in approximately 10 hours of elapsed time — of which the humans were actively engaged for roughly 30 minutes total. The remaining time was system execution and change window scheduling. Two findings require follow-up; both have more diagnostic context than a human investigator would have assembled manually.</p>
+  </div>
+</div>
+
+<!-- ── SECTION 8 ── -->
+<div class="section" id="s8">
+  <span class="section-num">08 · MVP Definition</span>
+  <h2>Version 1: Narrow, Reliable, Trustworthy</h2>
+
+  <p>The MVP is not a simplified version of the full system. It is a deliberately scoped subset designed to prove value, establish operational trust, and build the foundation on which the full system can grow. The single most common failure mode in AI infrastructure automation projects is over-scoping the initial version, producing a system that is too complex to debug when something goes wrong, and losing organizational trust after the first significant incident.</p>
+
+  <p>MVP success criteria: the system should handle a defined set of common, well-understood tasks with high reliability across the organization's primary infrastructure, with zero incidents of unauthorized changes, and measurably faster mean time to resolution on the tasks it covers.</p>
+
+  <div class="mvp-grid">
+    <div class="mvp-col in">
+      <h4>✓ Included in MVP</h4>
+      <ul>
+        <li>Natural language query interface for infrastructure state questions (read-only)</li>
+        <li>Splunk alert ingestion and automated triage with runbook retrieval</li>
+        <li>Terraform plan analysis and risk annotation (no auto-apply in MVP)</li>
+        <li>Firewall rule query and compliance diff against policy baseline</li>
+        <li>Automated compliance scan for a single benchmark (CIS AWS Foundations or equivalent)</li>
+        <li>Low-risk autonomous remediation for tag compliance and security group labeling</li>
+        <li>Human-in-the-loop escalation for all medium and high-risk findings</li>
+        <li>Full audit log with structured execution trace</li>
+        <li>Knowledge Store seeded with 20–30 core runbooks and config baselines</li>
+        <li>Single cloud provider support (AWS or Azure, not both)</li>
+        <li>Single firewall vendor support (Palo Alto NGFW)</li>
+      </ul>
+    </div>
+    <div class="mvp-col out">
+      <h4>✗ Excluded from MVP</h4>
+      <ul>
+        <li>Multi-cloud support (deferred to v1.5)</li>
+        <li>Autonomous Terraform apply execution</li>
+        <li>SD-WAN integration and network-layer automation</li>
+        <li>Fortinet or Cisco firewall support</li>
+        <li>Predictive anomaly detection or proactive remediation</li>
+        <li>Custom agent development framework (use fixed agent set)</li>
+        <li>Self-updating Knowledge Store (manual curation in MVP)</li>
+        <li>Cross-agent coordination for multi-domain tasks</li>
+        <li>ServiceNow integration for change management (email/Slack approval in MVP)</li>
+        <li>Multi-tenant / multi-customer deployment</li>
+        <li>Fine-tuned or custom foundation models</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>MVP Technology Stack</h3>
+
+  <table class="flow-table">
+    <thead>
+      <tr><th>Component</th><th>MVP Implementation</th><th>Rationale</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Foundation Model</td>
+        <td>LLM via API (GPT-4o, Claude 3.5 Sonnet, or Llama 3 for air-gapped)</td>
+        <td>Avoid model fine-tuning complexity until patterns are established</td>
+      </tr>
+      <tr>
+        <td>Knowledge Store</td>
+        <td>Vector database (pgvector or Chroma) + structured JSON configs</td>
+        <td>Simple, fast to seed, well-supported RAG tooling</td>
+      </tr>
+      <tr>
+        <td>Orchestrator</td>
+        <td>Python-based workflow engine (Prefect or Temporal) + LLM reasoning module</td>
+        <td>Stateful execution tracking without distributed systems complexity</td>
+      </tr>
+      <tr>
+        <td>Skills</td>
+        <td>Python functions with typed interfaces, per-vendor modules</td>
+        <td>Explicit, debuggable, not hidden behind a framework</td>
+      </tr>
+      <tr>
+        <td>Audit Log</td>
+        <td>Structured JSON logs → Splunk or S3 + Athena</td>
+        <td>Leverage existing observability infrastructure</td>
+      </tr>
+      <tr>
+        <td>Secrets</td>
+        <td>HashiCorp Vault with dynamic AWS credentials</td>
+        <td>Non-negotiable security baseline for autonomous execution</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ── SECTION 9 ── -->
+<div class="section" id="s9">
+  <span class="section-num">09 · Evolution Strategy</span>
+  <h2>How This System Grows Over Time</h2>
+
+  <p>The Control Plane is not a project with a completion date. It is a capability platform with an ongoing development lifecycle. Every week of production operation generates data that makes it more capable — more runbooks retrieved, more execution patterns validated, more failure modes understood. The evolution strategy is structured around three dimensions: Knowledge expansion, Skills expansion, and Autonomy expansion. These proceed on different timelines and have different risk profiles.</p>
+
+  <div class="roadmap">
+    <div class="roadmap-phase">
+      <div class="roadmap-phase-label">MVP · Months 1–3</div>
+      <h4>Foundation</h4>
+      <ul>
+        <li>Core orchestration pipeline</li>
+        <li>20–30 seeded runbooks</li>
+        <li>Read-only query capability</li>
+        <li>Single cloud, single firewall vendor</li>
+        <li>Human approval for all changes</li>
+        <li>Audit log and basic reporting</li>
+      </ul>
+    </div>
+    <div class="roadmap-phase">
+      <div class="roadmap-phase-label">v1.5 · Months 4–6</div>
+      <h4>Autonomy Expansion</h4>
+      <ul>
+        <li>Low-risk autonomous execution</li>
+        <li>Splunk alert auto-triage</li>
+        <li>ServiceNow change integration</li>
+        <li>Second cloud provider added</li>
+        <li>Knowledge auto-update pipeline</li>
+        <li>Blast radius monitoring dashboard</li>
+      </ul>
+    </div>
+    <div class="roadmap-phase">
+      <div class="roadmap-phase-label">v2.0 · Months 7–12</div>
+      <h4>Multi-Domain Coordination</h4>
+      <ul>
+        <li>Cross-agent task coordination</li>
+        <li>SD-WAN integration</li>
+        <li>Terraform auto-apply (low-risk)</li>
+        <li>Second firewall vendor</li>
+        <li>Compliance multi-benchmark</li>
+        <li>Incident timeline reconstruction</li>
+      </ul>
+    </div>
+    <div class="roadmap-phase">
+      <div class="roadmap-phase-label">v3.0 · Year 2</div>
+      <h4>Predictive Operations</h4>
+      <ul>
+        <li>Anomaly prediction from telemetry</li>
+        <li>Proactive remediation proposals</li>
+        <li>Agent self-improvement from outcomes</li>
+        <li>Custom Skills SDK for team-authored extensions</li>
+        <li>Multi-tenant deployment model</li>
+        <li>Continuous compliance posture scoring</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Knowledge Expansion Strategy</h3>
+
+  <p>The Knowledge Store should grow on three tracks. The first is planned expansion: a dedicated engineering sprint each quarter focused on adding runbooks, config baselines, and policy definitions for newly supported systems and vendors. The second is opportunistic capture: any time a human engineer resolves an incident or makes an infrastructure decision that the system could not handle autonomously, that resolution should be documented and ingested as a new runbook. The third is automated synthesis: the system should generate draft runbooks from its own execution traces — a human reviews and approves, but the drafting work is done by the system based on what it just did. Over time, this creates a compounding effect where the system's operational experience directly grows its own knowledge base.</p>
+
+  <h3>Autonomy Expansion Strategy</h3>
+
+  <p>Autonomy expansion is the highest-risk dimension and requires the most conservative approach. The framework is: every action category starts in observe-only mode, progresses to proposal mode (system recommends, human approves), then to supervised autonomous mode (system executes, human can interrupt), then to full autonomous mode (system executes and notifies). Each transition requires a demonstrated reliability track record — typically 90 days of clean operation at the previous level — and explicit approval from the security and architecture review board. This is not a technical gate. It is an organizational trust gate. Respect it.</p>
+
+  <div class="callout info">
+    <div class="callout-label">Key Design Principle</div>
+    <p>Autonomy should be earned incrementally through demonstrated reliability, not granted upfront based on architectural confidence. Every autonomous action category should begin its life as a human-supervised action. The system builds trust by performing well under supervision before operating independently.</p>
+  </div>
+</div>
+
+<!-- ── SECTION 10 ── -->
+<div class="section" id="s10">
+  <span class="section-num">10 · Product Thinking</span>
+  <h2>From Internal Tool to Platform</h2>
+
+  <p>The architecture described in this document is designed to support three distinct product instantiations. These are not mutually exclusive — they represent different packaging of the same underlying platform, and an organization might move through all three as the system matures.</p>
+
+  <h3>Instantiation 1: Internal Enterprise Tool</h3>
+
+  <p>The simplest form: the Control Plane is deployed as an internal platform, maintained by the infrastructure or DevSecOps team, and used exclusively within the organization. Skills are built for the organization's specific vendor stack. Runbooks are sourced from the organization's existing SOPs. Agents are scoped to the organization's specific asset inventory and credential model. This is the right starting point for any organization, and for many it will be the permanent form — there is nothing wrong with a powerful internal tool that does not aspire to be a product.</p>
+
+  <h3>Instantiation 2: GitHub-Based Automation Framework</h3>
+
+  <p>A step toward reusability: the Skills library and Knowledge Store population tools are open-sourced as a framework. Other teams — within the same organization or externally — can contribute Skills for new vendors, new runbook categories, and new compliance benchmarks. The Orchestrator and agent architecture are templated and documented for deployment. This model benefits from the open-source contribution dynamic while maintaining the deployment complexity on the operator. It also serves as a portfolio and credibility artifact for engineering teams building in this space.</p>
+
+  <h3>Instantiation 3: SaaS Platform</h3>
+
+  <p>The most complex form: the Control Plane becomes a multi-tenant SaaS offering where customers connect their infrastructure via agent-side connectors. Each customer's data — their knowledge base, their execution history, their configuration baselines — is fully isolated. The platform provides the Orchestrator, Foundation Model infrastructure, and Skills library as a service. Customers deploy lightweight agent connectors within their environments that relay task execution back to the cloud-hosted control plane. This model maximizes the reusability of the platform engineering investment and allows continuous improvement of the shared Skills library across all customers.</p>
+
+  <h3>Extensibility Architecture</h3>
+
+  <p>Regardless of instantiation, the system's extensibility is governed by three interface contracts. The Skills API defines how new tool integrations are added — a typed interface specification that any engineer can implement to add a new vendor, a new API, or a new automation workflow. The Knowledge Schema defines how new runbooks and policy definitions are structured for ingestion — a standardized format that allows subject matter experts to contribute knowledge without engineering involvement. The Agent Interface defines how new domain agents are registered with the Orchestrator — enabling specialized agents (a FinOps Agent, a DR Testing Agent, a Patch Management Agent) to be added without modifying the core orchestration logic.</p>
+
+  <p>These three extension points are the product's long-term competitive moat. A platform where every enterprise can bring their own knowledge, their own agents, and their own integrations — while sharing a common orchestration and autonomy framework — becomes more valuable with every contributor. The platform does not need to know about every vendor. Its users do, and they will build the Skills to prove it.</p>
+
+  <blockquote>
+    The system's intelligence is not in the foundation model. It is in the accumulated operational knowledge, the validated Skills library, and the trust calibration of the Autonomy Layer. These take months to build and years to refine. That is the moat.
+  </blockquote>
+
+  <h3>Reusability Across Clients and Environments</h3>
+
+  <p>The key to reusability is the separation of the platform layer from the configuration layer. The Orchestrator, the Agent framework, the Autonomy engine, the audit infrastructure — these are platform concerns and should be identical across all deployments. The Skills implementations, the Knowledge Store contents, and the Autonomy thresholds — these are configuration concerns and should be environment-specific. Any customization that bleeds from the configuration layer into the platform layer is technical debt that will make the next deployment harder than the last. Maintain this boundary with the same discipline you would apply to any other architectural separation of concerns.</p>
+</div>
+
+<div class="spacer"></div>
+<div class="spacer"></div>
+
+</div><!-- /content -->
+
+<!-- ═══════════════════════════════════════════════════════ FOOTER -->
+<div class="doc-footer">
+  <div class="doc-footer-inner">
+    <div>
+      <p>Enterprise Infrastructure AI Control Plane</p>
+      <p>Foundation Architecture Document · Version 1.0 · April 2026</p>
+      <p>For internal use · Enterprise Architects · DevSecOps · AI Platform Engineering</p>
+    </div>
+    <div>
+      <p style="text-align:right;">Sections: 10 · Components: 6</p>
+      <p style="text-align:right;">Status: Foundation Draft</p>
+      <p style="text-align:right;">Next Review: Quarterly</p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

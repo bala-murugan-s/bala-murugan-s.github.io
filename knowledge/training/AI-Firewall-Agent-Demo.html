@@ -1,0 +1,1770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enterprise Infrastructure AI Control Plane</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════ DESIGN TOKENS */
+:root {
+  --bg:       #080c14;
+  --surface:  #0d1421;
+  --card:     #111827;
+  --border:   #1e2d45;
+  --border2:  #243550;
+  --text:     #c8d6e8;
+  --text-dim: #5a7090;
+  --text-faint:#2d4060;
+  --accent:   #00d4ff;
+  --accent2:  #0099cc;
+  --green:    #00e676;
+  --green2:   #00b055;
+  --amber:    #ffb300;
+  --red:      #ff4444;
+  --purple:   #a855f7;
+  --mono:     'JetBrains Mono', monospace;
+  --display:  'Syne', sans-serif;
+  --radius:   6px;
+}
+
+/* ═══════════════════════════════════════════════ RESET + BASE */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; scroll-behavior: smooth; }
+body {
+  font-family: var(--mono);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════════ GRID SCANLINES */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px,
+    rgba(0,212,255,0.012) 2px, rgba(0,212,255,0.012) 4px
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ═══════════════════════════════════════════════ HEADER */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 2rem;
+  border-bottom: 1px solid var(--border);
+  background: rgba(8,12,20,0.95);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo-icon {
+  width: 32px; height: 32px;
+  border: 1.5px solid var(--accent);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-icon::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(0,212,255,0.15), transparent);
+}
+
+.logo-icon span {
+  font-family: var(--display);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--accent);
+  position: relative;
+  z-index: 1;
+}
+
+.logo-text {
+  font-family: var(--display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: #e0eeff;
+  letter-spacing: -0.01em;
+}
+
+.logo-sub {
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: 1px;
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.version-tag {
+  font-size: 0.65rem;
+  color: var(--accent);
+  border: 1px solid rgba(0,212,255,0.25);
+  padding: 0.2rem 0.5rem;
+  border-radius: 3px;
+  letter-spacing: 0.08em;
+}
+
+/* ═══════════════════════════════════════════════ LAYOUT */
+.layout {
+  display: grid;
+  grid-template-columns: 240px 1fr 320px;
+  min-height: calc(100vh - 57px);
+  position: relative;
+  z-index: 1;
+}
+
+/* ═══════════════════════════════════════════════ LEFT SIDEBAR — ARCHITECTURE */
+.arch-sidebar {
+  border-right: 1px solid var(--border);
+  padding: 1.5rem 0;
+  position: sticky;
+  top: 57px;
+  height: calc(100vh - 57px);
+  overflow-y: auto;
+}
+
+.arch-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding: 0 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.arch-layers {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 0.75rem;
+}
+
+.arch-layer {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  cursor: default;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.arch-layer::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: transparent;
+  transition: background 0.3s;
+}
+
+.arch-layer.active {
+  background: rgba(0,212,255,0.06);
+  border-color: rgba(0,212,255,0.2);
+}
+
+.arch-layer.active::before {
+  background: var(--accent);
+}
+
+.arch-layer.done {
+  background: rgba(0,230,118,0.04);
+  border-color: rgba(0,230,118,0.15);
+}
+
+.arch-layer.done::before {
+  background: var(--green);
+}
+
+.layer-num {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--text-faint);
+  min-width: 1.5ch;
+  transition: color 0.3s;
+}
+
+.arch-layer.active .layer-num { color: var(--accent); }
+.arch-layer.done .layer-num { color: var(--green); }
+
+.layer-info { flex: 1; }
+
+.layer-name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  transition: color 0.3s;
+  letter-spacing: 0.02em;
+}
+
+.arch-layer.active .layer-name { color: var(--accent); }
+.arch-layer.done .layer-name { color: var(--green); }
+
+.layer-desc {
+  font-size: 0.6rem;
+  color: var(--text-faint);
+  margin-top: 1px;
+  transition: color 0.3s;
+}
+
+.arch-layer.active .layer-desc { color: rgba(0,212,255,0.5); }
+.arch-layer.done .layer-desc { color: rgba(0,230,118,0.4); }
+
+.layer-status {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.layer-status.idle { color: var(--text-faint); }
+.layer-status.running { color: var(--accent); animation: blink 0.8s ease-in-out infinite; }
+.layer-status.done { color: var(--green); }
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.arch-divider {
+  height: 1px;
+  background: var(--border);
+  margin: 1rem 1.25rem;
+}
+
+.arch-op-section {
+  padding: 0 0.75rem;
+}
+
+.op-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+  margin-bottom: 2px;
+}
+
+.op-item.selected {
+  background: rgba(0,212,255,0.08);
+  border-color: rgba(0,212,255,0.25);
+}
+
+.op-item:hover:not(.selected) {
+  background: rgba(255,255,255,0.03);
+}
+
+.op-item.disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.op-icon {
+  width: 22px; height: 22px;
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.op-icon.fw { background: rgba(0,212,255,0.1); color: var(--accent); }
+.op-icon.cloud { background: rgba(168,85,247,0.1); color: var(--purple); }
+.op-icon.comp { background: rgba(0,230,118,0.1); color: var(--green); }
+.op-icon.net { background: rgba(255,179,0,0.1); color: var(--amber); }
+
+.op-label { font-size: 0.72rem; color: var(--text-dim); }
+.op-badge {
+  font-size: 0.55rem;
+  background: rgba(255,179,0,0.15);
+  color: var(--amber);
+  padding: 0.1rem 0.35rem;
+  border-radius: 2px;
+  letter-spacing: 0.08em;
+  margin-left: auto;
+}
+.op-badge.live { background: rgba(0,230,118,0.12); color: var(--green); }
+
+/* ═══════════════════════════════════════════════ MAIN CONTENT */
+.main {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  min-height: calc(100vh - 57px);
+}
+
+/* ── OPERATION HEADER */
+.op-header {
+  padding: 1.5rem 2rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.op-breadcrumb {
+  font-size: 0.62rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 0.6rem;
+}
+
+.op-breadcrumb span { color: var(--accent); }
+
+.op-title {
+  font-family: var(--display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #e8f4ff;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.4rem;
+}
+
+.op-meta {
+  display: flex;
+  gap: 1.5rem;
+  font-size: 0.65rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.op-meta-item { display: flex; align-items: center; gap: 0.35rem; }
+.op-meta-item .badge {
+  color: var(--accent);
+  background: rgba(0,212,255,0.08);
+  padding: 0.1rem 0.4rem;
+  border-radius: 2px;
+}
+
+/* ── FIREWALL TABLE */
+.section-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding: 1.25rem 2rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.fw-table-wrap {
+  padding: 0 2rem 1rem;
+  overflow-x: auto;
+}
+
+.fw-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.7rem;
+}
+
+.fw-table th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  color: var(--text-faint);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.fw-table td {
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid rgba(30,45,69,0.5);
+  vertical-align: middle;
+  white-space: nowrap;
+  transition: background 0.3s;
+}
+
+.fw-table tr { transition: all 0.3s; }
+
+.fw-table tr.highlight-remove td {
+  background: rgba(255,68,68,0.06);
+  border-bottom-color: rgba(255,68,68,0.15);
+}
+
+.fw-table tr.highlight-keep td {
+  background: rgba(0,230,118,0.03);
+}
+
+.fw-table tr.fading td {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.5s ease;
+}
+
+.rule-id {
+  font-weight: 600;
+  color: var(--text-dim);
+  font-size: 0.65rem;
+}
+
+.rule-name { color: var(--text); font-weight: 500; }
+
+.tag-zone {
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.zone-trust { background: rgba(0,230,118,0.1); color: var(--green); }
+.zone-untrust { background: rgba(255,68,68,0.1); color: var(--red); }
+.zone-dmz { background: rgba(0,212,255,0.1); color: var(--accent); }
+.zone-corp { background: rgba(168,85,247,0.1); color: var(--purple); }
+.zone-mgmt { background: rgba(255,179,0,0.1); color: var(--amber); }
+
+.hit-count {
+  font-weight: 700;
+  font-size: 0.65rem;
+}
+
+.hit-count.zero { color: var(--red); }
+.hit-count.low { color: var(--amber); }
+.hit-count.ok { color: var(--green); }
+
+.last-hit { color: var(--text-faint); font-size: 0.65rem; }
+
+.risk-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.risk-critical { background: rgba(255,68,68,0.12); color: var(--red); border: 1px solid rgba(255,68,68,0.2); }
+.risk-high { background: rgba(255,140,0,0.12); color: #ff8c00; border: 1px solid rgba(255,140,0,0.2); }
+.risk-low { background: rgba(0,230,118,0.08); color: var(--green); border: 1px solid rgba(0,230,118,0.15); }
+.risk-medium { background: rgba(255,179,0,0.1); color: var(--amber); border: 1px solid rgba(255,179,0,0.2); }
+
+.action-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+}
+
+.action-remove { background: rgba(255,68,68,0.1); color: var(--red); }
+.action-keep { background: rgba(0,230,118,0.08); color: var(--green); }
+.action-review { background: rgba(255,179,0,0.1); color: var(--amber); }
+.action-pending { background: rgba(255,255,255,0.05); color: var(--text-faint); }
+
+/* ── CONTROLS */
+.controls {
+  padding: 1.25rem 2rem;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: auto;
+  background: rgba(13,20,33,0.8);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--radius);
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  text-transform: uppercase;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #33ddff;
+  box-shadow: 0 0 20px rgba(0,212,255,0.3);
+}
+
+.btn-primary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-danger {
+  background: rgba(255,68,68,0.12);
+  color: var(--red);
+  border: 1px solid rgba(255,68,68,0.25);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: rgba(255,68,68,0.2);
+  box-shadow: 0 0 15px rgba(255,68,68,0.15);
+}
+
+.btn-danger:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-dim);
+  border: 1px solid var(--border2);
+}
+
+.btn-ghost:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+
+.control-stats {
+  margin-left: auto;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.stat {
+  text-align: right;
+}
+
+.stat-val {
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: var(--display);
+  color: var(--text);
+}
+
+.stat-val.danger { color: var(--red); }
+.stat-val.success { color: var(--green); }
+
+.stat-label {
+  font-size: 0.58rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* ═══════════════════════════════════════════════ RIGHT PANEL — EXECUTION LOG */
+.exec-panel {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  position: sticky;
+  top: 57px;
+  height: calc(100vh - 57px);
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.panel-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.panel-clear {
+  font-size: 0.6rem;
+  color: var(--text-faint);
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: color 0.2s;
+}
+
+.panel-clear:hover { color: var(--text-dim); }
+
+/* Layer trace */
+.layer-trace {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  gap: 0;
+  flex-shrink: 0;
+}
+
+.trace-step {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  position: relative;
+}
+
+.trace-step::after {
+  content: '›';
+  position: absolute;
+  right: -3px;
+  top: 7px;
+  font-size: 0.7rem;
+  color: var(--text-faint);
+}
+
+.trace-step:last-child::after { display: none; }
+
+.trace-node {
+  width: 24px; height: 24px;
+  border-radius: 4px;
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.55rem;
+  font-weight: 700;
+  color: var(--text-faint);
+  transition: all 0.3s;
+  background: var(--card);
+}
+
+.trace-step.active .trace-node {
+  border-color: var(--accent);
+  background: rgba(0,212,255,0.1);
+  color: var(--accent);
+  box-shadow: 0 0 8px rgba(0,212,255,0.25);
+}
+
+.trace-step.done .trace-node {
+  border-color: var(--green);
+  background: rgba(0,230,118,0.08);
+  color: var(--green);
+}
+
+.trace-label {
+  font-size: 0.5rem;
+  color: var(--text-faint);
+  text-align: center;
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+}
+
+.trace-step.active .trace-label { color: var(--accent); }
+.trace-step.done .trace-label { color: var(--green2); }
+
+/* Log stream */
+.log-stream {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.log-stream::-webkit-scrollbar { width: 3px; }
+.log-stream::-webkit-scrollbar-track { background: transparent; }
+.log-stream::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.log-entry {
+  padding: 0.5rem 0.6rem;
+  border-radius: 4px;
+  margin-bottom: 3px;
+  animation: fadeInLog 0.25s ease;
+  border-left: 2px solid transparent;
+}
+
+@keyframes fadeInLog {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.log-entry.sys { border-left-color: var(--border2); }
+.log-entry.orchestrator { border-left-color: var(--accent); background: rgba(0,212,255,0.03); }
+.log-entry.knowledge { border-left-color: var(--purple); background: rgba(168,85,247,0.03); }
+.log-entry.model { border-left-color: #60a5fa; background: rgba(96,165,250,0.03); }
+.log-entry.autonomy { border-left-color: var(--amber); background: rgba(255,179,0,0.03); }
+.log-entry.agent { border-left-color: var(--green); background: rgba(0,230,118,0.03); }
+.log-entry.skill { border-left-color: #f472b6; background: rgba(244,114,182,0.03); }
+.log-entry.success { border-left-color: var(--green); background: rgba(0,230,118,0.05); }
+.log-entry.error { border-left-color: var(--red); background: rgba(255,68,68,0.05); }
+.log-entry.warn { border-left-color: var(--amber); background: rgba(255,179,0,0.05); }
+
+.log-ts {
+  font-size: 0.55rem;
+  color: var(--text-faint);
+  margin-bottom: 1px;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.log-layer-tag {
+  font-size: 0.52rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.05rem 0.35rem;
+  border-radius: 2px;
+}
+
+.tag-orch { background: rgba(0,212,255,0.12); color: var(--accent); }
+.tag-know { background: rgba(168,85,247,0.12); color: var(--purple); }
+.tag-model { background: rgba(96,165,250,0.12); color: #60a5fa; }
+.tag-auto { background: rgba(255,179,0,0.12); color: var(--amber); }
+.tag-agent { background: rgba(0,230,118,0.12); color: var(--green); }
+.tag-skill { background: rgba(244,114,182,0.12); color: #f472b6; }
+.tag-sys { background: rgba(255,255,255,0.06); color: var(--text-faint); }
+
+.log-msg {
+  font-size: 0.68rem;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.log-entry.orchestrator .log-msg { color: rgba(0,212,255,0.9); }
+.log-entry.knowledge .log-msg { color: rgba(168,85,247,0.85); }
+.log-entry.model .log-msg { color: rgba(200,220,255,0.9); }
+.log-entry.autonomy .log-msg { color: rgba(255,179,0,0.9); }
+.log-entry.agent .log-msg { color: rgba(0,230,118,0.9); }
+.log-entry.skill .log-msg { color: rgba(244,114,182,0.9); }
+.log-entry.success .log-msg { color: var(--green); font-weight: 600; }
+.log-entry.error .log-msg { color: var(--red); }
+
+/* AI reasoning block */
+.ai-block {
+  background: rgba(96,165,250,0.04);
+  border: 1px solid rgba(96,165,250,0.15);
+  border-radius: 4px;
+  padding: 0.6rem 0.75rem;
+  margin: 4px 0;
+  animation: fadeInLog 0.3s ease;
+}
+
+.ai-block-header {
+  font-size: 0.55rem;
+  color: #60a5fa;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.ai-block-content {
+  font-size: 0.67rem;
+  color: var(--text);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.thinking-dots {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.thinking-dots span {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: #60a5fa;
+  animation: dots 1.2s ease-in-out infinite;
+}
+
+.thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+.thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dots {
+  0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+  40% { opacity: 1; transform: scale(1); }
+}
+
+/* Result summary */
+.result-summary {
+  padding: 0.75rem;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.result-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.result-item {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.5rem 0.6rem;
+}
+
+.result-item-val {
+  font-family: var(--display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.result-item-val.r { color: var(--red); }
+.result-item-val.g { color: var(--green); }
+.result-item-val.a { color: var(--amber); }
+
+.result-item-label {
+  font-size: 0.56rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 1px;
+}
+
+/* ── MODAL */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4,8,16,0.85);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.modal-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.modal {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  width: 480px;
+  max-width: 90vw;
+  padding: 1.75rem;
+  box-shadow: 0 0 60px rgba(0,0,0,0.6), 0 0 0 1px rgba(0,212,255,0.08);
+}
+
+.modal-icon {
+  width: 40px; height: 40px;
+  border-radius: 8px;
+  background: rgba(255,68,68,0.1);
+  border: 1px solid rgba(255,68,68,0.2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.modal-title {
+  font-family: var(--display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #e8f4ff;
+  margin-bottom: 0.5rem;
+}
+
+.modal-desc {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+}
+
+.modal-list {
+  background: rgba(255,68,68,0.04);
+  border: 1px solid rgba(255,68,68,0.1);
+  border-radius: 4px;
+  padding: 0.75rem;
+  margin-bottom: 1.25rem;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.modal-rule-item {
+  font-size: 0.68rem;
+  color: var(--red);
+  padding: 0.25rem 0;
+  border-bottom: 1px solid rgba(255,68,68,0.08);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.modal-rule-item:last-child { border-bottom: none; }
+
+.modal-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+/* ═══════════════════════════════════════════════ RESPONSIVE */
+@media (max-width: 1100px) {
+  .layout { grid-template-columns: 200px 1fr 280px; }
+}
+
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; }
+  .arch-sidebar, .exec-panel { position: static; height: auto; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══════════════════════════════════════════════════════ -->
+<header class="header">
+  <div class="logo">
+    <div class="logo-icon"><span>AI</span></div>
+    <div>
+      <div class="logo-text">Control Plane</div>
+      <div class="logo-sub">Enterprise Infrastructure · Demo</div>
+    </div>
+  </div>
+  <div class="header-status">
+    <div class="status-pill"><div class="dot"></div> Live Demo Mode</div>
+    <div class="version-tag">MVP v1.0</div>
+  </div>
+</header>
+
+<!-- ═══ LAYOUT ════════════════════════════════════════════════════════ -->
+<div class="layout">
+
+  <!-- ── LEFT: Architecture Sidebar ───────────────────────────────── -->
+  <aside class="arch-sidebar">
+    <div class="arch-label">Architecture Layers</div>
+    <div class="arch-layers" id="archLayers">
+
+      <div class="arch-layer" data-layer="signal">
+        <div class="layer-num">S</div>
+        <div class="layer-info">
+          <div class="layer-name">Signal</div>
+          <div class="layer-desc">Input · Alert ingestion</div>
+        </div>
+        <div class="layer-status idle" id="ls-signal">●</div>
+      </div>
+
+      <div class="arch-layer" data-layer="orchestrator">
+        <div class="layer-num">O</div>
+        <div class="layer-info">
+          <div class="layer-name">Orchestrator</div>
+          <div class="layer-desc">Decision engine</div>
+        </div>
+        <div class="layer-status idle" id="ls-orchestrator">●</div>
+      </div>
+
+      <div class="arch-layer" data-layer="knowledge">
+        <div class="layer-num">K</div>
+        <div class="layer-info">
+          <div class="layer-name">Knowledge</div>
+          <div class="layer-desc">Runbooks · Baselines</div>
+        </div>
+        <div class="layer-status idle" id="ls-knowledge">●</div>
+      </div>
+
+      <div class="arch-layer" data-layer="model">
+        <div class="layer-num">F</div>
+        <div class="layer-info">
+          <div class="layer-name">Foundation Model</div>
+          <div class="layer-desc">AI reasoning (Claude)</div>
+        </div>
+        <div class="layer-status idle" id="ls-model">●</div>
+      </div>
+
+      <div class="arch-layer" data-layer="autonomy">
+        <div class="layer-num">A</div>
+        <div class="layer-info">
+          <div class="layer-name">Autonomy</div>
+          <div class="layer-desc">Gate · Blast radius</div>
+        </div>
+        <div class="layer-status idle" id="ls-autonomy">●</div>
+      </div>
+
+      <div class="arch-layer" data-layer="agent">
+        <div class="layer-num">Ag</div>
+        <div class="layer-info">
+          <div class="layer-name">Agent</div>
+          <div class="layer-desc">Security Agent</div>
+        </div>
+        <div class="layer-status idle" id="ls-agent">●</div>
+      </div>
+
+      <div class="arch-layer" data-layer="skill">
+        <div class="layer-num">Sk</div>
+        <div class="layer-info">
+          <div class="layer-name">Skill</div>
+          <div class="layer-desc">PAN-OS API wrapper</div>
+        </div>
+        <div class="layer-status idle" id="ls-skill">●</div>
+      </div>
+    </div>
+
+    <div class="arch-divider"></div>
+    <div class="arch-label">Operations</div>
+
+    <!-- ══ OPERATIONS MENU — Add your new operations here ══ -->
+    <div class="arch-op-section">
+      <!-- OPERATION 1: Active (demo ready) -->
+      <div class="op-item selected" data-op="unused-rules">
+        <div class="op-icon fw">FW</div>
+        <div>
+          <div class="op-label">Unused Rule Cleanup</div>
+        </div>
+        <span class="op-badge live">Live</span>
+      </div>
+
+      <!-- OPERATION 2: Coming soon — you will build this next -->
+      <div class="op-item disabled" data-op="shadow-rules">
+        <div class="op-icon fw">FW</div>
+        <div><div class="op-label">Shadow Rule Detection</div></div>
+        <span class="op-badge">Soon</span>
+      </div>
+
+      <!-- OPERATION 3: Coming soon -->
+      <div class="op-item disabled" data-op="tf-drift">
+        <div class="op-icon cloud">TF</div>
+        <div><div class="op-label">Terraform Drift Scan</div></div>
+        <span class="op-badge">Soon</span>
+      </div>
+
+      <!-- OPERATION 4: Coming soon -->
+      <div class="op-item disabled" data-op="cis-bench">
+        <div class="op-icon comp">CIS</div>
+        <div><div class="op-label">CIS Benchmark Audit</div></div>
+        <span class="op-badge">Soon</span>
+      </div>
+
+      <!-- OPERATION 5: Coming soon -->
+      <div class="op-item disabled" data-op="sdwan-perf">
+        <div class="op-icon net">WAN</div>
+        <div><div class="op-label">SD-WAN Perf Analysis</div></div>
+        <span class="op-badge">Soon</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN CONTENT ──────────────────────────────────────────────── -->
+  <main class="main">
+    <div class="op-header">
+      <div class="op-breadcrumb">Security Agent → <span>Palo Alto NGFW</span> → Rule Audit</div>
+      <div class="op-title">Unused Firewall Rule Cleanup</div>
+      <div class="op-meta">
+        <div class="op-meta-item">Vendor <span class="badge">PAN-OS 11.x</span></div>
+        <div class="op-meta-item">Device <span class="badge">PA-5250-PROD-01</span></div>
+        <div class="op-meta-item">Vsys <span class="badge">vsys1</span></div>
+        <div class="op-meta-item">Policy <span class="badge">Security Policy</span></div>
+      </div>
+    </div>
+
+    <div class="section-label">Firewall Rule Inventory — 14 Rules Loaded</div>
+
+    <div class="fw-table-wrap">
+      <table class="fw-table" id="fwTable">
+        <thead>
+          <tr>
+            <th>Rule ID</th>
+            <th>Name</th>
+            <th>From Zone</th>
+            <th>To Zone</th>
+            <th>Application</th>
+            <th>Action</th>
+            <th>Hit Count</th>
+            <th>Last Hit</th>
+            <th>Risk</th>
+            <th>Decision</th>
+          </tr>
+        </thead>
+        <tbody id="rulesBody">
+          <!-- Populated by JS -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-primary" id="btnAnalyze" onclick="startAnalysis()">
+        ▶ Run AI Analysis
+      </button>
+      <button class="btn btn-danger" id="btnExecute" onclick="openConfirm()" disabled>
+        ⚠ Execute Cleanup
+      </button>
+      <button class="btn btn-ghost" onclick="resetAll()">↺ Reset</button>
+
+      <div class="control-stats">
+        <div class="stat">
+          <div class="stat-val danger" id="statRemove">0</div>
+          <div class="stat-label">To Remove</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val" id="statReview">0</div>
+          <div class="stat-label">Manual Review</div>
+        </div>
+        <div class="stat">
+          <div class="stat-val success" id="statKeep">0</div>
+          <div class="stat-label">Keep</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── RIGHT: Execution Panel ────────────────────────────────────── -->
+  <aside class="exec-panel">
+    <div class="panel-header">
+      <div class="panel-title">⬡ Execution Trace</div>
+      <div class="panel-clear" onclick="clearLog()">Clear</div>
+    </div>
+
+    <!-- Layer trace nodes -->
+    <div class="layer-trace" id="layerTrace">
+      <div class="trace-step" id="ts-signal">
+        <div class="trace-node">SIG</div>
+        <div class="trace-label">Signal</div>
+      </div>
+      <div class="trace-step" id="ts-orchestrator">
+        <div class="trace-node">ORC</div>
+        <div class="trace-label">Orch.</div>
+      </div>
+      <div class="trace-step" id="ts-knowledge">
+        <div class="trace-node">KNW</div>
+        <div class="trace-label">Know.</div>
+      </div>
+      <div class="trace-step" id="ts-model">
+        <div class="trace-node">LLM</div>
+        <div class="trace-label">Model</div>
+      </div>
+      <div class="trace-step" id="ts-autonomy">
+        <div class="trace-node">AUT</div>
+        <div class="trace-label">Auto.</div>
+      </div>
+      <div class="trace-step" id="ts-agent">
+        <div class="trace-node">AGT</div>
+        <div class="trace-label">Agent</div>
+      </div>
+      <div class="trace-step" id="ts-skill">
+        <div class="trace-node">SKL</div>
+        <div class="trace-label">Skill</div>
+      </div>
+    </div>
+
+    <!-- Log stream -->
+    <div class="log-stream" id="logStream">
+      <div class="log-entry sys">
+        <div class="log-ts"><span class="log-layer-tag tag-sys">SYSTEM</span> ready</div>
+        <div class="log-msg">Control Plane initialized. Awaiting operation trigger.</div>
+      </div>
+      <div class="log-entry sys">
+        <div class="log-ts"><span class="log-layer-tag tag-sys">TARGET</span> connected</div>
+        <div class="log-msg">PA-5250-PROD-01 · PAN-OS 11.1.2 · vsys1 · 14 rules loaded</div>
+      </div>
+    </div>
+
+    <!-- Result summary -->
+    <div class="result-summary" id="resultSummary" style="display:none;">
+      <div style="font-size:0.6rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--text-faint);margin-bottom:0.5rem;">Analysis Result</div>
+      <div class="result-grid">
+        <div class="result-item">
+          <div class="result-item-val r" id="rRemove">0</div>
+          <div class="result-item-label">Flagged for Removal</div>
+        </div>
+        <div class="result-item">
+          <div class="result-item-val a" id="rReview">0</div>
+          <div class="result-item-label">Manual Review</div>
+        </div>
+        <div class="result-item">
+          <div class="result-item-val g" id="rKeep">0</div>
+          <div class="result-item-label">Authorized ✓</div>
+        </div>
+        <div class="result-item">
+          <div class="result-item-val" id="rRisk">LOW</div>
+          <div class="result-item-label">Exec. Risk Level</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- ═══ CONFIRM MODAL ════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal">
+    <div class="modal-icon">⚠</div>
+    <div class="modal-title">Confirm Rule Removal</div>
+    <div class="modal-desc">The Autonomy Layer has authorized removal of the following rules. This action will call the PAN-OS API via the Skill layer and commit changes to the running configuration. This operation is logged to the audit trail.</div>
+    <div class="modal-list" id="modalRuleList"></div>
+    <div style="font-size:0.68rem;color:var(--text-dim);margin-bottom:1.25rem;padding:0.6rem;background:rgba(255,179,0,0.05);border:1px solid rgba(255,179,0,0.12);border-radius:4px;">
+      ⚡ Autonomy Gate: APPROVED · Blast radius: LOW · Change window: ACTIVE
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-danger" onclick="executeCleanup()">Confirm Execution</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════
+   DATA MODEL
+   ─────────────────────────────────────────────────────────────────
+   This simulates what the Skill layer would fetch from PAN-OS API.
+   In production: replace with actual PAN-OS XML API response parser.
+═══════════════════════════════════════════════════════════════════ */
+const FIREWALL_RULES = [
+  { id: "R-001", name: "Allow-Corp-to-Internet",    from: "corp",    to: "untrust", app: "ssl,web-browsing", action: "allow", hits: 94820, lastHit: "2min ago",   risk: "low",      _unused: false },
+  { id: "R-002", name: "Allow-DMZ-WebServers",      from: "untrust", to: "dmz",     app: "http,https",      action: "allow", hits: 42311, lastHit: "1min ago",   risk: "low",      _unused: false },
+  { id: "R-003", name: "Legacy-FTP-Transfer",       from: "corp",    to: "dmz",     app: "ftp",             action: "allow", hits: 0,     lastHit: "Never",      risk: "critical", _unused: true  },
+  { id: "R-004", name: "Allow-DNS-Internal",        from: "corp",    to: "trust",   app: "dns",             action: "allow", hits: 31002, lastHit: "30sec ago",  risk: "low",      _unused: false },
+  { id: "R-005", name: "Temp-Vendor-Access-2022",   from: "untrust", to: "mgmt",    app: "ssh,rdp",         action: "allow", hits: 0,     lastHit: "Never",      risk: "critical", _unused: true  },
+  { id: "R-006", name: "Allow-SIEM-Syslog",         from: "trust",   to: "corp",    app: "syslog",          action: "allow", hits: 58901, lastHit: "10sec ago",  risk: "low",      _unused: false },
+  { id: "R-007", name: "Old-Backup-Rule",           from: "corp",    to: "trust",   app: "rsync,ssh",       action: "allow", hits: 0,     lastHit: "430d ago",   risk: "high",     _unused: true  },
+  { id: "R-008", name: "Allow-AD-Auth",             from: "corp",    to: "trust",   app: "kerberos,ldap",   action: "allow", hits: 12930, lastHit: "5min ago",   risk: "low",      _unused: false },
+  { id: "R-009", name: "Dev-Bypass-Any-Any",        from: "corp",    to: "untrust", app: "any",             action: "allow", hits: 3,     lastHit: "92d ago",    risk: "critical", _unused: true  },
+  { id: "R-010", name: "Allow-NTP-Sync",            from: "trust",   to: "untrust", app: "ntp",             action: "allow", hits: 4401,  lastHit: "2min ago",   risk: "low",      _unused: false },
+  { id: "R-011", name: "Deny-Telnet",               from: "any",     to: "any",     app: "telnet",          action: "deny",  hits: 892,   lastHit: "1hr ago",    risk: "low",      _unused: false },
+  { id: "R-012", name: "Block-TOR-Exits",           from: "corp",    to: "untrust", app: "tor",             action: "deny",  hits: 44,    lastHit: "3d ago",     risk: "medium",   _unused: false },
+  { id: "R-013", name: "Expired-Contractor-VPN",    from: "untrust", to: "corp",    app: "ipsec,ssl-vpn",   action: "allow", hits: 0,     lastHit: "Never",      risk: "high",     _unused: true  },
+  { id: "R-014", name: "Deny-All-Default",          from: "any",     to: "any",     app: "any",             action: "deny",  hits: 2204,  lastHit: "20sec ago",  risk: "low",      _unused: false },
+];
+
+/* ═══════════════════════════════════════════════════════════════════
+   KNOWLEDGE STORE (Simulated RAG retrieval)
+   ─────────────────────────────────────────────────────────────────
+   In production: replace with vector DB query (pgvector / Chroma)
+═══════════════════════════════════════════════════════════════════ */
+const KNOWLEDGE_CONTEXT = `
+RUNBOOK: PAN-OS Unused Rule Cleanup (RB-FW-003)
+Version: 2.1 | Last Updated: 2025-11-01
+
+POLICY: A firewall rule is classified as unused if:
+  - Hit count is 0 with no last-hit timestamp, OR
+  - Last hit was > 365 days ago
+  - Exception: Deny-all rules are always retained regardless of hit count.
+
+RISK CLASSIFICATION:
+  - Any-any rules: CRITICAL risk — require immediate escalation
+  - Rules allowing access to MGMT zone: CRITICAL risk
+  - Rules with >180d last hit: HIGH risk
+  - Rules with 0 hits, never hit: HIGH risk (could be legitimate pre-staging)
+  - Standard port rules, 0 hits: MEDIUM
+
+AUTONOMY THRESHOLDS (v1.0):
+  - CRITICAL risk rules: REQUIRE human approval before removal
+  - HIGH risk rules: Autonomous removal APPROVED within change window
+  - MEDIUM/LOW: Fully autonomous
+
+VENDOR NOTE: PAN-OS commit required after rule deletion. Use candidate config pattern.
+`;
+
+/* ═══════════════════════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════════════════════ */
+let analysisComplete = false;
+let decisions = {};
+let isRunning = false;
+
+/* ═══════════════════════════════════════════════════════════════════
+   RENDER RULES TABLE
+═══════════════════════════════════════════════════════════════════ */
+function renderTable() {
+  const tbody = document.getElementById('rulesBody');
+  tbody.innerHTML = '';
+  FIREWALL_RULES.forEach(rule => {
+    const dec = decisions[rule.id] || 'pending';
+    const row = document.createElement('tr');
+    row.id = `row-${rule.id}`;
+    if (dec === 'remove') row.classList.add('highlight-remove');
+    else if (dec === 'keep') row.classList.add('highlight-keep');
+
+    const zoneClass = z => {
+      const m = { trust:'zone-trust', untrust:'zone-untrust', dmz:'zone-dmz', corp:'zone-corp', mgmt:'zone-mgmt', any:'zone-dmz' };
+      return m[z] || 'zone-dmz';
+    };
+
+    const hitClass = rule.hits === 0 ? 'zero' : rule.hits < 100 ? 'low' : 'ok';
+    const riskClass = `risk-${rule.risk}`;
+    
+    let decHtml = '<span class="action-indicator action-pending">Pending</span>';
+    if (dec === 'remove') decHtml = '<span class="action-indicator action-remove">✕ Remove</span>';
+    else if (dec === 'keep') decHtml = '<span class="action-indicator action-keep">✓ Keep</span>';
+    else if (dec === 'review') decHtml = '<span class="action-indicator action-review">⚑ Review</span>';
+
+    row.innerHTML = `
+      <td><span class="rule-id">${rule.id}</span></td>
+      <td><span class="rule-name">${rule.name}</span></td>
+      <td><span class="tag-zone ${zoneClass(rule.from)}">${rule.from}</span></td>
+      <td><span class="tag-zone ${zoneClass(rule.to)}">${rule.to}</span></td>
+      <td style="color:var(--text-dim);font-size:0.65rem;">${rule.app}</td>
+      <td style="color:${rule.action==='allow'?'var(--green)':'var(--red)'};font-size:0.65rem;font-weight:600;">${rule.action.toUpperCase()}</td>
+      <td><span class="hit-count ${hitClass}">${rule.hits.toLocaleString()}</span></td>
+      <td><span class="last-hit">${rule.lastHit}</span></td>
+      <td><span class="risk-badge ${riskClass}">${rule.risk.toUpperCase()}</span></td>
+      <td>${decHtml}</td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LOGGING UTILITIES
+═══════════════════════════════════════════════════════════════════ */
+function now() {
+  return new Date().toLocaleTimeString('en-US', { hour12: false, hour:'2-digit', minute:'2-digit', second:'2-digit' });
+}
+
+function log(type, layer, msg) {
+  const stream = document.getElementById('logStream');
+  const entry = document.createElement('div');
+  entry.className = `log-entry ${type}`;
+  const tagMap = {
+    orchestrator:'tag-orch', knowledge:'tag-know', model:'tag-model',
+    autonomy:'tag-auto', agent:'tag-agent', skill:'tag-skill', sys:'tag-sys',
+    success:'tag-sys', error:'tag-sys', warn:'tag-auto'
+  };
+  entry.innerHTML = `
+    <div class="log-ts">
+      <span class="log-layer-tag ${tagMap[type]||'tag-sys'}">${layer}</span>
+      ${now()}
+    </div>
+    <div class="log-msg">${msg}</div>
+  `;
+  stream.appendChild(entry);
+  stream.scrollTop = stream.scrollHeight;
+}
+
+function showThinking() {
+  const stream = document.getElementById('logStream');
+  const block = document.createElement('div');
+  block.className = 'ai-block';
+  block.id = 'thinkingBlock';
+  block.innerHTML = `
+    <div class="ai-block-header">
+      ◈ Foundation Model · Reasoning
+      <div class="thinking-dots"><span></span><span></span><span></span></div>
+    </div>
+    <div class="ai-block-content" id="thinkingContent">Analyzing rule set against knowledge base...</div>
+  `;
+  stream.appendChild(block);
+  stream.scrollTop = stream.scrollHeight;
+  return block;
+}
+
+function updateThinking(text) {
+  const el = document.getElementById('thinkingContent');
+  if (el) el.textContent = text;
+  const stream = document.getElementById('logStream');
+  stream.scrollTop = stream.scrollHeight;
+}
+
+function finalizeThinking(content) {
+  const block = document.getElementById('thinkingBlock');
+  if (block) {
+    block.querySelector('.ai-block-header').innerHTML = '◈ Foundation Model · Analysis Complete';
+    const el = block.querySelector('.ai-block-content');
+    if (el) el.textContent = content;
+    const stream = document.getElementById('logStream');
+    stream.scrollTop = stream.scrollHeight;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   LAYER ACTIVATION
+═══════════════════════════════════════════════════════════════════ */
+function setLayer(name, state) {
+  // Sidebar
+  const layer = document.querySelector(`[data-layer="${name}"]`);
+  if (layer) {
+    layer.className = `arch-layer ${state}`;
+  }
+  const ls = document.getElementById(`ls-${name}`);
+  if (ls) {
+    ls.className = `layer-status ${state}`;
+    ls.textContent = state === 'running' ? '◉' : state === 'done' ? '✓' : '●';
+  }
+  // Trace nodes
+  const ts = document.getElementById(`ts-${name}`);
+  if (ts) {
+    ts.className = `trace-step ${state}`;
+  }
+}
+
+function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   MAIN ANALYSIS FLOW
+   ─────────────────────────────────────────────────────────────────
+   This is the Orchestrator loop. Each await block represents
+   one architectural layer activating.
+═══════════════════════════════════════════════════════════════════ */
+async function startAnalysis() {
+  if (isRunning) return;
+  isRunning = true;
+  decisions = {};
+  renderTable();
+  document.getElementById('btnAnalyze').disabled = true;
+  document.getElementById('btnExecute').disabled = true;
+  document.getElementById('resultSummary').style.display = 'none';
+  document.getElementById('statRemove').textContent = '0';
+  document.getElementById('statReview').textContent = '0';
+  document.getElementById('statKeep').textContent = '0';
+  clearLog();
+
+  /* ── LAYER 1: SIGNAL ──────────────────────────────────────── */
+  setLayer('signal', 'running');
+  log('sys', 'SIGNAL', 'User operation triggered: Unused Rule Cleanup · PA-5250-PROD-01');
+  await delay(600);
+  log('sys', 'SIGNAL', 'Signal normalized → Orchestrator event queue');
+  setLayer('signal', 'done');
+  await delay(400);
+
+  /* ── LAYER 2: ORCHESTRATOR ────────────────────────────────── */
+  setLayer('orchestrator', 'running');
+  log('orchestrator', 'ORCHESTRATOR', 'Intent classified: FIREWALL_RULE_AUDIT · scope=vsys1 · vendor=PAN-OS');
+  await delay(500);
+  log('orchestrator', 'ORCHESTRATOR', 'Task decomposed: [1] knowledge_retrieve → [2] model_reason → [3] autonomy_gate → [4] agent_dispatch');
+  await delay(500);
+  log('orchestrator', 'ORCHESTRATOR', 'Change window check: ACTIVE (Tue 10PM–4AM) · Current mode: ANALYSIS');
+  setLayer('orchestrator', 'done');
+  await delay(400);
+
+  /* ── LAYER 3: KNOWLEDGE ───────────────────────────────────── */
+  setLayer('knowledge', 'running');
+  log('knowledge', 'KNOWLEDGE', 'RAG query: firewall_rule_cleanup, panos_unused_rules, risk_thresholds');
+  await delay(700);
+  log('knowledge', 'KNOWLEDGE', 'Retrieved: RB-FW-003 (Unused Rule Cleanup v2.1)');
+  await delay(400);
+  log('knowledge', 'KNOWLEDGE', 'Retrieved: PAN-OS vendor risk matrix · Autonomy thresholds v1.0');
+  await delay(400);
+  log('knowledge', 'KNOWLEDGE', 'Context assembled: 3 documents · 1,240 tokens');
+  setLayer('knowledge', 'done');
+  await delay(400);
+
+  /* ── LAYER 4: FOUNDATION MODEL (Claude API) ───────────────── */
+  setLayer('model', 'running');
+  log('model', 'LLM', 'Sending rule set + knowledge context to Foundation Model...');
+  const thinkBlock = showThinking();
+  await delay(300);
+
+  // Build prompt for Claude
+  const rulesJson = JSON.stringify(FIREWALL_RULES.map(r => ({
+    id: r.id, name: r.name, from: r.from, to: r.to,
+    app: r.app, action: r.action, hits: r.hits, lastHit: r.lastHit, risk: r.risk
+  })), null, 2);
+
+  const prompt = `You are the Foundation Model layer of an Enterprise Infrastructure AI Control Plane. You are analyzing a Palo Alto firewall rule set.
+
+KNOWLEDGE BASE CONTEXT:
+${KNOWLEDGE_CONTEXT}
+
+FIREWALL RULES TO ANALYZE:
+${rulesJson}
+
+TASK: Analyze each rule and classify it as:
+- "remove": Rule should be removed (unused, expired, or violates policy)
+- "keep": Rule is active and necessary
+- "review": Rule requires human review before action (high risk, ambiguous, or CRITICAL risk)
+
+Return ONLY a JSON object in exactly this format, nothing else:
+{
+  "decisions": {
+    "R-001": "keep",
+    "R-002": "keep"
+  },
+  "summary": "2-3 sentence summary of findings",
+  "removeCount": 0,
+  "keepCount": 0,
+  "reviewCount": 0,
+  "riskLevel": "LOW|MEDIUM|HIGH|CRITICAL"
+}`;
+
+  let aiResult = null;
+
+  try {
+    updateThinking("Calling Claude API · Analyzing 14 rules against runbook RB-FW-003...");
+
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+    const rawText = data.content?.map(b => b.text || '').join('') || '';
+    updateThinking("Parsing model output...");
+    await delay(300);
+
+    // Parse JSON from response
+    const clean = rawText.replace(/```json|```/g, '').trim();
+    aiResult = JSON.parse(clean);
+    finalizeThinking(aiResult.summary);
+
+  } catch (err) {
+    // Fallback: deterministic decisions if API unavailable
+    console.warn('API fallback:', err);
+    updateThinking("API unavailable — applying deterministic fallback logic from Knowledge Store...");
+    await delay(800);
+
+    aiResult = {
+      decisions: {},
+      summary: "Fallback analysis: 5 rules flagged by deterministic rule engine based on hit-count and last-hit thresholds from RB-FW-003. CRITICAL risk rules require manual review.",
+      removeCount: 0, keepCount: 0, reviewCount: 0,
+      riskLevel: "HIGH"
+    };
+
+    FIREWALL_RULES.forEach(r => {
+      if (r.risk === 'critical' && r._unused) aiResult.decisions[r.id] = 'review';
+      else if (r._unused) aiResult.decisions[r.id] = 'remove';
+      else aiResult.decisions[r.id] = 'keep';
+    });
+
+    let rc=0, kc=0, rv=0;
+    Object.values(aiResult.decisions).forEach(d => {
+      if (d==='remove') rc++;
+      else if (d==='keep') kc++;
+      else rv++;
+    });
+    aiResult.removeCount=rc; aiResult.keepCount=kc; aiResult.reviewCount=rv;
+
+    finalizeThinking(aiResult.summary);
+  }
+
+  setLayer('model', 'done');
+  await delay(300);
+  log('model', 'LLM', `Analysis complete · Remove: ${aiResult.removeCount} · Keep: ${aiResult.keepCount} · Review: ${aiResult.reviewCount}`);
+  await delay(300);
+
+  /* ── LAYER 5: AUTONOMY ────────────────────────────────────── */
+  setLayer('autonomy', 'running');
+  log('autonomy', 'AUTONOMY', 'Evaluating decisions against autonomy thresholds...');
+  await delay(500);
+  log('autonomy', 'AUTONOMY', 'Blast radius check: ' + aiResult.removeCount + ' rules · within daily limit (max: 10)');
+  await delay(400);
+
+  const critReviews = Object.entries(aiResult.decisions).filter(([id, d]) => {
+    const rule = FIREWALL_RULES.find(r => r.id === id);
+    return d === 'review' || (rule && rule.risk === 'critical' && d === 'remove');
+  });
+
+  if (critReviews.length > 0) {
+    log('autonomy', 'AUTONOMY', `CRITICAL risk rules detected — escalated to Manual Review queue (${critReviews.length} rules)`);
+    // Upgrade critical-risk removes to review
+    critReviews.forEach(([id]) => {
+      if (aiResult.decisions[id] === 'remove') {
+        const rule = FIREWALL_RULES.find(r => r.id === id);
+        if (rule && rule.risk === 'critical') {
+          aiResult.decisions[id] = 'review';
+          aiResult.removeCount--;
+          aiResult.reviewCount++;
+        }
+      }
+    });
+  }
+
+  log('autonomy', 'AUTONOMY', `Gate APPROVED for autonomous execution: ${aiResult.removeCount} rules`);
+  await delay(400);
+  log('autonomy', 'AUTONOMY', 'Risk level: ' + aiResult.riskLevel + ' · Change window: ACTIVE');
+  setLayer('autonomy', 'done');
+  await delay(300);
+
+  /* ── LAYER 6: AGENT ───────────────────────────────────────── */
+  setLayer('agent', 'running');
+  log('agent', 'SEC-AGENT', 'Security Agent activated · Credentials: Vault lease #fw-sa-1291');
+  await delay(500);
+  log('agent', 'SEC-AGENT', 'Scoped access: PA-5250-PROD-01 · vsys1 · READ+WRITE · Security Policy');
+  await delay(400);
+  log('agent', 'SEC-AGENT', 'Dispatching tasks to Skill: panos_rule_cleanup');
+  setLayer('agent', 'done');
+  await delay(300);
+
+  /* ── LAYER 7: SKILL ───────────────────────────────────────── */
+  setLayer('skill', 'running');
+  log('skill', 'SKILL', 'PAN-OS Skill: panos_rule_cleanup · Validating pre-execution state...');
+  await delay(600);
+  log('skill', 'SKILL', 'Pre-flight: Candidate config locked · Rollback snapshot created');
+  await delay(500);
+
+  // Apply decisions + animate table
+  decisions = aiResult.decisions;
+  renderTable();
+  await delay(400);
+  log('skill', 'SKILL', 'Audit trail written · Rule decisions applied to UI');
+  setLayer('skill', 'done');
+  await delay(300);
+
+  /* ── FINALIZE ─────────────────────────────────────────────── */
+  // Update stats
+  let rc=0, kc=0, rv=0;
+  Object.values(decisions).forEach(d => {
+    if (d==='remove') rc++;
+    else if (d==='keep') kc++;
+    else if (d==='review') rv++;
+  });
+
+  document.getElementById('statRemove').textContent = rc;
+  document.getElementById('statReview').textContent = rv;
+  document.getElementById('statKeep').textContent = kc;
+
+  document.getElementById('rRemove').textContent = rc;
+  document.getElementById('rReview').textContent = rv;
+  document.getElementById('rKeep').textContent = kc;
+  document.getElementById('rRisk').textContent = aiResult.riskLevel;
+  document.getElementById('resultSummary').style.display = 'block';
+
+  log('success', 'COMPLETE', `Analysis complete. ${rc} rules queued for removal · ${rv} require manual review · ${kc} authorized.`);
+
+  if (rc > 0) {
+    document.getElementById('btnExecute').disabled = false;
+  }
+
+  document.getElementById('btnAnalyze').disabled = false;
+  analysisComplete = true;
+  isRunning = false;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CONFIRM + EXECUTE
+   ─────────────────────────────────────────────────────────────────
+   In production: this calls the PAN-OS API via the Skill wrapper.
+   Here: we animate the removal from the table.
+═══════════════════════════════════════════════════════════════════ */
+function openConfirm() {
+  const toRemove = FIREWALL_RULES.filter(r => decisions[r.id] === 'remove');
+  const list = document.getElementById('modalRuleList');
+  list.innerHTML = toRemove.map(r =>
+    `<div class="modal-rule-item">⬡ <strong>${r.id}</strong> · ${r.name} · Risk: ${r.risk.toUpperCase()}</div>`
+  ).join('');
+  document.getElementById('confirmModal').classList.add('open');
+}
+
+function closeConfirm() {
+  document.getElementById('confirmModal').classList.remove('open');
+}
+
+async function executeCleanup() {
+  closeConfirm();
+  const toRemove = FIREWALL_RULES.filter(r => decisions[r.id] === 'remove');
+  document.getElementById('btnExecute').disabled = true;
+
+  log('skill', 'SKILL', `Executing PAN-OS API calls · Removing ${toRemove.length} rules...`);
+
+  for (const rule of toRemove) {
+    await delay(600);
+    log('skill', 'SKILL', `DELETE rule: ${rule.id} · ${rule.name}`);
+    const row = document.getElementById(`row-${rule.id}`);
+    if (row) {
+      row.classList.add('fading');
+      await delay(500);
+      row.remove();
+    }
+  }
+
+  await delay(400);
+  log('skill', 'SKILL', 'PAN-OS commit executed · Candidate config pushed to running config');
+  await delay(400);
+  log('success', 'COMPLETE', `✓ ${toRemove.length} rules removed · Audit log written · Rollback snapshot retained 30d`);
+  log('agent', 'SEC-AGENT', 'Vault lease released · Agent session terminated');
+
+  document.getElementById('statRemove').textContent = '0';
+  document.getElementById('rRemove').textContent = '0';
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   UTILITIES
+═══════════════════════════════════════════════════════════════════ */
+function clearLog() {
+  document.getElementById('logStream').innerHTML = '';
+}
+
+function resetAll() {
+  if (isRunning) return;
+  decisions = {};
+  analysisComplete = false;
+  document.getElementById('btnAnalyze').disabled = false;
+  document.getElementById('btnExecute').disabled = true;
+  document.getElementById('resultSummary').style.display = 'none';
+  document.getElementById('statRemove').textContent = '0';
+  document.getElementById('statReview').textContent = '0';
+  document.getElementById('statKeep').textContent = '0';
+  ['signal','orchestrator','knowledge','model','autonomy','agent','skill'].forEach(l => setLayer(l, ''));
+  clearLog();
+  log('sys', 'SYSTEM', 'Control Plane reset · Awaiting trigger');
+  log('sys', 'TARGET', 'PA-5250-PROD-01 · PAN-OS 11.1.2 · vsys1 · 14 rules loaded');
+  renderTable();
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════════════════════ */
+renderTable();
+</script>
+</body>
+</html>

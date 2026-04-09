@@ -1,0 +1,19 @@
+{
+    "cpu": 45.2,
+    "memory": 62.8,
+    "sessions": 12453,
+    "status": "active",
+    "haStatus": "active-passive",
+    "alerts": [
+        {
+            "level": "warning",
+            "message": "High memory usage detected",
+            "time": "2025-04-05T10:30:00Z"
+        },
+        {
+            "level": "info",
+            "message": "HA synchronization completed",
+            "time": "2025-04-05T09:15:00Z"
+        }
+    ]
+}

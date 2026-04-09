@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>NetDiag Tool</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/alpinejs/3.13.3/cdn.min.js" defer></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600&family=Syne:wght@500;700;800&display=swap"
+    rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
+  <link rel="stylesheet" href="/static/css/main.css" />
+</head>
+
+<body x-data="netdiagApp()" x-init="init()" class="app-shell">
+
+  <!-- ═══ SIDEBAR ═══════════════════════════════════════════════════ -->
+  <aside class="sidebar" :class="{'sidebar--collapsed': sidebarCollapsed}">
+    <div class="sidebar__logo">
+      <div class="logo-mark">
+        <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+          <rect x="2" y="2" width="10" height="10" rx="2" fill="#00d4ff" opacity="0.9" />
+          <rect x="16" y="2" width="10" height="10" rx="2" fill="#00d4ff" opacity="0.45" />
+          <rect x="2" y="16" width="10" height="10" rx="2" fill="#00d4ff" opacity="0.45" />
+          <rect x="16" y="16" width="10" height="10" rx="2" fill="#00d4ff" opacity="0.9" />
+          <circle cx="14" cy="14" r="2.5" fill="#00d4ff" />
+        </svg>
+      </div>
+      <span class="logo-text" x-show="!sidebarCollapsed">NetDiag</span>
+      <button class="collapse-btn" @click="sidebarCollapsed=!sidebarCollapsed" style="margin-left:auto">
+        <i data-lucide="chevrons-left" x-show="!sidebarCollapsed"></i>
+        <i data-lucide="chevrons-right" x-show="sidebarCollapsed"></i>
+      </button>
+    </div>
+
+    <nav class="sidebar__nav">
+      <div class="nav-label-group" x-show="!sidebarCollapsed">TOOLS</div>
+
+      <button class="nav-item" :class="{'nav-item--active': activeView==='dashboard'}" @click="activeView='dashboard'">
+        <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span>
+        <span x-show="!sidebarCollapsed" class="nav-text">Dashboard</span>
+      </button>
+
+      <button class="nav-item" :class="{'nav-item--active': activeView==='ping'}" @click="activeView='ping'">
+        <span class="nav-icon"><i data-lucide="activity"></i></span>
+        <span x-show="!sidebarCollapsed" class="nav-text">Ping Tool</span>
+        <span class="nav-badge nav-badge--green" x-show="!sidebarCollapsed && activeIPCount>0"
+          x-text="activeIPCount+' live'"></span>
+      </button>
+
+      <button class="nav-item" :class="{'nav-item--active': activeView==='dns'}" @click="activeView='dns'">
+        <span class="nav-icon"><i data-lucide="globe"></i></span>
+        <span x-show="!sidebarCollapsed" class="nav-text">DNS Resolver</span>
+      </button>
+
+      <button class="nav-item" :class="{'nav-item--active': activeView==='ssl'}" @click="activeView='ssl'">
+        <span class="nav-icon"><i data-lucide="shield-check"></i></span>
+        <span x-show="!sidebarCollapsed" class="nav-text">SSL Analyzer</span>
+      </button>
+
+      <div class="nav-label-group" x-show="!sidebarCollapsed" style="margin-top:12px">SOON</div>
+      <button class="nav-item nav-item--disabled" disabled>
+        <span class="nav-icon"><i data-lucide="scan"></i></span>
+        <span x-show="!sidebarCollapsed" class="nav-text">Port Scanner</span>
+      </button>
+      <button class="nav-item nav-item--disabled" disabled>
+        <span class="nav-icon"><i data-lucide="map"></i></span>
+        <span x-show="!sidebarCollapsed" class="nav-text">Traceroute</span>
+      </button>
+    </nav>
+
+    <div class="sidebar__footer" x-show="!sidebarCollapsed">
+      <span class="pulse-dot" :class="sseConnected ? 'pulse-dot--green' : 'pulse-dot--red'"></span>
+      <span x-text="sseConnected ? 'Stream Connected' : 'Reconnecting…'"></span>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN ══════════════════════════════════════════════════════ -->
+  <div class="main-wrap" :class="{'main-wrap--expanded': sidebarCollapsed}">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar__left">
+        <span class="breadcrumb-app">NetDiag</span>
+        <i data-lucide="chevron-right" style="width:13px;height:13px;opacity:0.35"></i>
+        <span class="breadcrumb-page"
+          x-text="{dashboard:'Overview',ping:'Ping Tool',dns:'DNS Resolver',ssl:'SSL Analyzer'}[activeView]"></span>
+      </div>
+      <div class="topbar__center">
+        <div class="search-bar">
+          <i data-lucide="search"></i>
+          <input type="text" placeholder="Search targets, events…" readonly @click="void 0" />
+          <kbd>⌘K</kbd>
+        </div>
+      </div>
+      <div class="topbar__right">
+        <div class="stat-pill stat-pill--blue"><i data-lucide="monitor"></i><span x-text="ipList.length"></span><span
+            class="pill-lbl">IPs</span></div>
+        <div class="stat-pill stat-pill--green"><i data-lucide="check-circle-2"></i><span
+            x-text="activeIPCount"></span><span class="pill-lbl">Active</span></div>
+        <div class="stat-pill stat-pill--red"><i data-lucide="x-circle"></i><span x-text="failedIPCount"></span><span
+            class="pill-lbl">Down</span></div>
+        <div class="stat-pill stat-pill--amber"><i data-lucide="alert-triangle"></i><span
+            x-text="warningIPCount"></span><span class="pill-lbl">Warn</span></div>
+        <div class="live-pill" x-show="activeIPCount>0">
+          <span class="pulse-dot pulse-dot--green"></span>LIVE
+        </div>
+      </div>
+    </header>
+
+    <!-- ════ DASHBOARD VIEW ════════════════════════════════════════ -->
+    <main class="content" x-show="activeView==='dashboard'">
+      <div class="page-hdr">
+        <h1 class="page-title">Network Overview</h1>
+        <p class="page-sub">Real-time infrastructure pulse</p>
+      </div>
+
+      <!-- Metric cards -->
+      <div class="metric-grid">
+        <div class="metric-card metric-card--blue">
+          <div class="mc-icon"><i data-lucide="monitor-dot"></i></div>
+          <div class="mc-body">
+            <div class="mc-val" x-text="ipList.length||'—'"></div>
+            <div class="mc-lbl">Total IPs</div>
+            <div class="mc-trend mc-trend--up" x-show="ipList.length>0">↑ Monitored</div>
+          </div>
+        </div>
+        <div class="metric-card metric-card--green">
+          <div class="mc-icon"><i data-lucide="activity"></i></div>
+          <div class="mc-body">
+            <div class="mc-val" x-text="activeIPCount||'—'"></div>
+            <div class="mc-lbl">Active</div>
+            <div class="mc-trend mc-trend--up" x-show="activeIPCount>0">↑ Online</div>
+          </div>
+        </div>
+        <div class="metric-card metric-card--red">
+          <div class="mc-icon"><i data-lucide="wifi-off"></i></div>
+          <div class="mc-body">
+            <div class="mc-val" x-text="failedIPCount||'—'"></div>
+            <div class="mc-lbl">Failed</div>
+            <div class="mc-trend mc-trend--down" x-show="failedIPCount>0">↓ Unreachable</div>
+          </div>
+        </div>
+        <div class="metric-card metric-card--amber">
+          <div class="mc-icon"><i data-lucide="timer"></i></div>
+          <div class="mc-body">
+            <div class="mc-val" x-text="globalAvgLatency>0 ? globalAvgLatency.toFixed(1)+'ms' : '—'"></div>
+            <div class="mc-lbl">Avg Latency</div>
+            <div class="mc-trend" :class="globalAvgLatency<50?'mc-trend--up':'mc-trend--down'"
+              x-show="globalAvgLatency>0" x-text="globalAvgLatency<50?'↑ Excellent':'↓ Elevated'"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- IP cards -->
+      <div class="section-hdr">
+        <h2 class="section-title">IP Status Board</h2>
+        <button class="btn btn--ghost btn--sm" @click="activeView='ping'"><i data-lucide="plus"></i> Add IPs</button>
+      </div>
+      <div class="empty-card" x-show="ipList.length===0">
+        <i data-lucide="radar"></i>
+        <p>No IPs monitored yet.</p>
+        <button class="btn btn--primary" @click="activeView='ping'">Go to Ping Tool</button>
+      </div>
+      <div class="ip-cards-grid" x-show="ipList.length>0">
+        <template x-for="snap in ipList" :key="snap.ip">
+          <div class="ip-card" :class="ipCardClass(snap)">
+            <div class="ip-card__hdr">
+              <span class="ip-addr" x-text="snap.ip"></span>
+              <span class="status-dot" :class="statusDotClass(snap)"></span>
+            </div>
+            <div class="ip-stats">
+              <div class="ip-stat">
+                <span class="ip-stat__val" x-text="snap.avg_latency>0 ? snap.avg_latency.toFixed(1)+'ms' : '—'"></span>
+                <span class="ip-stat__lbl">Avg</span>
+              </div>
+              <div class="ip-stat">
+                <span class="ip-stat__val" x-text="snap.total_pings"></span>
+                <span class="ip-stat__lbl">Pings</span>
+              </div>
+              <div class="ip-stat">
+                <span class="ip-stat__val"
+                  x-text="snap.total_pings ? Math.round(snap.total_ok/snap.total_pings*100)+'%' : '—'"></span>
+                <span class="ip-stat__lbl">Uptime</span>
+              </div>
+            </div>
+            <div class="sparkline">
+              <template x-for="(r,i) in (snap.rolling||[]).slice(-8)" :key="i">
+                <div class="spark-bar" :class="sparkClass(r)" :style="sparkHeight(r)"></div>
+              </template>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <!-- Activity feed -->
+      <div class="section-hdr" style="margin-top:28px">
+        <h2 class="section-title">Live Activity</h2>
+        <span class="section-count" x-text="activityFeed.length+' events'"></span>
+      </div>
+      <div class="activity-feed">
+        <template x-for="(ev,i) in activityFeed.slice(0,60)" :key="i">
+          <div class="activity-item" :class="'activity-item--'+ev.type">
+            <span class="ev-time" x-text="ev.time"></span>
+            <span class="ev-ip" x-text="ev.ip"></span>
+            <span class="ev-arrow">→</span>
+            <span class="ev-msg" x-text="ev.msg"></span>
+          </div>
+        </template>
+        <div class="feed-empty" x-show="activityFeed.length===0"><i data-lucide="rss"></i> Waiting for events…</div>
+      </div>
+    </main>
+
+    <!-- ════ PING TOOL VIEW ════════════════════════════════════════ -->
+    <main class="content" x-show="activeView==='ping'">
+      <div class="page-hdr">
+        <h1 class="page-title">Ping Tool</h1>
+        <p class="page-sub">Real-time host reachability monitoring</p>
+      </div>
+      <div class="ping-layout">
+
+        <!-- Input panel -->
+        <div class="input-panel">
+          <div class="card">
+            <div class="card__hdr"><i data-lucide="terminal"></i> Target Configuration</div>
+            <div class="form-group">
+              <label class="form-lbl">IP / Hostname (one per line)</label>
+              <textarea class="form-textarea" x-model="pingInput" rows="8"
+                placeholder="8.8.8.8&#10;1.1.1.1&#10;github.com"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-lbl">Ping Interval</label>
+              <div class="btn-row">
+                <template x-for="opt in intervalOptions" :key="opt.val">
+                  <button class="seg-btn" :class="{'seg-btn--active': pingInterval===opt.val}"
+                    @click="pingInterval=opt.val" x-text="opt.label"></button>
+                </template>
+              </div>
+            </div>
+            <div class="btn-stack">
+              <button class="btn btn--primary" @click="startSinglePing()" :disabled="!pingInput.trim()">
+                <i data-lucide="play"></i> Ping Once
+              </button>
+              <button class="btn btn--success" @click="startContinuousPing()" :disabled="!pingInput.trim()">
+                <i data-lucide="refresh-cw"></i> Continuous Ping
+              </button>
+              <button class="btn btn--danger" @click="stopAll()" :disabled="activeIPCount===0">
+                <i data-lucide="square"></i> Stop All
+              </button>
+            </div>
+            <div class="quick-stats" x-show="ipList.length>0">
+              <div class="qs"><span class="qs__val text-green" x-text="activeIPCount"></span><span
+                  class="qs__lbl">Active</span></div>
+              <div class="qs"><span class="qs__val text-red" x-text="failedIPCount"></span><span
+                  class="qs__lbl">Down</span></div>
+              <div class="qs"><span class="qs__val text-amber" x-text="warningIPCount"></span><span
+                  class="qs__lbl">Warn</span></div>
+            </div>
+          </div>
+
+          <!-- Single results -->
+          <div class="card" x-show="singleResults.length>0">
+            <div class="card__hdr"><i data-lucide="zap"></i> Ping Results</div>
+            <div class="single-results">
+              <template x-for="r in singleResults" :key="r.ip">
+                <div class="sr-row" :class="'sr-row--'+r.status">
+                  <span class="sr-ip" x-text="r.ip"></span>
+                  <span class="badge" :class="'badge--'+r.status"
+                    x-text="r.status==='success' ? r.latency.toFixed(1)+'ms' : r.status.toUpperCase()"></span>
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <!-- Activity feed compact -->
+          <div class="card">
+            <div class="card__hdr">
+              <i data-lucide="rss"></i> Event Feed
+              <span class="live-pill" x-show="activeIPCount>0" style="margin-left:auto"><span
+                  class="pulse-dot pulse-dot--green"></span>LIVE</span>
+            </div>
+            <div class="activity-feed activity-feed--sm">
+              <template x-for="(ev,i) in activityFeed.slice(0,40)" :key="i">
+                <div class="activity-item" :class="'activity-item--'+ev.type">
+                  <span class="ev-time" x-text="ev.time"></span>
+                  <span class="ev-ip" x-text="ev.ip"></span>
+                  <span class="ev-arrow">→</span>
+                  <span class="ev-msg" x-text="ev.msg"></span>
+                </div>
+              </template>
+              <div class="feed-empty" x-show="activityFeed.length===0"><i data-lucide="rss"></i> Waiting…</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Continuous ping table -->
+        <div class="table-panel">
+          <div class="card card--fill">
+            <div class="card__hdr">
+              <i data-lucide="table-2"></i> Continuous Monitor
+              <span class="live-pill" x-show="activeIPCount>0"><span
+                  class="pulse-dot pulse-dot--green"></span>LIVE</span>
+              <span class="row-count" style="margin-left:auto" x-text="ipList.length+' hosts'"></span>
+            </div>
+            <div class="table-wrap" x-show="ipList.length>0">
+              <table class="ping-table">
+                <thead>
+                  <tr>
+                    <th class="th-ip">Host</th>
+                    <template x-for="n in 10" :key="n">
+                      <th class="th-ping" x-text="'P'+n"></th>
+                    </template>
+                    <th class="th-avg">Avg(10)</th>
+                    <th class="th-avg">Overall</th>
+                    <th class="th-up">Uptime</th>
+                    <th class="th-act">Act</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <template x-for="snap in ipList" :key="snap.ip">
+                    <tr :class="{'row--stopped': !snap.active}">
+                      <td class="th-ip">
+                        <div class="ip-cell">
+                          <span class="status-dot" :class="statusDotClass(snap)"></span>
+                          <span x-text="snap.ip"></span>
+                        </div>
+                      </td>
+                      <template x-for="(cell,ci) in getPaddedRolling(snap)" :key="ci">
+                        <td class="th-ping">
+                          <span class="ping-badge" :class="pingBadgeClass(cell)" x-text="pingBadgeText(cell)"></span>
+                        </td>
+                      </template>
+                      <td class="th-avg"><span :class="avgClass(snap.avg_latency)"
+                          x-text="snap.avg_latency>0 ? snap.avg_latency.toFixed(1)+'ms' : '—'"></span></td>
+                      <td class="th-avg"><span class="text-muted"
+                          x-text="snap.overall_avg>0 ? snap.overall_avg.toFixed(1)+'ms' : '—'"></span></td>
+                      <td class="th-up">
+                        <div class="uptime-wrap">
+                          <div class="uptime-bar">
+                            <div class="uptime-fill" :class="uptimeBarClass(snap)"
+                              :style="'width:'+getUptime(snap)+'%'"></div>
+                          </div>
+                          <span class="uptime-pct" x-text="getUptime(snap)+'%'"></span>
+                        </div>
+                      </td>
+                      <td class="th-act">
+                        <button x-show="snap.active" class="act-btn act-btn--stop" @click="stopIP(snap.ip)"><i
+                            data-lucide="square"></i></button>
+                        <button x-show="!snap.active" class="act-btn act-btn--play" @click="resumeIP(snap.ip)"><i
+                            data-lucide="play"></i></button>
+                      </td>
+                    </tr>
+                  </template>
+                </tbody>
+              </table>
+            </div>
+            <div class="table-empty" x-show="ipList.length===0">
+              <i data-lucide="activity"></i>
+              <p>Enter IPs above and click <strong>Continuous Ping</strong></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ════ DNS RESOLVER VIEW ═════════════════════════════════════ -->
+    <main class="content" x-show="activeView==='dns'">
+      <div class="page-hdr">
+        <h1 class="page-title">DNS Resolver</h1>
+        <p class="page-sub">Query DNS records for any domain</p>
+      </div>
+      <div class="tool-layout">
+        <!-- Input -->
+        <div class="input-panel">
+          <div class="card">
+            <div class="card__hdr"><i data-lucide="globe"></i> Query Configuration</div>
+            <div class="form-group">
+              <label class="form-lbl">Domain(s) — one per line</label>
+              <textarea class="form-textarea" x-model="dnsInput" rows="6"
+                placeholder="google.com&#10;github.com&#10;cloudflare.com"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-lbl">Record Types</label>
+              <div class="btn-row" style="flex-wrap:wrap">
+                <template x-for="t in dnsTypeOptions" :key="t">
+                  <button class="seg-btn" :class="{'seg-btn--active': dnsTypeActive(t)}" @click="toggleDNSType(t)"
+                    x-text="t"></button>
+                </template>
+              </div>
+            </div>
+            <div class="btn-stack">
+              <button class="btn btn--primary" @click="runDNS()" :disabled="!dnsInput.trim() || dnsLoading">
+                <i data-lucide="search"></i>
+                <span x-text="dnsLoading ? 'Resolving…' : 'Resolve'"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div class="results-panel">
+          <div class="error-banner" x-show="dnsError" x-text="dnsError"></div>
+
+          <template x-for="result in dnsResults" :key="result.domain">
+            <div class="card" style="margin-bottom:16px">
+              <div class="card__hdr">
+                <i data-lucide="globe"></i>
+                <span x-text="result.domain"></span>
+                <span class="badge" :class="result.error ? 'badge--red' : 'badge--green'"
+                  x-text="result.error ? 'Failed' : result.records.length+' records'" style="margin-left:auto"></span>
+                <span class="text-muted" style="font-size:11px;margin-left:8px"
+                  x-text="result.query_time_ms.toFixed(1)+'ms'"></span>
+              </div>
+
+              <div class="dns-error" x-show="result.error" x-text="result.error"></div>
+
+              <div class="dns-records" x-show="!result.error && result.records.length>0">
+                <template x-for="(rec,i) in result.records" :key="i">
+                  <div class="dns-row">
+                    <span class="badge" :class="dnsRecordClass(rec.type)" x-text="rec.type"></span>
+                    <span class="dns-val" x-text="rec.value"></span>
+                  </div>
+                </template>
+              </div>
+
+              <div class="dns-empty" x-show="!result.error && result.records.length===0">
+                No records found for selected types.
+              </div>
+            </div>
+          </template>
+
+          <div class="empty-card" x-show="dnsResults.length===0 && !dnsLoading && !dnsError">
+            <i data-lucide="globe"></i>
+            <p>Enter a domain and click Resolve</p>
+          </div>
+          <div class="empty-card" x-show="dnsLoading">
+            <i data-lucide="loader-2" class="spin"></i>
+            <p>Resolving DNS records…</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- ════ SSL ANALYZER VIEW ════════════════════════════════════ -->
+    <main class="content" x-show="activeView==='ssl'">
+      <div class="page-hdr">
+        <h1 class="page-title">SSL Analyzer</h1>
+        <p class="page-sub">Inspect TLS certificates and security grade</p>
+      </div>
+      <div class="tool-layout">
+        <!-- Input -->
+        <div class="input-panel">
+          <div class="card">
+            <div class="card__hdr"><i data-lucide="shield-check"></i> Scan Configuration</div>
+            <div class="form-group">
+              <label class="form-lbl">Host(s) — one per line</label>
+              <textarea class="form-textarea" x-model="sslInput" rows="6"
+                placeholder="google.com&#10;github.com&#10;expired.badssl.com"></textarea>
+            </div>
+            <div class="form-group">
+              <label class="form-lbl">Port</label>
+              <input class="form-input" type="text" x-model="sslPort" placeholder="443" />
+            </div>
+            <div class="btn-stack">
+              <button class="btn btn--primary" @click="runSSL()" :disabled="!sslInput.trim() || sslLoading">
+                <i data-lucide="shield-check"></i>
+                <span x-text="sslLoading ? 'Analyzing…' : 'Analyze SSL'"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Results -->
+        <div class="results-panel">
+          <div class="error-banner" x-show="sslError" x-text="sslError"></div>
+
+          <template x-for="result in sslResults" :key="result.host">
+            <div class="card ssl-card" style="margin-bottom:16px">
+              <!-- Header row -->
+              <div class="card__hdr">
+                <i data-lucide="shield-check"></i>
+                <span x-text="result.host + ':' + result.port"></span>
+                <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+                  <span class="ssl-grade" :class="'ssl-grade--'+result.grade" x-text="result.grade"></span>
+                  <span class="badge" :class="result.connected ? 'badge--green' : 'badge--red'"
+                    x-text="result.connected ? 'Connected' : 'Failed'"></span>
+                  <span class="text-muted" style="font-size:11px"
+                    x-text="result.connect_time_ms.toFixed(0)+'ms'"></span>
+                </div>
+              </div>
+
+              <div class="ssl-error" x-show="result.error" x-text="result.error"></div>
+
+              <!-- Issues -->
+              <div class="ssl-issues" x-show="result.issues && result.issues.length>0">
+                <template x-for="(issue,i) in result.issues" :key="i">
+                  <div class="issue-row">
+                    <i data-lucide="alert-triangle" style="width:13px;height:13px;color:#ffb300;flex-shrink:0"></i>
+                    <span x-text="issue"></span>
+                  </div>
+                </template>
+              </div>
+
+              <div x-show="result.certificate" class="ssl-body">
+                <!-- TLS info -->
+                <div class="ssl-section" x-show="result.tls">
+                  <div class="ssl-section-title">TLS</div>
+                  <div class="ssl-kv">
+                    <span class="ssl-k">Version</span>
+                    <span class="ssl-v" x-text="result.tls && result.tls.version"></span>
+                  </div>
+                  <div class="ssl-kv">
+                    <span class="ssl-k">Cipher</span>
+                    <span class="ssl-v" x-text="result.tls && result.tls.cipher_suite"></span>
+                  </div>
+                </div>
+
+                <!-- Certificate info -->
+                <div class="ssl-section" x-show="result.certificate">
+                  <div class="ssl-section-title">Certificate</div>
+                  <div class="ssl-kv">
+                    <span class="ssl-k">Common Name</span>
+                    <span class="ssl-v" x-text="result.certificate && result.certificate.common_name"></span>
+                  </div>
+                  <div class="ssl-kv">
+                    <span class="ssl-k">Issuer</span>
+                    <span class="ssl-v ssl-v--wrap" x-text="result.certificate && result.certificate.issuer"></span>
+                  </div>
+                  <div class="ssl-kv">
+                    <span class="ssl-k">Valid Until</span>
+                    <span class="ssl-v"
+                      :class="result.certificate && sslExpiryClass(result.certificate.days_until_expiry)"
+                      x-text="result.certificate && (new Date(result.certificate.not_after).toLocaleDateString() + ' (' + result.certificate.days_until_expiry + ' days)')">
+                    </span>
+                  </div>
+                  <div class="ssl-kv">
+                    <span class="ssl-k">Valid From</span>
+                    <span class="ssl-v"
+                      x-text="result.certificate && new Date(result.certificate.not_before).toLocaleDateString()"></span>
+                  </div>
+                  <div class="ssl-kv">
+                    <span class="ssl-k">Key</span>
+                    <span class="ssl-v"
+                      x-text="result.certificate && (result.certificate.public_key_algorithm + ' ' + result.certificate.key_size + ' bit')"></span>
+                  </div>
+                  <div class="ssl-kv">
+                    <span class="ssl-k">Serial</span>
+                    <span class="ssl-v ssl-v--mono"
+                      x-text="result.certificate && result.certificate.serial_number"></span>
+                  </div>
+                  <!-- SANs -->
+                  <div class="ssl-kv"
+                    x-show="result.certificate && result.certificate.sans && result.certificate.sans.length>0">
+                    <span class="ssl-k">SANs</span>
+                    <div class="sans-list">
+                      <template x-for="(san,i) in (result.certificate ? result.certificate.sans.slice(0,8) : [])"
+                        :key="i">
+                        <span class="badge badge--dim" x-text="san"></span>
+                      </template>
+                      <span class="text-muted" x-show="result.certificate && result.certificate.sans.length>8"
+                        x-text="'+'+(result.certificate.sans.length-8)+' more'"></span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Chain -->
+                <div class="ssl-section" x-show="result.chain && result.chain.length>0">
+                  <div class="ssl-section-title">Certificate Chain (<span
+                      x-text="result.chain ? result.chain.length : 0"></span> intermediates)</div>
+                  <template x-for="(c,i) in (result.chain||[])" :key="i">
+                    <div class="chain-row">
+                      <span class="chain-idx" x-text="i+1"></span>
+                      <span class="chain-cn" x-text="c.common_name||c.subject"></span>
+                      <span class="badge badge--dim chain-ca" x-show="c.is_ca">CA</span>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </template>
+
+          <div class="empty-card" x-show="sslResults.length===0 && !sslLoading && !sslError">
+            <i data-lucide="shield-check"></i>
+            <p>Enter a hostname and click Analyze SSL</p>
+          </div>
+          <div class="empty-card" x-show="sslLoading">
+            <i data-lucide="loader-2" class="spin"></i>
+            <p>Analyzing TLS certificate…</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+  </div><!-- /main-wrap -->
+
+  <script src="/static/js/app.js"></script>
+  <script>
+    document.addEventListener('alpine:initialized', () => {
+      lucide.createIcons();
+      new MutationObserver(() => lucide.createIcons())
+        .observe(document.body, { childList: true, subtree: true });
+    });
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';" />
+  <title>NetDiag — Network Diagnostic Tool</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+
+    <!-- Sidebar Nav -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div class="logo-icon">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <circle cx="14" cy="14" r="12" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 2"/>
+            <circle cx="14" cy="14" r="5" fill="currentColor" opacity="0.8"/>
+            <line x1="14" y1="2" x2="14" y2="6" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="14" y1="22" x2="14" y2="26" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="2" y1="14" x2="6" y2="14" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="22" y1="14" x2="26" y2="14" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <span class="logo-text">NetDiag</span>
+        <span class="logo-version">v1.0</span>
+      </div>
+
+      <nav class="nav-menu">
+        <button class="nav-item active" data-tab="ping" title="Single Ping">
+          <svg class="nav-icon" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="3" fill="currentColor"/>
+            <circle cx="10" cy="10" r="7" stroke="currentColor" stroke-width="1.5" opacity="0.5"/>
+          </svg>
+          <span>Single Ping</span>
+        </button>
+        <button class="nav-item" data-tab="bulk" title="Bulk Ping">
+          <svg class="nav-icon" viewBox="0 0 20 20" fill="none">
+            <circle cx="5" cy="7" r="2" fill="currentColor"/>
+            <circle cx="10" cy="7" r="2" fill="currentColor" opacity="0.7"/>
+            <circle cx="15" cy="7" r="2" fill="currentColor" opacity="0.4"/>
+            <line x1="3" y1="13" x2="17" y2="13" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="3" y1="16" x2="13" y2="16" stroke="currentColor" stroke-width="1.5"/>
+          </svg>
+          <span>Bulk Ping</span>
+        </button>
+        <button class="nav-item" data-tab="traceroute" title="Traceroute">
+          <svg class="nav-icon" viewBox="0 0 20 20" fill="none">
+            <polyline points="3,17 7,11 11,14 17,5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linejoin="round"/>
+            <circle cx="17" cy="5" r="2" fill="currentColor"/>
+          </svg>
+          <span>Traceroute</span>
+        </button>
+        <button class="nav-item" data-tab="monitor" title="Live Monitor">
+          <svg class="nav-icon" viewBox="0 0 20 20" fill="none">
+            <rect x="2" y="4" width="16" height="11" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="7" y1="18" x2="13" y2="18" stroke="currentColor" stroke-width="1.5"/>
+            <polyline points="5,10 8,7 11,9 15,6" stroke="currentColor" stroke-width="1.2" fill="none"/>
+          </svg>
+          <span>Live Monitor</span>
+          <span class="nav-badge" id="monitor-badge" style="display:none">●</span>
+        </button>
+        <button class="nav-item" data-tab="dns" title="DNS Resolver">
+          <svg class="nav-icon" viewBox="0 0 20 20" fill="none">
+            <path d="M10 3C6.5 3 3 6 3 10s3.5 7 7 7 7-3 7-7-3.5-7-7-7z" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M10 3c-2 0-3.5 3-3.5 7s1.5 7 3.5 7 3.5-3 3.5-7-1.5-7-3.5-7z" stroke="currentColor" stroke-width="1.2" opacity="0.6"/>
+            <line x1="3" y1="10" x2="17" y2="10" stroke="currentColor" stroke-width="1.2" opacity="0.6"/>
+          </svg>
+          <span>DNS Resolver</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button class="theme-toggle" id="themeToggle" title="Toggle theme">
+          <svg viewBox="0 0 20 20" fill="none" width="16" height="16">
+            <circle cx="10" cy="10" r="4" stroke="currentColor" stroke-width="1.5"/>
+            <line x1="10" y1="2" x2="10" y2="4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="10" y1="16" x2="10" y2="18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="2" y1="10" x2="4" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="16" y1="10" x2="18" y2="10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <span class="sidebar-status" id="sidebarStatus">Ready</span>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+      <!-- ══════════════════ SINGLE PING ══════════════════ -->
+      <section class="tab-panel active" id="tab-ping">
+        <div class="panel-header">
+          <h1 class="panel-title">Single Ping</h1>
+          <p class="panel-subtitle">Test connectivity and latency to a host</p>
+        </div>
+
+        <div class="card input-card">
+          <div class="input-row">
+            <div class="input-group flex-1">
+              <label class="input-label">Hostname or IP Address</label>
+              <input type="text" id="pingHost" class="text-input" placeholder="e.g. 8.8.8.8 or google.com" autocomplete="off" spellcheck="false" />
+            </div>
+            <div class="input-group" style="width:100px">
+              <label class="input-label">Ping Count</label>
+              <input type="number" id="pingCount" class="text-input" value="4" min="1" max="20" />
+            </div>
+            <button class="btn-primary" id="pingBtn" onclick="pingModule.run()">
+              <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="2" fill="currentColor"/></svg>
+              Ping
+            </button>
+          </div>
+        </div>
+
+        <div id="pingResult" class="result-area" style="display:none">
+          <div class="result-header">
+            <span class="result-label">Result</span>
+            <button class="btn-copy" onclick="copyToClipboard('pingResultText')">Copy</button>
+          </div>
+          <div id="pingResultText" class="result-content"></div>
+        </div>
+
+        <div class="demo-section">
+          <p class="demo-hint">Quick targets:</p>
+          <div class="quick-tags">
+            <button class="quick-tag" onclick="document.getElementById('pingHost').value='8.8.8.8'">8.8.8.8</button>
+            <button class="quick-tag" onclick="document.getElementById('pingHost').value='1.1.1.1'">1.1.1.1</button>
+            <button class="quick-tag" onclick="document.getElementById('pingHost').value='localhost'">localhost</button>
+            <button class="quick-tag" onclick="document.getElementById('pingHost').value='google.com'">google.com</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════ BULK PING ══════════════════ -->
+      <section class="tab-panel" id="tab-bulk">
+        <div class="panel-header">
+          <h1 class="panel-title">Bulk Ping</h1>
+          <p class="panel-subtitle">Ping multiple hosts simultaneously</p>
+        </div>
+
+        <div class="card input-card">
+          <div class="input-group">
+            <label class="input-label">Hosts (one per line)</label>
+            <textarea id="bulkHosts" class="text-area" rows="6" placeholder="8.8.8.8&#10;1.1.1.1&#10;9.9.9.9&#10;google.com&#10;cloudflare.com" spellcheck="false"></textarea>
+          </div>
+          <div class="input-row" style="margin-top:12px">
+            <div class="input-group" style="width:120px">
+              <label class="input-label">Ping Count</label>
+              <input type="number" id="bulkCount" class="text-input" value="2" min="1" max="10" />
+            </div>
+            <div style="flex:1"></div>
+            <button class="btn-secondary" onclick="bulkModule.loadSample()">Load Sample</button>
+            <button class="btn-primary" id="bulkBtn" onclick="bulkModule.run()">
+              <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><circle cx="4" cy="8" r="2" fill="currentColor"/><circle cx="9" cy="8" r="2" fill="currentColor" opacity="0.7"/><circle cx="14" cy="8" r="2" fill="currentColor" opacity="0.4"/></svg>
+              Bulk Ping
+            </button>
+          </div>
+        </div>
+
+        <div id="bulkProgress" class="progress-bar-wrap" style="display:none">
+          <div class="progress-bar" id="bulkProgressBar"></div>
+        </div>
+
+        <div id="bulkResults" class="result-area" style="display:none">
+          <div class="result-header">
+            <span class="result-label">Results <span id="bulkCount2" class="result-count"></span></span>
+            <div class="result-actions">
+              <button class="btn-copy" onclick="bulkModule.exportCSV()">Export CSV</button>
+              <button class="btn-copy" onclick="copyToClipboard('bulkResultText')">Copy</button>
+            </div>
+          </div>
+          <div id="bulkResultText" class="result-content">
+            <table class="results-table" id="bulkTable">
+              <thead>
+                <tr>
+                  <th>Host</th>
+                  <th>Status</th>
+                  <th>Latency</th>
+                  <th>Packet Loss</th>
+                </tr>
+              </thead>
+              <tbody id="bulkTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════ TRACEROUTE ══════════════════ -->
+      <section class="tab-panel" id="tab-traceroute">
+        <div class="panel-header">
+          <h1 class="panel-title">Traceroute</h1>
+          <p class="panel-subtitle">Trace the network path to a destination</p>
+        </div>
+
+        <div class="card input-card">
+          <div class="input-row">
+            <div class="input-group flex-1">
+              <label class="input-label">Target Hostname or IP</label>
+              <input type="text" id="traceHost" class="text-input" placeholder="e.g. 8.8.8.8 or google.com" autocomplete="off" spellcheck="false" />
+            </div>
+            <div class="input-group" style="width:110px">
+              <label class="input-label">Max Hops</label>
+              <input type="number" id="traceMaxHops" class="text-input" value="30" min="5" max="64" />
+            </div>
+            <button class="btn-primary" id="traceBtn" onclick="traceModule.run()">
+              <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><polyline points="2,13 5,8 9,10 14,3" stroke="currentColor" stroke-width="1.5" fill="none"/></svg>
+              Trace
+            </button>
+          </div>
+        </div>
+
+        <div id="traceResult" class="result-area" style="display:none">
+          <div class="result-header">
+            <span class="result-label">Trace Path</span>
+            <button class="btn-copy" onclick="copyToClipboard('traceResultText')">Copy</button>
+          </div>
+          <div id="traceResultText" class="result-content">
+            <table class="results-table" id="traceTable">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Host</th>
+                  <th>IP</th>
+                  <th>RTT 1</th>
+                  <th>RTT 2</th>
+                  <th>RTT 3</th>
+                  <th>Avg</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="traceTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════ LIVE MONITOR ══════════════════ -->
+      <section class="tab-panel" id="tab-monitor">
+        <div class="panel-header">
+          <h1 class="panel-title">Live Monitor</h1>
+          <p class="panel-subtitle">Continuously monitor multiple hosts in real-time</p>
+        </div>
+
+        <div class="card input-card" id="monitorConfig">
+          <div class="input-group">
+            <label class="input-label">Hosts to Monitor (one per line)</label>
+            <textarea id="monitorHosts" class="text-area" rows="5" placeholder="8.8.8.8&#10;1.1.1.1&#10;9.9.9.9&#10;192.168.1.1" spellcheck="false"></textarea>
+          </div>
+          <div class="input-row" style="margin-top:12px">
+            <div class="input-group" style="width:160px">
+              <label class="input-label">Interval (ms)</label>
+              <input type="number" id="monitorInterval" class="text-input" value="2000" min="500" max="30000" step="500" />
+            </div>
+            <div style="flex:1"></div>
+            <button class="btn-secondary" onclick="monitorModule.loadSample()">Load Sample</button>
+            <button class="btn-primary" id="monitorStartBtn" onclick="monitorModule.start()">
+              <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><polygon points="4,2 14,8 4,14" fill="currentColor"/></svg>
+              Start Monitor
+            </button>
+            <button class="btn-danger" id="monitorStopBtn" onclick="monitorModule.stop()" style="display:none">
+              <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><rect x="3" y="3" width="10" height="10" fill="currentColor"/></svg>
+              Stop
+            </button>
+          </div>
+        </div>
+
+        <div id="monitorStats" class="monitor-stats" style="display:none">
+          <div class="stat-chip">
+            <span class="stat-label">Hosts</span>
+            <span class="stat-value" id="statHosts">0</span>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-label">Online</span>
+            <span class="stat-value success" id="statOnline">0</span>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-label">Offline</span>
+            <span class="stat-value danger" id="statOffline">0</span>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-label">Avg RTT</span>
+            <span class="stat-value" id="statAvgRtt">—</span>
+          </div>
+          <div class="stat-chip">
+            <span class="stat-label">Uptime</span>
+            <span class="stat-value" id="statUptime">0s</span>
+          </div>
+        </div>
+
+        <div id="monitorTableWrap" class="result-area" style="display:none">
+          <div class="result-header">
+            <span class="result-label">Live Results <span class="live-dot">●</span></span>
+            <button class="btn-copy" onclick="monitorModule.exportCSV()">Export CSV</button>
+          </div>
+          <div class="monitor-table-scroll">
+            <table class="results-table monitor-table" id="monitorTable">
+              <thead>
+                <tr>
+                  <th class="th-host">Host</th>
+                  <th class="th-ping">1</th>
+                  <th class="th-ping">2</th>
+                  <th class="th-ping">3</th>
+                  <th class="th-ping">4</th>
+                  <th class="th-ping">5</th>
+                  <th class="th-ping">6</th>
+                  <th class="th-ping">7</th>
+                  <th class="th-ping">8</th>
+                  <th class="th-ping">9</th>
+                  <th class="th-ping">10</th>
+                  <th class="th-avg">Avg (10)</th>
+                  <th class="th-avg">Overall</th>
+                  <th class="th-status">Status</th>
+                </tr>
+              </thead>
+              <tbody id="monitorTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ══════════════════ DNS RESOLVER ══════════════════ -->
+      <section class="tab-panel" id="tab-dns">
+        <div class="panel-header">
+          <h1 class="panel-title">DNS Resolver</h1>
+          <p class="panel-subtitle">Resolve hostnames using specific DNS servers</p>
+        </div>
+
+        <div class="card input-card">
+          <div class="input-row">
+            <div class="input-group flex-1">
+              <label class="input-label">Hostname to Resolve</label>
+              <input type="text" id="dnsHost" class="text-input" placeholder="e.g. google.com or api.example.com" autocomplete="off" spellcheck="false" />
+            </div>
+          </div>
+          <div class="input-row" style="margin-top:12px">
+            <div class="input-group" style="width:200px">
+              <label class="input-label">DNS Server</label>
+              <select class="select-input" id="dnsServerSelect" onchange="dnsModule.onServerChange()">
+                <option value="">System Default</option>
+                <option value="8.8.8.8">8.8.8.8 — Google</option>
+                <option value="8.8.4.4">8.8.4.4 — Google Alt</option>
+                <option value="1.1.1.1">1.1.1.1 — Cloudflare</option>
+                <option value="1.0.0.1">1.0.0.1 — Cloudflare Alt</option>
+                <option value="9.9.9.9">9.9.9.9 — Quad9</option>
+                <option value="208.67.222.222">208.67.222.222 — OpenDNS</option>
+                <option value="custom">Custom…</option>
+              </select>
+            </div>
+            <div class="input-group flex-1" id="customDnsGroup" style="display:none">
+              <label class="input-label">Custom DNS IP</label>
+              <input type="text" id="customDnsIp" class="text-input" placeholder="e.g. 192.168.1.53" autocomplete="off" />
+            </div>
+            <button class="btn-primary" id="dnsBtn" onclick="dnsModule.run()">
+              <svg viewBox="0 0 16 16" fill="none" width="14" height="14"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 2c-2 0-3 2.5-3 6s1 6 3 6 3-2.5 3-6-1-6-3-6z" stroke="currentColor" stroke-width="1.2" opacity="0.6"/><line x1="2" y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.2" opacity="0.6"/></svg>
+              Resolve
+            </button>
+          </div>
+        </div>
+
+        <div id="dnsResult" class="result-area" style="display:none">
+          <div class="result-header">
+            <span class="result-label">Resolution Result</span>
+            <button class="btn-copy" onclick="copyToClipboard('dnsResultText')">Copy</button>
+          </div>
+          <div id="dnsResultText" class="result-content"></div>
+        </div>
+
+        <div class="demo-section">
+          <p class="demo-hint">Quick examples:</p>
+          <div class="quick-tags">
+            <button class="quick-tag" onclick="document.getElementById('dnsHost').value='google.com'">google.com</button>
+            <button class="quick-tag" onclick="document.getElementById('dnsHost').value='cloudflare.com'">cloudflare.com</button>
+            <button class="quick-tag" onclick="document.getElementById('dnsHost').value='github.com'">github.com</button>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Loading overlay -->
+  <div class="loading-overlay" id="loadingOverlay" style="display:none">
+    <div class="loading-spinner"></div>
+    <span class="loading-text" id="loadingText">Running...</span>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast"></div>
+
+  <script src="js/app.js"></script>
+  <script src="js/ping.js"></script>
+  <script src="js/bulk.js"></script>
+  <script src="js/traceroute.js"></script>
+  <script src="js/monitor.js"></script>
+  <script src="js/dns.js"></script>
+</body>
+</html>

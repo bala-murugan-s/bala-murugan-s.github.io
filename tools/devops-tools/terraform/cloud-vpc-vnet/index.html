@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terraform VPC/VNET Builder</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-hcl.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .left-panel {
+            padding: 30px;
+            overflow-y: auto;
+            max-height: 800px;
+            border-right: 2px solid #e0e0e0;
+        }
+
+        .right-panel {
+            background: #1e1e1e;
+            padding: 30px;
+            overflow-y: auto;
+            max-height: 800px;
+            position: relative;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 0.95em;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .provider-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .provider-tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .provider-tab:hover {
+            color: #667eea;
+        }
+
+        .provider-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .subnet-list {
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-top: 10px;
+        }
+
+        .subnet-item {
+            display: grid;
+            grid-template-columns: 1fr 2fr auto;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .subnet-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .subnet-item input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #48bb78;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #38a169;
+        }
+
+        .btn-danger {
+            background: #f56565;
+            color: white;
+            padding: 8px 16px;
+            font-size: 0.9em;
+        }
+
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.9em;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .code-header h3 {
+            color: #fff;
+            font-size: 1.2em;
+        }
+
+        .code-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .code-tab {
+            padding: 8px 16px;
+            background: #2d2d2d;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.9em;
+            transition: all 0.3s;
+        }
+
+        .code-tab:hover {
+            color: #fff;
+            background: #3d3d3d;
+        }
+
+        .code-tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        pre {
+            margin: 0 !important;
+            border-radius: 6px !important;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        pre code {
+            font-size: 0.9em !important;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 80px;
+            right: 40px;
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s;
+            z-index: 10;
+        }
+
+        .copy-btn:hover {
+            background: #38a169;
+        }
+
+        .copy-btn.copied {
+            background: #4299e1;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+        }
+
+        .info-badge {
+            display: inline-block;
+            background: #edf2f7;
+            color: #2d3748;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            margin-left: 8px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .right-panel {
+                max-height: 500px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏗️ Terraform VPC/VNET Builder</h1>
+            <p>Generate production-ready Terraform code for multi-cloud networks</p>
+        </header>
+
+        <div class="main-content">
+            <div class="left-panel">
+                <div class="provider-tabs">
+                    <button class="provider-tab active" data-provider="aws">AWS VPC</button>
+                    <button class="provider-tab" data-provider="azure">Azure VNET</button>
+                    <button class="provider-tab" data-provider="gcp">GCP VPC</button>
+                </div>
+
+                <div id="aws-form" class="provider-form">
+                    <div class="form-group">
+                        <label>VPC Name</label>
+                        <input type="text" id="aws-vpc-name" value="main-vpc" placeholder="e.g., main-vpc">
+                    </div>
+
+                    <div class="form-group">
+                        <label>VPC CIDR Block</label>
+                        <input type="text" id="aws-vpc-cidr" value="10.0.0.0/16" placeholder="e.g., 10.0.0.0/16">
+                    </div>
+
+                    <div class="form-group">
+                        <label>AWS Region</label>
+                        <select id="aws-region">
+                            <option value="us-east-1">us-east-1 (N. Virginia)</option>
+                            <option value="us-west-2">us-west-2 (Oregon)</option>
+                            <option value="eu-west-1">eu-west-1 (Ireland)</option>
+                            <option value="ap-southeast-1">ap-southeast-1 (Singapore)</option>
+                        </select>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="aws-dns-hostnames" checked>
+                        <label for="aws-dns-hostnames">Enable DNS Hostnames</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="aws-dns-support" checked>
+                        <label for="aws-dns-support">Enable DNS Support</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Subnets <span class="info-badge">Public & Private</span></label>
+                        <div class="subnet-list" id="aws-subnets">
+                            <div class="subnet-item">
+                                <input type="text" placeholder="Name" value="public-1" class="subnet-name">
+                                <input type="text" placeholder="CIDR" value="10.0.1.0/24" class="subnet-cidr">
+                                <select class="subnet-type">
+                                    <option value="public">Public</option>
+                                    <option value="private">Private</option>
+                                </select>
+                                <button class="btn btn-danger btn-small" onclick="removeSubnet(this)">Remove</button>
+                            </div>
+                            <div class="subnet-item">
+                                <input type="text" placeholder="Name" value="private-1" class="subnet-name">
+                                <input type="text" placeholder="CIDR" value="10.0.10.0/24" class="subnet-cidr">
+                                <select class="subnet-type">
+                                    <option value="public">Public</option>
+                                    <option value="private" selected>Private</option>
+                                </select>
+                                <button class="btn btn-danger btn-small" onclick="removeSubnet(this)">Remove</button>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="addSubnet('aws')" style="margin-top: 10px;">+ Add Subnet</button>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="aws-nat-gateway" checked>
+                        <label for="aws-nat-gateway">Create NAT Gateway for Private Subnets</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="aws-flow-logs">
+                        <label for="aws-flow-logs">Enable VPC Flow Logs</label>
+                    </div>
+                </div>
+
+                <div id="azure-form" class="provider-form hidden">
+                    <div class="form-group">
+                        <label>Resource Group Name</label>
+                        <input type="text" id="azure-rg-name" value="network-rg" placeholder="e.g., network-rg">
+                    </div>
+
+                    <div class="form-group">
+                        <label>VNET Name</label>
+                        <input type="text" id="azure-vnet-name" value="main-vnet" placeholder="e.g., main-vnet">
+                    </div>
+
+                    <div class="form-group">
+                        <label>VNET Address Space</label>
+                        <input type="text" id="azure-vnet-cidr" value="10.0.0.0/16" placeholder="e.g., 10.0.0.0/16">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Azure Region</label>
+                        <select id="azure-region">
+                            <option value="eastus">East US</option>
+                            <option value="westus2">West US 2</option>
+                            <option value="westeurope">West Europe</option>
+                            <option value="southeastasia">Southeast Asia</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Subnets</label>
+                        <div class="subnet-list" id="azure-subnets">
+                            <div class="subnet-item">
+                                <input type="text" placeholder="Name" value="frontend" class="subnet-name">
+                                <input type="text" placeholder="CIDR" value="10.0.1.0/24" class="subnet-cidr">
+                                <button class="btn btn-danger btn-small" onclick="removeSubnet(this)">Remove</button>
+                            </div>
+                            <div class="subnet-item">
+                                <input type="text" placeholder="Name" value="backend" class="subnet-name">
+                                <input type="text" placeholder="CIDR" value="10.0.2.0/24" class="subnet-cidr">
+                                <button class="btn btn-danger btn-small" onclick="removeSubnet(this)">Remove</button>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="addSubnet('azure')" style="margin-top: 10px;">+ Add Subnet</button>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="azure-ddos">
+                        <label for="azure-ddos">Enable DDoS Protection</label>
+                    </div>
+                </div>
+
+                <div id="gcp-form" class="provider-form hidden">
+                    <div class="form-group">
+                        <label>VPC Name</label>
+                        <input type="text" id="gcp-vpc-name" value="main-vpc" placeholder="e.g., main-vpc">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Project ID</label>
+                        <input type="text" id="gcp-project" value="my-project-id" placeholder="e.g., my-project-id">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Routing Mode</label>
+                        <select id="gcp-routing-mode">
+                            <option value="REGIONAL">Regional</option>
+                            <option value="GLOBAL">Global</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Subnets <span class="info-badge">Region-based</span></label>
+                        <div class="subnet-list" id="gcp-subnets">
+                            <div class="subnet-item" style="grid-template-columns: 1fr 1fr 1fr auto;">
+                                <input type="text" placeholder="Name" value="subnet-us-central" class="subnet-name">
+                                <input type="text" placeholder="CIDR" value="10.0.1.0/24" class="subnet-cidr">
+                                <select class="subnet-region">
+                                    <option value="us-central1">us-central1</option>
+                                    <option value="us-east1">us-east1</option>
+                                    <option value="europe-west1">europe-west1</option>
+                                    <option value="asia-southeast1">asia-southeast1</option>
+                                </select>
+                                <button class="btn btn-danger btn-small" onclick="removeSubnet(this)">Remove</button>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary btn-small" onclick="addSubnet('gcp')" style="margin-top: 10px;">+ Add Subnet</button>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="gcp-private-access" checked>
+                        <label for="gcp-private-access">Enable Private Google Access</label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="gcp-flow-logs">
+                        <label for="gcp-flow-logs">Enable Flow Logs</label>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="generateTerraform()">🚀 Generate Terraform</button>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="code-header">
+                    <h3>Generated Terraform Code</h3>
+                </div>
+                <div class="code-tabs">
+                    <button class="code-tab active" data-file="main">main.tf</button>
+                    <button class="code-tab" data-file="variables">variables.tf</button>
+                    <button class="code-tab" data-file="outputs">outputs.tf</button>
+                    <button class="code-tab" data-file="backend">backend.tf</button>
+                </div>
+                <button class="copy-btn" onclick="copyCode()">📋 Copy</button>
+                <pre><code id="code-output" class="language-hcl"># Click "Generate Terraform" to see your infrastructure code here
+
+# Your Terraform configuration will include:
+# - VPC/VNET resources
+# - Subnets (public/private)
+# - Internet Gateway
+# - NAT Gateway (optional)
+# - Route Tables
+# - Security best practices
+
+# Ready to build cloud infrastructure? 🚀</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentProvider = 'aws';
+        let currentFile = 'main';
+        let generatedCode = {
+            main: '',
+            variables: '',
+            outputs: '',
+            backend: ''
+        };
+
+        // Provider tab switching
+        document.querySelectorAll('.provider-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.provider-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                currentProvider = this.dataset.provider;
+                
+                document.querySelectorAll('.provider-form').forEach(form => form.classList.add('hidden'));
+                document.getElementById(`${currentProvider}-form`).classList.remove('hidden');
+            });
+        });
+
+        // Code tab switching
+        document.querySelectorAll('.code-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                currentFile = this.dataset.file;
+                updateCodeDisplay();
+            });
+        });
+
+        function addSubnet(provider) {
+            const subnetList = document.getElementById(`${provider}-subnets`);
+            const newSubnet = document.createElement('div');
+            
+            if (provider === 'gcp') {
+                newSubnet.className = 'subnet-item';
+                newSubnet.style.gridTemplateColumns = '1fr 1fr 1fr auto';
+                newSubnet.innerHTML = `
+                    <input type="text" placeholder="Name" value="subnet-new" class="subnet-name">
+                    <input type="text" placeholder="CIDR" value="10.0.X.0/24" class="subnet-cidr">
+                    <select class="subnet-region">
+                        <option value="us-central1">us-central1</option>
+                        <option value="us-east1">us-east1</option>
+                        <option value="europe-west1">europe-west1</option>
+                        <option value="asia-southeast1">asia-southeast1</option>
+                    </select>
+                    <button class="btn btn-danger btn-small" onclick="removeSubnet(this)">Remove</button>
+                `;
+            } else if (provider === 'aws') {
+                newSubnet.className = 'subnet-item';
+                newSubnet.innerHTML = `
+                    <input type="text" placeholder="Name" value="subnet-new" class="subnet-name">
+                    <input type="text" placeholder="CIDR" value="10.0.X.0/24" class="subnet-cidr">
+                    <select class="subnet-type">
+                        <option value="public">Public</option>
+                        <option value="private">Private</option>
+                    </select>
+                    <button class="btn btn-danger btn-small" onclick="removeSubnet(this)">Remove</button>
+                `;
+            } else {
+                newSubnet.className = 'subnet-item';
+                newSubnet.innerHTML = `
+                    <input type="text" placeholder="Name" value="subnet-new" class="subnet-name">
+                    <input type="text" placeholder="CIDR" value="10.0.X.0/24" class="subnet-cidr">
+                    <button class="btn btn-danger btn-small" onclick="removeSubnet(this)">Remove</button>
+                `;
+            }
+            
+            subnetList.appendChild(newSubnet);
+        }
+
+        function removeSubnet(button) {
+            button.parentElement.remove();
+        }
+
+        function generateTerraform() {
+            if (currentProvider === 'aws') {
+                generateAWS();
+            } else if (currentProvider === 'azure') {
+                generateAzure();
+            } else if (currentProvider === 'gcp') {
+                generateGCP();
+            }
+            
+            currentFile = 'main';
+            document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('active'));
+            document.querySelector('.code-tab[data-file="main"]').classList.add('active');
+            updateCodeDisplay();
+        }
+
+        function generateAWS() {
+            const vpcName = document.getElementById('aws-vpc-name').value;
+            const vpcCidr = document.getElementById('aws-vpc-cidr').value;
+            const region = document.getElementById('aws-region').value;
+            const dnsHostnames = document.getElementById('aws-dns-hostnames').checked;
+            const dnsSupport = document.getElementById('aws-dns-support').checked;
+            const natGateway = document.getElementById('aws-nat-gateway').checked;
+            const flowLogs = document.getElementById('aws-flow-logs').checked;
+
+            const subnets = Array.from(document.querySelectorAll('#aws-subnets .subnet-item')).map(item => ({
+                name: item.querySelector('.subnet-name').value,
+                cidr: item.querySelector('.subnet-cidr').value,
+                type: item.querySelector('.subnet-type').value
+            }));
+
+            const publicSubnets = subnets.filter(s => s.type === 'public');
+            const privateSubnets = subnets.filter(s => s.type === 'private');
+
+            // Main.tf
+            generatedCode.main = `# AWS VPC Configuration
+# Generated by DevOps Tools - https://bala-murugan-s.github.io
+
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = var.aws_region
+}
+
+# VPC
+resource "aws_vpc" "main" {
+  cidr_block           = var.vpc_cidr
+  enable_dns_hostnames = ${dnsHostnames}
+  enable_dns_support   = ${dnsSupport}
+
+  tags = {
+    Name        = var.vpc_name
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
+
+# Internet Gateway
+resource "aws_internet_gateway" "main" {
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name        = "\${var.vpc_name}-igw"
+    Environment = var.environment
+  }
+}
+
+${publicSubnets.map((subnet, idx) => `
+# Public Subnet ${idx + 1}
+resource "aws_subnet" "public_${idx + 1}" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "${subnet.cidr}"
+  map_public_ip_on_launch = true
+  availability_zone       = data.aws_availability_zones.available.names[${idx % 2}]
+
+  tags = {
+    Name        = "\${var.vpc_name}-${subnet.name}"
+    Type        = "Public"
+    Environment = var.environment
+  }
+}`).join('\n')}
+
+${privateSubnets.map((subnet, idx) => `
+# Private Subnet ${idx + 1}
+resource "aws_subnet" "private_${idx + 1}" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "${subnet.cidr}"
+  availability_zone = data.aws_availability_zones.available.names[${idx % 2}]
+
+  tags = {
+    Name        = "\${var.vpc_name}-${subnet.name}"
+    Type        = "Private"
+    Environment = var.environment
+  }
+}`).join('\n')}
+
+${natGateway && privateSubnets.length > 0 ? `
+# Elastic IP for NAT Gateway
+resource "aws_eip" "nat" {
+  domain = "vpc"
+
+  tags = {
+    Name        = "\${var.vpc_name}-nat-eip"
+    Environment = var.environment
+  }
+}
+
+# NAT Gateway
+resource "aws_nat_gateway" "main" {
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.public_1.id
+
+  tags = {
+    Name        = "\${var.vpc_name}-nat"
+    Environment = var.environment
+  }
+
+  depends_on = [aws_internet_gateway.main]
+}
+` : ''}
+
+# Public Route Table
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.main.id
+  }
+
+  tags = {
+    Name        = "\${var.vpc_name}-public-rt"
+    Environment = var.environment
+  }
+}
+
+${publicSubnets.map((_, idx) => `
+# Public Subnet Route Table Association ${idx + 1}
+resource "aws_route_table_association" "public_${idx + 1}" {
+  subnet_id      = aws_subnet.public_${idx + 1}.id
+  route_table_id = aws_route_table.public.id
+}`).join('\n')}
+
+${privateSubnets.length > 0 ? `
+# Private Route Table
+resource "aws_route_table" "private" {
+  vpc_id = aws_vpc.main.id
+
+${natGateway ? `  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.main.id
+  }
+` : ''}
+  tags = {
+    Name        = "\${var.vpc_name}-private-rt"
+    Environment = var.environment
+  }
+}
+
+${privateSubnets.map((_, idx) => `
+# Private Subnet Route Table Association ${idx + 1}
+resource "aws_route_table_association" "private_${idx + 1}" {
+  subnet_id      = aws_subnet.private_${idx + 1}.id
+  route_table_id = aws_route_table.private.id
+}`).join('\n')}
+` : ''}
+
+${flowLogs ? `
+# VPC Flow Logs
+resource "aws_flow_log" "main" {
+  vpc_id          = aws_vpc.main.id
+  traffic_type    = "ALL"
+  iam_role_arn    = aws_iam_role.flow_logs.arn
+  log_destination = aws_cloudwatch_log_group.flow_logs.arn
+
+  tags = {
+    Name        = "\${var.vpc_name}-flow-logs"
+    Environment = var.environment
+  }
+}
+
+resource "aws_cloudwatch_log_group" "flow_logs" {
+  name              = "/aws/vpc/\${var.vpc_name}"
+  retention_in_days = 7
+
+  tags = {
+    Name        = "\${var.vpc_name}-flow-logs"
+    Environment = var.environment
+  }
+}
+
+resource "aws_iam_role" "flow_logs" {
+  name = "\${var.vpc_name}-flow-logs-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Principal = {
+        Service = "vpc-flow-logs.amazonaws.com"
+      }
+      Action = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "flow_logs" {
+  name = "\${var.vpc_name}-flow-logs-policy"
+  role = aws_iam_role.flow_logs.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect = "Allow"
+      Action = [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams"
+      ]
+      Resource = "*"
+    }]
+  })
+}
+` : ''}
+
+# Data source for availability zones
+data "aws_availability_zones" "available" {
+  state = "available"
+}`;
+
+            // Variables.tf
+            generatedCode.variables = `# Variables for AWS VPC Configuration
+
+variable "aws_region" {
+  description = "AWS region for resources"
+  type        = string
+  default     = "${region}"
+}
+
+variable "vpc_name" {
+  description = "Name of the VPC"
+  type        = string
+  default     = "${vpcName}"
+}
+
+variable "vpc_cidr" {
+  description = "CIDR block for VPC"
+  type        = string
+  default     = "${vpcCidr}"
+}
+
+variable "environment" {
+  description = "Environment name"
+  type        = string
+  default     = "production"
+}`;
+
+            // Outputs.tf
+            generatedCode.outputs = `# Outputs for AWS VPC Configuration
+
+output "vpc_id" {
+  description = "ID of the VPC"
+  value       = aws_vpc.main.id
+}
+
+output "vpc_cidr" {
+  description = "CIDR block of the VPC"
+  value       = aws_vpc.main.cidr_block
+}
+
+output "internet_gateway_id" {
+  description = "ID of the Internet Gateway"
+  value       = aws_internet_gateway.main.id
+}
+
+${publicSubnets.map((subnet, idx) => `
+output "public_subnet_${idx + 1}_id" {
+  description = "ID of public subnet ${idx + 1}"
+  value       = aws_subnet.public_${idx + 1}.id
+}`).join('\n')}
+
+${privateSubnets.map((subnet, idx) => `
+output "private_subnet_${idx + 1}_id" {
+  description = "ID of private subnet ${idx + 1}"
+  value       = aws_subnet.private_${idx + 1}.id
+}`).join('\n')}
+
+${natGateway && privateSubnets.length > 0 ? `
+output "nat_gateway_id" {
+  description = "ID of the NAT Gateway"
+  value       = aws_nat_gateway.main.id
+}
+
+output "nat_gateway_ip" {
+  description = "Elastic IP of the NAT Gateway"
+  value       = aws_eip.nat.public_ip
+}` : ''}`;
+
+            // Backend.tf
+            generatedCode.backend = `# Backend Configuration for Terraform State
+# Uncomment and configure for remote state storage
+
+# terraform {
+#   backend "s3" {
+#     bucket         = "my-terraform-state-bucket"
+#     key            = "vpc/${vpcName}/terraform.tfstate"
+#     region         = "${region}"
+#     encrypt        = true
+#     dynamodb_table = "terraform-state-lock"
+#   }
+# }
+
+# To use this backend:
+# 1. Create an S3 bucket for state storage
+# 2. Create a DynamoDB table for state locking
+# 3. Uncomment the backend block above
+# 4. Run: terraform init -reconfigure`;
+        }
+
+        function generateAzure() {
+            const rgName = document.getElementById('azure-rg-name').value;
+            const vnetName = document.getElementById('azure-vnet-name').value;
+            const vnetCidr = document.getElementById('azure-vnet-cidr').value;
+            const region = document.getElementById('azure-region').value;
+            const ddos = document.getElementById('azure-ddos').checked;
+
+            const subnets = Array.from(document.querySelectorAll('#azure-subnets .subnet-item')).map(item => ({
+                name: item.querySelector('.subnet-name').value,
+                cidr: item.querySelector('.subnet-cidr').value
+            }));
+
+            // Main.tf
+            generatedCode.main = `# Azure VNET Configuration
+# Generated by DevOps Tools - https://bala-murugan-s.github.io
+
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 3.0"
+    }
+  }
+}
+
+provider "azurerm" {
+  features {}
+}
+
+# Resource Group
+resource "azurerm_resource_group" "main" {
+  name     = var.resource_group_name
+  location = var.azure_region
+
+  tags = {
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
+
+# Virtual Network
+resource "azurerm_virtual_network" "main" {
+  name                = var.vnet_name
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+  address_space       = [var.vnet_address_space]
+
+${ddos ? `  ddos_protection_plan {
+    enable = true
+  }
+` : ''}
+  tags = {
+    Environment = var.environment
+    ManagedBy   = "Terraform"
+  }
+}
+
+${subnets.map((subnet, idx) => `
+# Subnet: ${subnet.name}
+resource "azurerm_subnet" "subnet_${idx + 1}" {
+  name                 = "${subnet.name}"
+  resource_group_name  = azurerm_resource_group.main.name
+  virtual_network_name = azurerm_virtual_network.main.name
+  address_prefixes     = ["${subnet.cidr}"]
+}
+
+# Network Security Group for ${subnet.name}
+resource "azurerm_network_security_group" "nsg_${idx + 1}" {
+  name                = "\${var.vnet_name}-${subnet.name}-nsg"
+  location            = azurerm_resource_group.main.location
+  resource_group_name = azurerm_resource_group.main.name
+
+  tags = {
+    Environment = var.environment
+    Subnet      = "${subnet.name}"
+  }
+}
+
+# Associate NSG with Subnet
+resource "azurerm_subnet_network_security_group_association" "nsg_assoc_${idx + 1}" {
+  subnet_id                 = azurerm_subnet.subnet_${idx + 1}.id
+  network_security_group_id = azurerm_network_security_group.nsg_${idx + 1}.id
+}`).join('\n')}`;
+
+            // Variables.tf
+            generatedCode.variables = `# Variables for Azure VNET Configuration
+
+variable "resource_group_name" {
+  description = "Name of the resource group"
+  type        = string
+  default     = "${rgName}"
+}
+
+variable "vnet_name" {
+  description = "Name of the virtual network"
+  type        = string
+  default     = "${vnetName}"
+}
+
+variable "vnet_address_space" {
+  description = "Address space for VNET"
+  type        = string
+  default     = "${vnetCidr}"
+}
+
+variable "azure_region" {
+  description = "Azure region for resources"
+  type        = string
+  default     = "${region}"
+}
+
+variable "environment" {
+  description = "Environment name"
+  type        = string
+  default     = "production"
+}`;
+
+            // Outputs.tf
+            generatedCode.outputs = `# Outputs for Azure VNET Configuration
+
+output "resource_group_name" {
+  description = "Name of the resource group"
+  value       = azurerm_resource_group.main.name
+}
+
+output "vnet_id" {
+  description = "ID of the virtual network"
+  value       = azurerm_virtual_network.main.id
+}
+
+output "vnet_name" {
+  description = "Name of the virtual network"
+  value       = azurerm_virtual_network.main.name
+}
+
+output "vnet_address_space" {
+  description = "Address space of the VNET"
+  value       = azurerm_virtual_network.main.address_space
+}
+
+${subnets.map((subnet, idx) => `
+output "subnet_${idx + 1}_id" {
+  description = "ID of subnet ${subnet.name}"
+  value       = azurerm_subnet.subnet_${idx + 1}.id
+}
+
+output "nsg_${idx + 1}_id" {
+  description = "ID of NSG for ${subnet.name}"
+  value       = azurerm_network_security_group.nsg_${idx + 1}.id
+}`).join('\n')}`;
+
+            // Backend.tf
+            generatedCode.backend = `# Backend Configuration for Terraform State
+# Uncomment and configure for remote state storage
+
+# terraform {
+#   backend "azurerm" {
+#     resource_group_name  = "terraform-state-rg"
+#     storage_account_name = "tfstatestorage"
+#     container_name       = "tfstate"
+#     key                  = "vnet/${vnetName}/terraform.tfstate"
+#   }
+# }
+
+# To use this backend:
+# 1. Create a storage account for state storage
+# 2. Create a container named "tfstate"
+# 3. Uncomment the backend block above
+# 4. Run: terraform init -reconfigure`;
+        }
+
+        function generateGCP() {
+            const vpcName = document.getElementById('gcp-vpc-name').value;
+            const projectId = document.getElementById('gcp-project').value;
+            const routingMode = document.getElementById('gcp-routing-mode').value;
+            const privateAccess = document.getElementById('gcp-private-access').checked;
+            const flowLogs = document.getElementById('gcp-flow-logs').checked;
+
+            const subnets = Array.from(document.querySelectorAll('#gcp-subnets .subnet-item')).map(item => ({
+                name: item.querySelector('.subnet-name').value,
+                cidr: item.querySelector('.subnet-cidr').value,
+                region: item.querySelector('.subnet-region').value
+            }));
+
+            // Main.tf
+            generatedCode.main = `# GCP VPC Configuration
+# Generated by DevOps Tools - https://bala-murugan-s.github.io
+
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "google" {
+  project = var.project_id
+  region  = var.default_region
+}
+
+# VPC Network
+resource "google_compute_network" "main" {
+  name                    = var.vpc_name
+  auto_create_subnetworks = false
+  routing_mode            = "${routingMode}"
+
+  description = "VPC created by Terraform"
+}
+
+${subnets.map((subnet, idx) => `
+# Subnet: ${subnet.name}
+resource "google_compute_subnetwork" "subnet_${idx + 1}" {
+  name          = "${subnet.name}"
+  ip_cidr_range = "${subnet.cidr}"
+  region        = "${subnet.region}"
+  network       = google_compute_network.main.id
+
+  private_ip_google_access = ${privateAccess}
+
+${flowLogs ? `  log_config {
+    aggregation_interval = "INTERVAL_5_SEC"
+    flow_sampling        = 0.5
+    metadata            = "INCLUDE_ALL_METADATA"
+  }
+` : ''}
+  description = "Subnet ${subnet.name} in ${subnet.region}"
+}`).join('\n')}
+
+# Cloud Router for NAT (optional but recommended)
+${subnets.length > 0 ? `
+resource "google_compute_router" "router" {
+  name    = "\${var.vpc_name}-router"
+  region  = "${subnets[0].region}"
+  network = google_compute_network.main.id
+}
+
+# Cloud NAT for private instances
+resource "google_compute_router_nat" "nat" {
+  name                               = "\${var.vpc_name}-nat"
+  router                             = google_compute_router.router.name
+  region                             = google_compute_router.router.region
+  nat_ip_allocate_option             = "AUTO_ONLY"
+  source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
+
+  log_config {
+    enable = true
+    filter = "ERRORS_ONLY"
+  }
+}
+` : ''}
+
+# Firewall Rule - Allow internal communication
+resource "google_compute_firewall" "allow_internal" {
+  name    = "\${var.vpc_name}-allow-internal"
+  network = google_compute_network.main.name
+
+  allow {
+    protocol = "tcp"
+    ports    = ["0-65535"]
+  }
+
+  allow {
+    protocol = "udp"
+    ports    = ["0-65535"]
+  }
+
+  allow {
+    protocol = "icmp"
+  }
+
+  source_ranges = [${subnets.map(s => `"${s.cidr}"`).join(', ')}]
+
+  description = "Allow internal traffic between subnets"
+}
+
+# Firewall Rule - Allow SSH from IAP
+resource "google_compute_firewall" "allow_iap_ssh" {
+  name    = "\${var.vpc_name}-allow-iap-ssh"
+  network = google_compute_network.main.name
+
+  allow {
+    protocol = "tcp"
+    ports    = ["22"]
+  }
+
+  source_ranges = ["35.235.240.0/20"]
+
+  description = "Allow SSH from Identity-Aware Proxy"
+}`;
+
+            // Variables.tf
+            generatedCode.variables = `# Variables for GCP VPC Configuration
+
+variable "project_id" {
+  description = "GCP Project ID"
+  type        = string
+  default     = "${projectId}"
+}
+
+variable "vpc_name" {
+  description = "Name of the VPC network"
+  type        = string
+  default     = "${vpcName}"
+}
+
+variable "default_region" {
+  description = "Default GCP region"
+  type        = string
+  default     = "${subnets[0]?.region || 'us-central1'}"
+}
+
+variable "environment" {
+  description = "Environment name"
+  type        = string
+  default     = "production"
+}`;
+
+            // Outputs.tf
+            generatedCode.outputs = `# Outputs for GCP VPC Configuration
+
+output "vpc_id" {
+  description = "ID of the VPC network"
+  value       = google_compute_network.main.id
+}
+
+output "vpc_name" {
+  description = "Name of the VPC network"
+  value       = google_compute_network.main.name
+}
+
+output "vpc_self_link" {
+  description = "Self link of the VPC network"
+  value       = google_compute_network.main.self_link
+}
+
+${subnets.map((subnet, idx) => `
+output "subnet_${idx + 1}_id" {
+  description = "ID of subnet ${subnet.name}"
+  value       = google_compute_subnetwork.subnet_${idx + 1}.id
+}
+
+output "subnet_${idx + 1}_cidr" {
+  description = "CIDR of subnet ${subnet.name}"
+  value       = google_compute_subnetwork.subnet_${idx + 1}.ip_cidr_range
+}`).join('\n')}`;
+
+            // Backend.tf
+            generatedCode.backend = `# Backend Configuration for Terraform State
+# Uncomment and configure for remote state storage
+
+# terraform {
+#   backend "gcs" {
+#     bucket = "my-terraform-state-bucket"
+#     prefix = "vpc/${vpcName}"
+#   }
+# }
+
+# To use this backend:
+# 1. Create a GCS bucket for state storage
+# 2. Enable versioning on the bucket
+# 3. Uncomment the backend block above
+# 4. Run: terraform init -reconfigure`;
+        }
+
+        function updateCodeDisplay() {
+            const codeOutput = document.getElementById('code-output');
+            codeOutput.textContent = generatedCode[currentFile] || '# No code generated yet';
+            Prism.highlightElement(codeOutput);
+        }
+
+        function copyCode() {
+            const code = generatedCode[currentFile];
+            navigator.clipboard.writeText(code).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const originalText = btn.textContent;
+                btn.textContent = '✓ Copied!';
+                btn.classList.add('copied');
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // Auto-generate on page load
+        window.addEventListener('load', () => {
+            generateTerraform();
+        });
+    </script>
+
+  <!-- Add New Tool Info -->
+        <div class="mt-16 bg-gradient-to-r from-orange-600 to-green-600 text-white rounded-xl p-8 text-center">
+            <h2 class="text-2xl font-bold mb-4">More Devops Tools Coming Soon!</h2>
+            <p class="text-lg mb-6">I'm constantly adding new tools and utilities. Check back regularly for updates.</p>
+            <div class="flex justify-center gap-4">
+                <a href="https://github.com/bala-murugan-s" target="_blank" class="bg-white text-orange-600 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition">
+                    View on GitHub
+                </a>
+                <a href="mailto:s-balamurugan@zohomail.in" class="bg-orange-800 text-white px-6 py-3 rounded-lg font-semibold hover:bg-orange-900 transition">
+                    Suggest a Tool
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8 mt-16">
+        <div class="container mx-auto px-4 text-center">
+            <p class="mb-2">© 2025 Balamurugan Sivaraman - Security Tools</p>
+            <p class="text-gray-400 text-sm">Cloud & Network Security Specialist | 14+ Years Experience</p>
+        </div>
+    </footer>
+</body>
+</html>
+</body>
+</html>

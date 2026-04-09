@@ -1,0 +1,3 @@
+{
+    "output": "PAN-OS 10.2.5\nHostname: PA-VM-01\nModel: PA-VM\nSerial: 007200000001\nUptime: 45 days, 6 hours, 32 minutes\nCPU Load: 45%\nMemory Usage: 62%\nSession Count: 12453\nActive Policies: 156\nTotal Rules: 203\nHA Status: Active-Passive\nSync Status: In-Sync"
+}

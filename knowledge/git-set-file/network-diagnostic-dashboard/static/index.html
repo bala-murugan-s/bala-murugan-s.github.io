@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NetDiagnostic Pro | Network Troubleshooting Suite</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon">🔧</div>
+                <div>
+                    <span class="logo-text">NetDiagnostic Pro</span>
+                    <span class="logo-badge">Enterprise</span>
+                </div>
+            </div>
+            <div class="status">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span class="status-text" id="statusText">Connected</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="nav-container">
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-tab="dashboard">📊 Dashboard</button>
+                <button class="nav-tab" data-tab="connectivity">🌐 Connectivity</button>
+                <button class="nav-tab" data-tab="traceroute">🗺️ Traceroute</button>
+                <button class="nav-tab" data-tab="ssl">🔒 SSL Analyzer</button>
+                <button class="nav-tab" data-tab="portscan">🔌 Port Scanner</button>
+                <button class="nav-tab" data-tab="networkscan">📡 Network Scan</button>
+                <button class="nav-tab" data-tab="interfaces">🖥️ Interfaces</button>
+                <button class="nav-tab" data-tab="bulk">📊 Bulk Tools</button>
+            </div>
+        </div>
+
+        <main class="main-content">
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-pane active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="statLatency">--</div>
+                        <div class="stat-label">Avg Latency (ms)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statPacketLoss">--</div>
+                        <div class="stat-label">Packet Loss (%)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statOpenPorts">--</div>
+                        <div class="stat-label">Open Ports</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="statLiveHosts">--</div>
+                        <div class="stat-label">Live Hosts</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>System Health Check</h2>
+                        <button class="btn-secondary" onclick="runFullDiagnostic()">Run Full Diagnostic</button>
+                    </div>
+                    <div class="card-body">
+                        <div id="diagnosticResult"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Quick Actions</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="btn-group">
+                            <button class="btn-primary" onclick="quickPing()">Ping Google</button>
+                            <button class="btn-primary" onclick="quickDNS()">DNS Lookup</button>
+                            <button class="btn-primary" onclick="quickTraceroute()">Trace to Google</button>
+                            <button class="btn-primary" onclick="quickSSL()">Check Google SSL</button>
+                            <button class="btn-primary" onclick="quickPortScan()">Scan Common Ports</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Connectivity Tab (Ping & DNS) -->
+            <div id="connectivity" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>ICMP Ping Test</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Target Hostname or IP</label>
+                            <div class="input-group">
+                                <input type="text" id="pingHost" placeholder="google.com" value="google.com">
+                                <input type="number" id="pingCount" placeholder="Count" value="4" min="1" max="10"
+                                    style="width: 100px;">
+                                <button class="btn-primary" onclick="runPing()">Execute Ping</button>
+                            </div>
+                        </div>
+                        <div id="pingResult"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>DNS Record Lookup</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Domain Name</label>
+                            <div class="input-group">
+                                <input type="text" id="dnsDomain" placeholder="example.com" value="google.com">
+                                <button class="btn-primary" onclick="runDNS()">Lookup Records</button>
+                            </div>
+                        </div>
+                        <div id="dnsResult"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Traceroute Tab -->
+            <div id="traceroute" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Route Tracing (Traceroute)</h2>
+                        <span class="badge badge-info">Shows network path to destination</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Destination Host</label>
+                            <div class="input-group">
+                                <input type="text" id="traceHost" placeholder="google.com" value="google.com">
+                                <input type="number" id="maxHops" placeholder="Max Hops" value="30" min="1" max="60"
+                                    style="width: 120px;">
+                                <button class="btn-primary" onclick="runTraceroute()">Trace Route</button>
+                                <button class="btn-secondary" onclick="clearResult('traceResult')">Clear</button>
+                            </div>
+                        </div>
+                        <div id="traceResult"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SSL Analyzer Tab -->
+            <div id="ssl" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>SSL/TLS Certificate Analyzer</h2>
+                        <span class="badge badge-info">Security & Certificate Details</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Hostname</label>
+                            <div class="input-group">
+                                <input type="text" id="sslHost" placeholder="google.com" value="google.com">
+                                <input type="number" id="sslPort" placeholder="Port" value="443" min="1" max="65535"
+                                    style="width: 100px;">
+                                <button class="btn-primary" onclick="runSSL()">Analyze Certificate</button>
+                                <button class="btn-secondary" onclick="clearResult('sslResult')">Clear</button>
+                            </div>
+                        </div>
+                        <div id="sslResult"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Port Scanner Tab -->
+            <div id="portscan" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>TCP Port Scanner</h2>
+                        <span class="badge badge-warning">Multi-threaded scanning</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Target Host</label>
+                            <input type="text" id="scanHost" placeholder="localhost or 192.168.1.1" value="localhost">
+                        </div>
+                        <div class="form-group">
+                            <label>Ports (comma-separated, leave empty for common ports)</label>
+                            <input type="text" id="scanPorts" placeholder="22,80,443,3306,5432,8080,8443">
+                        </div>
+                        <div class="form-group">
+                            <label>Timeout (seconds)</label>
+                            <input type="number" id="scanTimeout" value="1" min="1" max="5" style="width: 100px;">
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn-primary" onclick="runPortScan()">Start Scan</button>
+                            <button class="btn-secondary" onclick="clearResult('portResult')">Clear</button>
+                        </div>
+                        <div id="portResult"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Network Scan Tab -->
+            <div id="networkscan" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Network Reachability Scanner</h2>
+                        <span class="badge badge-info">Discovers live hosts on subnet</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Subnet (CIDR notation)</label>
+                            <div class="input-group">
+                                <input type="text" id="subnet" placeholder="192.168.1.0/24" value="192.168.1.0/24">
+                                <button class="btn-primary" onclick="runNetworkScan()">Scan Subnet</button>
+                                <button class="btn-secondary" onclick="clearResult('networkResult')">Clear</button>
+                            </div>
+                        </div>
+                        <div id="networkResult"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- Bulk Tools Tab -->
+            <div id="bulk" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Bulk Ping Test</h2>
+                        <span class="badge badge-info">Ping multiple hosts simultaneously</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Hosts (one per line or comma-separated)</label>
+                            <textarea id="bulkHosts" rows="3" placeholder="google.com
+            github.com
+            cloudflare.com
+            8.8.8.8
+            1.1.1.1" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Ping Count per Host</label>
+                            <input type="number" id="bulkPingCount" value="2" min="1" max="5" style="width: 100px;">
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn-primary" onclick="runBulkPing()">Start Bulk Ping</button>
+                            <button class="btn-secondary" onclick="clearResult('bulkPingResult')">Clear</button>
+                        </div>
+                        <div id="bulkPingResult"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Bulk DNS Resolver</h2>
+                        <span class="badge badge-info">Resolve domains across multiple DNS servers</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Domains (one per line or comma-separated)</label>
+                            <textarea id="bulkDomains" rows="3" placeholder="google.com
+            github.com
+            cloudflare.com
+            amazon.com
+            microsoft.com" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>DNS Servers (leave empty for predefined list)</label>
+                            <textarea id="bulkDNSServers" rows="3" placeholder="8.8.8.8 (Google)
+            1.1.1.1 (Cloudflare)
+            9.9.9.9 (Quad9)
+            208.67.222.222 (OpenDNS)" style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem;"></textarea>
+                            <small style="color: var(--text-muted); margin-top: 4px; display: block;">Format: IP (Name)
+                                or just IP - one per line</small>
+                        </div>
+                        <div class="btn-group">
+                            <button class="btn-primary" onclick="runBulkDNS()">Start Bulk DNS</button>
+                            <button class="btn-secondary" onclick="clearResult('bulkDNSResult')">Clear</button>
+                        </div>
+                        <div id="bulkDNSResult"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- Interfaces Tab -->
+            <div id="interfaces" class="tab-pane">
+                <div class="card">
+                    <div class="card-header">
+                        <h2>Network Interface Information</h2>
+                        <button class="btn-secondary" onclick="loadInterfaces()">Refresh</button>
+                    </div>
+                    <div class="card-body">
+                        <div id="interfacesResult"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

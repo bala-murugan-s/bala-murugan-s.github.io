@@ -1,0 +1,14 @@
+{
+    "cpu": 38.5,
+    "memory": 55.2,
+    "sessions": 8762,
+    "status": "active",
+    "haStatus": "active-active",
+    "alerts": [
+        {
+            "level": "info",
+            "message": "IPS database updated",
+            "time": "2025-04-05T08:00:00Z"
+        }
+    ]
+}

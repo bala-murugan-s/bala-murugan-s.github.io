@@ -1,0 +1,21 @@
+{
+    "hostname": "PA-VM-01",
+    "model": "PA-VM",
+    "serial": "007200000123",
+    "osVersion": "10.2.3",
+    "uptime": "15 days, 4:32:10",
+    "interfaces": [
+        {
+            "name": "ethernet1/1",
+            "ip": "192.168.1.1",
+            "status": "up",
+            "zone": "trust"
+        },
+        {
+            "name": "ethernet1/2",
+            "ip": "203.0.113.1",
+            "status": "up",
+            "zone": "untrust"
+        }
+    ]
+}

@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Nexus Arc | Security & Network Intelligence</title>
+  <!-- Google Fonts + Font Awesome -->
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- GSAP & ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-dark: #05070a;
+      --surface-1: rgba(15, 20, 30, 0.65);
+      --surface-2: rgba(25, 32, 45, 0.75);
+      --glass-border: rgba(255, 255, 255, 0.08);
+      --glass-border-light: rgba(255, 255, 255, 0.12);
+      --text-primary: #ffffff;
+      --text-secondary: #a8b3cf;
+      --text-muted: #6c7a92;
+      --glow-blue: rgba(0, 212, 255, 0.3);
+      --accent-cyan: #00d4ff;
+      --accent-red: #ff4757;
+      --accent-orange: #ff6b35;
+      --accent-yellow: #f5a623;
+      --accent-purple: #a855f7;
+      --accent-green: #00e896;
+      --accent-teal: #1de9b6;
+      --accent-lime: #82e000;
+      --accent-lavender: #c084fc;
+      --card-radius: 28px;
+    }
+
+    body.light {
+      --bg-dark: #f0f2f8;
+      --surface-1: rgba(255, 255, 255, 0.75);
+      --surface-2: rgba(255, 255, 255, 0.85);
+      --glass-border: rgba(0, 0, 0, 0.06);
+      --glass-border-light: rgba(0, 0, 0, 0.1);
+      --text-primary: #0a0f1a;
+      --text-secondary: #2c3e50;
+      --text-muted: #5a6e8a;
+    }
+
+    body {
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      font-family: 'Space Grotesk', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Animated gradient background */
+    .bg-aura {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      background: radial-gradient(circle at 20% 30%, rgba(0,212,255,0.08) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 70%, rgba(168,85,247,0.08) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    body.light .bg-aura {
+      opacity: 0.4;
+    }
+
+    /* Glass nav & toggle */
+    .glass-nav {
+      position: fixed;
+      top: 24px;
+      right: 32px;
+      z-index: 200;
+      backdrop-filter: blur(16px);
+      background: var(--surface-1);
+      border: 1px solid var(--glass-border);
+      border-radius: 60px;
+      padding: 8px 20px;
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+    .theme-switch {
+      cursor: pointer;
+      font-size: 1.2rem;
+      background: rgba(255,255,255,0.1);
+      padding: 8px 12px;
+      border-radius: 40px;
+      transition: 0.3s;
+      display: flex;
+      gap: 12px;
+    }
+    .theme-switch i {
+      pointer-events: none;
+    }
+
+    /* main container */
+    .main-wrapper {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 100px 48px 120px;
+    }
+
+    /* Hero kinetic */
+    .hero {
+      margin-bottom: 80px;
+    }
+    .hero-badge {
+      display: inline-block;
+      font-size: 0.7rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      background: rgba(0,212,255,0.12);
+      padding: 6px 14px;
+      border-radius: 40px;
+      color: var(--accent-cyan);
+      margin-bottom: 24px;
+      border: 1px solid rgba(0,212,255,0.2);
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .hero h1 {
+      font-size: clamp(3rem, 8vw, 5.2rem);
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fff 0%, #a8b3cf 100%);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      margin-bottom: 24px;
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    body.light .hero h1 {
+      background: linear-gradient(135deg, #0a0f1a, #2c3e50);
+      background-clip: text;
+      -webkit-background-clip: text;
+    }
+    .hero-desc {
+      font-size: 1.2rem;
+      color: var(--text-secondary);
+      max-width: 620px;
+      margin-bottom: 40px;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .stats-row {
+      display: flex;
+      gap: 48px;
+      flex-wrap: wrap;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    .stat-block {
+      text-align: left;
+    }
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* Glass card grid - premium */
+    .cat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 28px;
+      margin-top: 30px;
+    }
+    .cat-card {
+      background: var(--surface-1);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--card-radius);
+      transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(40px);
+      position: relative;
+      overflow: hidden;
+    }
+    .cat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--tc, var(--accent-cyan));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .cat-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--tc, rgba(255,255,255,0.3));
+      box-shadow: 0 25px 40px -12px rgba(0,0,0,0.4);
+    }
+    .cat-card:hover::before {
+      opacity: 1;
+    }
+    .cc-inner {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .cc-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .cc-ico {
+      font-size: 2rem;
+      width: 56px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--glass-border-light);
+    }
+    .cc-badge {
+      font-size: 0.7rem;
+      font-weight: 600;
+      background: rgba(0,232,150,0.2);
+      padding: 6px 14px;
+      border-radius: 30px;
+      color: #00e896;
+      backdrop-filter: blur(4px);
+    }
+    .cc-badge.build {
+      background: rgba(255,180,40,0.2);
+      color: #ffb428;
+    }
+    .cc-name {
+      font-size: 1.5rem;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    .cc-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.45;
+    }
+    .cc-vendors {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 4px 0;
+    }
+    .cv {
+      background: rgba(255,255,255,0.05);
+      padding: 5px 12px;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+    }
+    .cc-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      padding-top: 16px;
+      border-top: 1px solid var(--glass-border);
+    }
+    .cc-stat {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    .cc-arr {
+      background: rgba(255,255,255,0.05);
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+    .cat-card:hover .cc-arr {
+      background: var(--tc, rgba(0,212,255,0.2));
+      transform: translateX(4px);
+    }
+
+    /* Detail panels - redesigned premium */
+    .detail-panel {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(5,7,10,0.92);
+      backdrop-filter: blur(24px);
+      z-index: 1000;
+      overflow-y: auto;
+      display: none;
+      padding: 60px 48px 100px;
+    }
+    body.light .detail-panel {
+      background: rgba(240,242,248,0.95);
+    }
+    .detail-panel.active {
+      display: block;
+      animation: panelReveal 0.5s ease-out;
+    }
+    @keyframes panelReveal {
+      from { opacity: 0; backdrop-filter: blur(0); transform: scale(0.98);}
+      to { opacity: 1; backdrop-filter: blur(24px); transform: scale(1);}
+    }
+    .panel-container {
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      margin-bottom: 40px;
+    }
+    .back-btn {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--glass-border);
+      padding: 12px 28px;
+      border-radius: 40px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: 0.2s;
+      color: var(--text-primary);
+    }
+    .back-btn i { margin-right: 8px; }
+    .back-btn:hover { background: rgba(255,255,255,0.12);}
+    .panel-title-section {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .panel-icon {
+      font-size: 3rem;
+      width: 80px;
+      height: 80px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--glass-border);
+    }
+    .panel-title h2 {
+      font-size: 2.8rem;
+      font-weight: 700;
+    }
+    .panel-sub {
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+    .tools-grid-detail {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 28px;
+      margin: 48px 0;
+    }
+    .tool-card-detail {
+      background: var(--surface-2);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 24px;
+      transition: all 0.25s;
+      display: flex;
+      flex-direction: column;
+    }
+    .tool-name {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+    .tool-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .tool-tag {
+      font-size: 0.7rem;
+      background: rgba(255,255,255,0.06);
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+    .tool-desc {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin: 12px 0 20px;
+      flex: 1;
+    }
+    .tool-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: auto;
+      padding: 10px 0 0;
+      font-weight: 600;
+      text-decoration: none;
+      color: var(--tc, var(--accent-cyan));
+      border-top: 1px solid var(--glass-border);
+      padding-top: 16px;
+      transition: gap 0.2s;
+    }
+    .tool-link i { transition: transform 0.2s; }
+    .tool-link:hover i { transform: translateX(6px); }
+    .coming-soon {
+      opacity: 0.6;
+      cursor: default;
+      color: var(--text-muted);
+    }
+    .full-workspace {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(255,255,255,0.04);
+      padding: 14px 32px;
+      border-radius: 60px;
+      text-decoration: none;
+      color: var(--text-primary);
+      border: 1px solid var(--glass-border);
+      font-weight: 500;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 760px) {
+      .main-wrapper { padding: 80px 24px 80px; }
+      .cat-grid { grid-template-columns: 1fr; }
+      .detail-panel { padding: 40px 24px; }
+      .panel-title h2 { font-size: 1.8rem; }
+    }
+    /* Back to HOME button in the Tools home page*/
+    .back-home-btn {
+    margin-left: 16px;
+    padding: 8px 14px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: var(--text-primary);
+    background: rgba(255,255,255,0.08);
+    backdrop-filter: blur(10px);
+    font-size: 14px;
+    transition: 0.3s;
+    }
+
+    .back-home-btn:hover {
+      background: rgba(255,255,255,0.15);
+    }
+  </style>
+</head>
+<body>
+<div class="bg-aura"></div>
+<div class="glass-nav">
+  <div class="theme-switch" id="themeToggle">
+    <i class="fas fa-sun" style="color: var(--text-primary);"></i>
+    <i class="fas fa-moon" style="color: var(--text-primary);"></i>
+  </div>
+  <a href="/index.html" class="back-home-btn"><i class="fas fa-home"></i> Back To Home</a>
+</div>
+
+<div class="main-wrapper" id="mainApp">
+  <div class="hero">
+    <div class="hero-badge"><i class="fas fa-bolt"></i> KINETIC INTELLIGENCE</div>
+    <h1>AI NEXUS SPHERE | Security & Network<br>Tool Arsenal</h1>
+    <div class="hero-desc">Practitioner-grade utilities built for real enterprise workflows — browser-native, zero data persistence. Motion-led interface.</div>
+    <div class="stats-row">
+      <div class="stat-block"><div class="stat-number">9</div><div class="stat-label">Categories</div></div>
+      <div class="stat-block"><div class="stat-number">35+</div><div class="stat-label">Integrated Tools</div></div>
+      <div class="stat-block"><div class="stat-number">6</div><div class="stat-label">Live Now</div></div>
+    </div>
+  </div>
+
+  <div class="cat-grid" id="catGrid">
+    <!-- Updated categories with correct taxonomy -->
+    <div class="cat-card" data-cat="core" style="--tc:var(--accent-cyan);"><div class="cc-inner"><div class="cc-top"><div class="cc-ico">🌐</div><span class="cc-badge">LIVE</span></div><div class="cc-name">Network & Core Infrastructure</div><div class="cc-desc">Routing, switching CLI references & automation templates for enterprise core.</div><div class="cc-vendors"><span class="cv">Cisco</span><span class="cv">Juniper</span><span class="cv">Arista</span></div><div class="cc-foot"><div class="cc-stat"><i class="fas fa-wrench"></i> 6 tools live</div><div class="cc-arr"><i class="fas fa-arrow-right"></i></div></div></div></div>
+    <div class="cat-card" data-cat="sdwan" style="--tc:var(--accent-green);"><div class="cc-inner"><div class="cc-top"><div class="cc-ico">⚡</div><span class="cc-badge">LIVE</span></div><div class="cc-name">SD-WAN & Edge Connectivity</div><div class="cc-desc">Multi-vendor SD-WAN automation, CLI quick-ref, and troubleshooting guides.</div><div class="cc-vendors"><span class="cv">Cisco vManage</span><span class="cv">Fortinet</span><span class="cv">SilverPeak</span></div><div class="cc-foot"><div class="cc-stat"><i class="fas fa-wrench"></i> 7 tools live</div><div class="cc-arr"><i class="fas fa-arrow-right"></i></div></div></div></div>
+    <div class="cat-card" data-cat="perimeter" style="--tc:var(--accent-orange);"><div class="cc-inner"><div class="cc-top"><div class="cc-ico">🔥</div><span class="cc-badge">LIVE</span></div><div class="cc-name">Perimeter Security & Network Protection</div><div class="cc-desc">CLI references & config helpers for Palo Alto, Fortinet, Cisco firewalls.</div><div class="cc-vendors"><span class="cv">Palo Alto</span><span class="cv">Fortinet</span><span class="cv">Cisco ASA</span></div><div class="cc-foot"><div class="cc-stat"><i class="fas fa-wrench"></i> 4 tools live</div><div class="cc-arr"><i class="fas fa-arrow-right"></i></div></div></div></div>
+    <div class="cat-card" data-cat="appsec" style="--tc:var(--accent-red);"><div class="cc-inner"><div class="cc-top"><div class="cc-ico">🔐</div><span class="cc-badge">LIVE</span></div><div class="cc-name">Application & Offensive Security</div><div class="cc-desc">Password strength, hashing, encoding, OWASP references — browser-side.</div><div class="cc-vendors"><span class="cv">OWASP</span><span class="cv">Hash/Crypto</span><span class="cv">VAPT</span></div><div class="cc-foot"><div class="cc-stat"><i class="fas fa-wrench"></i> 6 tools live</div><div class="cc-arr"><i class="fas fa-arrow-right"></i></div></div></div></div>
+    <div class="cat-card" data-cat="cloud" style="--tc:var(--accent-yellow);"><div class="cc-inner"><div class="cc-top"><div class="cc-ico">☁️</div><span class="cc-badge">LIVE</span></div><div class="cc-name">Cloud & Cloud Security</div><div class="cc-desc">Terraform IaC generators: VPC, NSG baselines, SASE tunnel configs.</div><div class="cc-vendors"><span class="cv">AWS</span><span class="cv">Azure</span><span class="cv">GCP</span><span class="cv">Terraform</span></div><div class="cc-foot"><div class="cc-stat"><i class="fas fa-wrench"></i> 3 tools live</div><div class="cc-arr"><i class="fas fa-arrow-right"></i></div></div></div></div>
+    <div class="cat-card" data-cat="sase" style="--tc:var(--accent-purple);"><div class="cc-inner"><div class="cc-top"><div class="cc-ico">🌍</div><span class="cc-badge">LIVE</span></div><div class="cc-name">SASE & Zero Trust Architecture</div><div class="cc-desc">Policy generators, ZTNA flow builders, CASB mappers for Zscaler & Prisma.</div><div class="cc-vendors"><span class="cv">Zscaler</span><span class="cv">Prisma SASE</span><span class="cv">ZTNA</span></div><div class="cc-foot"><div class="cc-stat"><i class="fas fa-wrench"></i> 2 live · expanding</div><div class="cc-arr"><i class="fas fa-arrow-right"></i></div></div></div></div>
+    <div class="cat-card" data-cat="adelivery" style="--tc:var(--accent-teal);"><div class="cc-inner"><div class="cc-top"><div class="cc-ico">⚖️</div><span class="cc-badge build">BUILDING</span></div><div class="cc-name">Application Delivery & Traffic Engineering</div><div class="cc-desc">F5, Nginx, HAProxy config helpers & health-check templates.</div><div class="cc-vendors"><span class="cv">F5 BIG-IP</span><span class="cv">Nginx</span><span class="cv">HAProxy</span></div><div class="cc-foot"><div class="cc-stat"><i class="fas fa-clock"></i> In development</div><div class="cc-arr"><i class="fas fa-arrow-right"></i></div></div></div></div>
+    <div class="cat-card" data-cat="secops" style="--tc:var(--accent-teal);"><div class="cc-inner"><div class="cc-top"><div class="cc-ico">📊</div><span class="cc-badge build">BUILDING</span></div><div class="cc-name">Security Operations & Threat Management</div><div class="cc-desc">KQL/SPL query helpers, SOAR playbooks, alert correlation.</div><div class="cc-vendors"><span class="cv">Sentinel</span><span class="cv">Splunk</span><span class="cv">QRadar</span></div><div class="cc-foot"><div class="cc-stat"><i class="fas fa-clock"></i> Coming soon</div><div class="cc-arr"><i class="fas fa-arrow-right"></i></div></div></div></div>
+    <div class="cat-card" data-cat="ai" style="--tc:var(--accent-lavender);"><div class="cc-inner"><div class="cc-top"><div class="cc-ico">🤖</div><span class="cc-badge build">BUILDING</span></div><div class="cc-name">AI-Driven Security & Intelligent Automation</div><div class="cc-desc">Prompt libraries, LLM log analysis, AI-assisted config generation.</div><div class="cc-vendors"><span class="cv">GPT-4</span><span class="cv">Claude</span><span class="cv">LangChain</span></div><div class="cc-foot"><div class="cc-stat"><i class="fas fa-clock"></i> In development</div><div class="cc-arr"><i class="fas fa-arrow-right"></i></div></div></div></div>
+  </div>
+</div>
+
+<!-- Dynamic Detail Panels (Modular) -->
+<div id="detailRoot"></div>
+
+<script>
+  // Category data mapping with tools (preserving original URLs)
+  const categoryData = {
+    core: { name: "Network & Core Infrastructure", icon: "🌐", color: "#00d4ff", vendor: "Cisco · Juniper · Arista", desc: "CLI references & automation for core networking.",
+      tools: [
+        { name: "Multi-Vendor CLI Reference", tags: ["Core","CLI"], desc: "Quick commands for Cisco IOS, JunOS, Arista EOS.", url: "./sdwan-tools/cli-reference/", live: true },
+        { name: "Network Automation (Ansible)", tags: ["Automation"], desc: "Playbooks for config backups, BGP templates.", url: "./devops-tools/ansible/sdwan-config/", live: true }
+      ], workspace: "./network-tools/network-index.html" },
+    sdwan: { name: "SD-WAN & Edge Connectivity", icon: "⚡", color: "#00e896", vendor: "Cisco · Fortinet · SilverPeak", desc: "Unified SD-WAN configs & troubleshooting.",
+      tools: [
+        { name: "SD-WAN Multi-Vendor Config", tags: ["Multi-vendor"], desc: "Cross-vendor templates & architecture references.", url: "./sdwan-tools/sdwan-multivendor/", live: true },
+        { name: "Cisco SD-WAN (vManage)", tags: ["vManage"], desc: "vManage templates, control policies.", url: "./sdwan-tools/cisco/", live: true },
+        { name: "Fortinet SD-WAN", tags: ["FortiGate"], desc: "Policy-based routing & SLA probes.", url: "./sdwan-tools/fortinet/", live: true }
+      ], workspace: "./sdwan-tools/sdwan-index.html" },
+    perimeter: { name: "Perimeter Security & Network Protection", icon: "🔥", color: "#ff6b35", vendor: "Palo Alto · Fortinet · Cisco", desc: "Firewall CLI & config patterns.",
+      tools: [
+        { name: "Palo Alto CLI Reference", tags: ["PAN-OS"], desc: "Monitoring, log analysis, HA status.", url: "./firewall-tools/cli/paloalto/cli-paloalto.html", live: true },
+        { name: "Multi-Vendor CLI Generator", tags: ["Multi-vendor"], desc: "Generate CLI snippets across firewall platforms.", url: "./firewall-tools/cli/multi-vendor/cli-multi-vendor.html", live: true }
+      ], workspace: "./firewall-tools/firewall-index.html" },
+    appsec: { name: "Application & Offensive Security", icon: "🔐", color: "#ff4757", vendor: "OWASP · Crypto · VAPT", desc: "Browser-based security utilities.",
+      tools: [
+        { name: "Password Strength Checker", tags: ["Auth"], desc: "Real-time password strength feedback.", url: "./security-tools/security-index.html", live: true },
+        { name: "Hash Generator", tags: ["Crypto"], desc: "MD5, SHA-1, SHA-256 from text/files.", url: "./security-tools/security-index.html", live: true },
+        { name: "Base64 Encoder/Decoder", tags: ["Encoding"], desc: "Encode/decode Base64 strings.", url: "./security-tools/security-index.html", live: true }
+      ], workspace: "./security-tools/security-index.html" },
+    cloud: { name: "Cloud & Cloud Security", icon: "☁️", color: "#f5a623", vendor: "AWS · Azure · GCP", desc: "IaC templates & security baselines.",
+      tools: [
+        { name: "Terraform VPC/VNet Builder", tags: ["Terraform"], desc: "Modular VPC configs for AWS/Azure/GCP.", url: "./devops-tools/terraform/cloud-vpc-vnet/", live: true },
+        { name: "Terraform NSG Generator", tags: ["Security Groups"], desc: "Auto-build NSG modules, deny-by-default.", url: "./devops-tools/terraform/cloud-nsg-gen/", live: true }
+      ], workspace: "./devops-tools/devops-index.html" },
+    sase: { name: "SASE & Zero Trust Architecture", icon: "🌍", color: "#a855f7", vendor: "Zscaler · Prisma", desc: "Policy generators, ZTNA builders.",
+      tools: [
+        { name: "SASE Policy Generator", tags: ["Vendor-agnostic"], desc: "Baseline SASE policies for cloud-delivered security.", url: "./sase-tools/sase-policy-generator/", live: true },
+        { name: "Zscaler Policy Generator", tags: ["ZIA","ZPA"], desc: "Zscaler best-practice policies.", url: "./sase-tools/zscaler-policy-generator/", live: true }
+      ], workspace: "./sase-tools/sase-index.html" },
+    adelivery: { name: "Application Delivery & Traffic Engineering", icon: "⚖️", color: "#1de9b6", vendor: "F5 · Nginx · HAProxy", desc: "Config helpers & health-check templates.",
+      tools: [
+        { name: "F5 BIG-IP Config Helper", tags: ["LTM"], desc: "Virtual server templates & iRules reference.", live: false },
+        { name: "Nginx Config Generator", tags: ["Reverse Proxy"], desc: "Security headers & load balancing.", live: false }
+      ], workspace: "#" },
+    secops: { name: "Security Operations & Threat Management", icon: "📊", color: "#1de9b6", vendor: "Sentinel · Splunk", desc: "Detection rules, KQL/SPL helpers.",
+      tools: [
+        { name: "KQL Detection Builder", tags: ["Sentinel"], desc: "Analytic rules for common threats.", live: false },
+        { name: "SPL Query Helper", tags: ["Splunk"], desc: "Log investigation templates.", live: false }
+      ], workspace: "#" },
+    ai: { name: "AI-Driven Security & Intelligent Automation", icon: "🤖", color: "#c084fc", vendor: "GPT-4 · Claude", desc: "Prompt libraries & AI-assisted analysis.",
+      tools: [
+        { name: "Security Prompt Library", tags: ["LLM"], desc: "Curated prompts for CVE triage, threat model.", live: false },
+        { name: "AI Firewall Config Generator", tags: ["Config Gen"], desc: "Generate vendor-specific configs from plain English.", live: false }
+      ], workspace: "#" }
+  };
+
+  function buildDetailPanel(catId) {
+    const data = categoryData[catId];
+    if(!data) return;
+    const toolsHtml = data.tools.map(t => `
+      <div class="tool-card-detail">
+        <div class="tool-name">${t.name}</div>
+        <div class="tool-tags">${t.tags.map(tg => `<span class="tool-tag">${tg}</span>`).join('')}</div>
+        <div class="tool-desc">${t.desc}</div>
+        ${t.live ? `<a href="${t.url}" target="_blank" class="tool-link" style="--tc:${data.color}"><i class="fas fa-arrow-up-right-from-square"></i> Launch Tool</a>` : `<div class="tool-link coming-soon"><i class="fas fa-clock"></i> Coming Soon</div>`}
+      </div>
+    `).join('');
+    return `
+      <div class="detail-panel" id="panel-${catId}" style="--det-color:${data.color}">
+        <div class="panel-container">
+          <div class="panel-header">
+            <button class="back-btn" onclick="closePanel()"><i class="fas fa-arrow-left"></i> Back to Categories</button>
+          </div>
+          <div class="panel-title-section">
+            <div class="panel-icon">${data.icon}</div>
+            <div class="panel-title">
+              <h2>${data.name}</h2>
+              <div class="panel-sub">${data.vendor}</div>
+            </div>
+          </div>
+          <p style="color: var(--text-secondary); max-width: 700px;">${data.desc}</p>
+          <div class="tools-grid-detail">
+            ${toolsHtml}
+          </div>
+          ${data.workspace && data.workspace !== '#' ? `<a href="${data.workspace}" target="_blank" class="full-workspace"><i class="fas fa-external-link-alt"></i> Open Full Workspace →</a>` : ''}
+        </div>
+      </div>
+    `;
+  }
+
+  function renderPanels() {
+    const container = document.getElementById('detailRoot');
+    if(!container) return;
+    let panelsHtml = '';
+    for(let key in categoryData) {
+      panelsHtml += buildDetailPanel(key);
+    }
+    container.innerHTML = panelsHtml;
+  }
+  renderPanels();
+
+  // open category
+  window.openCategory = function(catId) {
+    const panel = document.getElementById(`panel-${catId}`);
+    if(panel) {
+      document.getElementById('mainApp').style.display = 'none';
+      panel.classList.add('active');
+      window.scrollTo(0,0);
+    }
+  };
+  window.closePanel = function() {
+    document.querySelectorAll('.detail-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('mainApp').style.display = 'block';
+  };
+  // attach click listeners
+  document.querySelectorAll('.cat-card').forEach(card => {
+    const cat = card.getAttribute('data-cat');
+    if(cat) {
+      card.addEventListener('click', () => openCategory(cat));
+    }
+  });
+
+  // GSAP kinetic + scrolltrigger
+  gsap.registerPlugin(ScrollTrigger);
+  gsap.to(".hero-badge", { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" });
+  gsap.to(".hero h1", { opacity: 1, y: 0, duration: 1, delay: 0.2, ease: "power3.out" });
+  gsap.to(".hero-desc", { opacity: 1, y: 0, duration: 0.8, delay: 0.4 });
+  gsap.to(".stats-row", { opacity: 1, y: 0, duration: 0.7, delay: 0.6 });
+  gsap.utils.toArray(".cat-card").forEach((card, i) => {
+    gsap.to(card, {
+      scrollTrigger: { trigger: card, start: "top 88%", toggleActions: "play none none reverse" },
+      opacity: 1, y: 0, duration: 0.65, delay: i * 0.05, ease: "back.out(0.4)"
+    });
+  });
+
+  // Theme toggle
+  const toggle = document.getElementById('themeToggle');
+  toggle.addEventListener('click', () => {
+    document.body.classList.toggle('light');
+    localStorage.setItem('ui_theme', document.body.classList.contains('light') ? 'light' : 'dark');
+  });
+  if(localStorage.getItem('ui_theme') === 'light') document.body.classList.add('light');
+</script>
+</body>
+</html>
